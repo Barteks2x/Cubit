@@ -42,6 +42,7 @@ public class FREEMine {
 	private ChunkGenerator chunkGenerator;
 	private Chunk chunkArray[];
 	private Map<ChunkPosition, Integer> chunkDisplayLists;
+	private int selectionDisplayList;
 	private long seed = 64646;
 	//movement
 	private Timer timer;
@@ -84,7 +85,7 @@ public class FREEMine {
 		this.height = height;
 		this.fov = 60;
 		this.aspectRatio = (float)width / (float)height;
-		zNear = 0.01F;
+		zNear = 0.1F;
 		zFar = 200F;
 		initDisplay();
 		initGL();
@@ -97,13 +98,18 @@ public class FREEMine {
 
 			timer.nextFrame();
 			input(timer.getDelta());
-			renderText();
-			tex.bind();
-			render();
 
+			tex.bind();
+			glLoadIdentity();
+
+			renderChunks();
+
+			renderText();
+			renderSelection();
 
 			//Display.sync(maxFPS);
 			Display.update();
+			errorCheck();
 			if (Display.isCloseRequested()) {
 				isRunning = false;
 			}
@@ -111,15 +117,12 @@ public class FREEMine {
 		onClose(0);
 	}
 
-	private void render() {
-
-		glPushMatrix();
-		glLoadIdentity();
+	private void renderChunks() {
 
 		glRotated(player.getRy(), 1, 0, 0);
 		glRotated(player.getRx(), 0, 1, 0);
-		glTranslated(-player.getX(), -player.getY(), -player.getZ());
-		glPushMatrix();
+		glTranslatef(-player.getX(), -player.getY(), -player.getZ());
+
 		for (int x = minWorldChunkX; x < maxWorldChunkX; ++x) {
 			for (int y = minWorldChunkY; y < maxWorldChunkY; ++y) {
 				for (int z = minWorldChunkZ; z < maxWorldChunkZ; ++z) {
@@ -130,27 +133,37 @@ public class FREEMine {
 				}
 			}
 		}
-		glPopMatrix();
 
 
 	}
 
+	private void renderSelection() {
+		glPushMatrix();
+		//BlockPosition pos = player.getSelectedBlock();
+		//glTranslatef(pos.x, pos.y, pos.z);
+		glCallList(selectionDisplayList);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glPopMatrix();
+	}
+
 	private void renderText() {
+		glPushMatrix();
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrix(orthographicProjMatrix);
 		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
+
 		glLoadIdentity();
 		String x = formatter.format(player.getX());
 		String y = formatter.format(player.getY());
 		String z = formatter.format(player.getZ());
 		font.drawString(1F, 1F, new StringBuilder("FPS: ").append(timer.getFPS()).append("\n").
-				append("X: ").append(x).
-				append("\nY: ").append(y).append("\nZ: ").append(z).toString());
-		glPopMatrix();
+				append("X: ").append(x).append("\nY: ").append(y).append("\nZ: ").append(z).
+				toString());
+
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrix(perspectiveProjMatrix);
 		glMatrixMode(GL_MODELVIEW);
+		glPopMatrix();
 	}
 
 	private void initDisplay() {
@@ -352,6 +365,52 @@ public class FREEMine {
 			glEndList();
 		}
 		System.out.println(timer.nextDelta());
+		selectionDisplayList = glGenLists(1);
+		glNewList(selectionDisplayList, GL_COMPILE);
+		glBegin(GL_LINES);
+		glColor3f(0, 0, 0);
+		glLineWidth(3);
+
+		glVertex3f(1, 1, 1);
+		glVertex3f(1, 0, 1);
+
+		glVertex3f(1, 0, 1);
+		glVertex3f(1, 0, 0);
+
+		glVertex3f(1, 0, 0);
+		glVertex3f(1, 1, 0);
+
+		glVertex3f(1, 1, 0);
+		glVertex3f(1, 1, 1);
+
+
+
+		glVertex3f(0, 1, 0);
+		glVertex3f(0, 0, 0);
+
+		glVertex3f(0, 0, 0);
+		glVertex3f(0, 0, 1);
+
+		glVertex3f(0, 0, 1);
+		glVertex3f(0, 1, 1);
+
+		glVertex3f(0, 1, 1);
+		glVertex3f(0, 1, 0);
+
+
+		glVertex3f(0, 1, 0);
+		glVertex3f(1, 1, 0);
+
+		glVertex3f(0, 0, 0);
+		glVertex3f(1, 0, 0);
+
+		glVertex3f(0, 0, 1);
+		glVertex3f(1, 0, 1);
+
+		glVertex3f(0, 1, 1);
+		glVertex3f(1, 1, 1);
+		glEnd();
+		glEndList();
 	}
 
 	private void onClose(int i) {
@@ -370,9 +429,9 @@ public class FREEMine {
 		itime += dt;
 		while (Mouse.next()) {
 			if (Mouse.isGrabbed()) {
-				rX += Mouse.getDX();
+				rX += Mouse.getDX() * mouseSensitivity;
 				rX %= 360;
-				rY = Math.max(-90, Math.min(90, rY - Mouse.getDY()));
+				rY = Math.max(-90, Math.min(90, rY - Mouse.getDY() * mouseSensitivity));
 			}
 		}
 		while (Keyboard.next()) {
@@ -417,6 +476,10 @@ public class FREEMine {
 		player.setY((float)(y - upMove * dt - forwardMove * dt * sinRY));
 		player.setRx(rX);
 		player.setRy(rY);
+		float px = player.getX();
+		float py = player.getY();
+		float pz = player.getZ();
+		player.setSelectedBlock((int)px, (int)py + 2, (int)pz);
 	}
 
 	private void loadTextures() {
@@ -446,6 +509,13 @@ public class FREEMine {
 		} catch (SlickException ex) {
 			Logger.getLogger(FREEMine.class.getName()).log(Level.SEVERE, null, ex);
 			onClose(-1);
+		}
+	}
+
+	private void errorCheck() {
+		int e = glGetError();
+		if (e != GL_NO_ERROR) {
+			throw new IllegalStateException("OpenGL Error!\nglGetError() : " + e);
 		}
 	}
 }
