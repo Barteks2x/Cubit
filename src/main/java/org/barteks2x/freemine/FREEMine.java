@@ -483,7 +483,7 @@ public class FREEMine {
 		float pz = player.getZ() + (float)(selectionDistance * cosRX * cosRY * 0.01F);
 		float py = player.getY() + (float)(selectionDistance * sinRY * 0.01F);
 		float px = player.getX() + (float)(-selectionDistance * sinRX * cosRY * 0.01F);
-		System.out.println(px + ", " + py + ", " + pz);
+		//System.out.println(px + ", " + py + ", " + pz);
 		player.setSelectedBlock((int)px - (px < 0 ? 1 : 0), (int)py - (py < 0 ? 1 : 0),
 				(int)pz - (pz < 0 ? 1 : 0));
 	}
