@@ -15,7 +15,7 @@ public class ChunkGenerator {
 	public ChunkGenerator(long seed) {
 		this.rand = new Random(seed);
 		this.seed = seed;
-		this.noiseGen = new ValueNoiseGenerator(16, 0.6D, 1, 2.24564D, seed);
+		this.noiseGen = new ValueNoiseGenerator(128, 0.8D, 4, 2.24564D, seed);
 	}
 
 	public Chunk generateChunk(int x, int y, int z) {
@@ -33,7 +33,7 @@ public class ChunkGenerator {
 	protected void generateTerrain(int x, int y, int z, int[] blocks) {
 		for (int i = 0; i < Chunk.CHUNK_X; ++i) {
 			for (int j = 0; j < Chunk.CHUNK_Z; ++j) {
-				double v = noiseGen.getFBMValueAt((x << 4) + i, (z << 4) + j);
+				double v = noiseGen.getFBMValueAt((x * 16) + i, (z * 16) + j);
 				v *= 32;
 				v -= y << 4;
 				if (v <= 0) {

@@ -13,15 +13,15 @@ public class ValueNoiseGenerator extends NoiseGenerator2d {
 		int intX = (int)x;
 		int intZ = (int)z;
 
-		double dx = x - intX;
-		double dz = z - intZ;
+		double fx = x - intX;
+		double fz = z - intZ;
 		int x1 = 1, z1 = 1;
 		if (x < 0) {
-			dx *= -1;
+			fx *= -1;
 			x1 = -1;
 		}
 		if (z < 0) {
-			dz *= -1;
+			fz *= -1;
 			z1 = -1;
 		}
 
@@ -31,9 +31,9 @@ public class ValueNoiseGenerator extends NoiseGenerator2d {
 		v2 = random(intX + x1, intZ);
 		v3 = random(intX, intZ + z1);
 		v4 = random(intX + x1, intZ + z1);
-		t1 = lerp(v1, v2, dx);
-		t2 = lerp(v3, v4, dx);
-		return lerp(t1, t2, dz);
+		t1 = lerp(v1, v2, fx);
+		t2 = lerp(v3, v4, fx);
+		return lerp(t1, t2, fz);
 	}
 
 	protected double lerp(double x1, double x2, double a) {
@@ -41,8 +41,8 @@ public class ValueNoiseGenerator extends NoiseGenerator2d {
 	}
 
 	private double random(int x, int z) {
-		Random r1 = new Random(x);
-		Random r3 = new Random(z);
-		return new Random(seed + r1.nextLong() + r3.nextLong()).nextDouble();
+		Random r1 = new Random(x + seed);
+		Random r3 = new Random(z + r1.nextLong());
+		return new Random(seed * r1.nextLong() * r3.nextLong()).nextDouble();
 	}
 }
