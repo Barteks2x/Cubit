@@ -15,11 +15,22 @@ public class ValueNoiseGenerator extends NoiseGenerator2d {
 
 		double dx = x - intX;
 		double dz = z - intZ;
+		int x1 = 1, z1 = 1;
+		if (x < 0) {
+			dx *= -1;
+			x1 = -1;
+		}
+		if (z < 0) {
+			dz *= -1;
+			z1 = -1;
+		}
+
 		double v1, v2, v3, v4, t1, t2;
+
 		v1 = random(intX, intZ);
-		v2 = random(intX + 1, intZ);
-		v3 = random(intX, intZ + 1);
-		v4 = random(intX + 1, intZ + 1);
+		v2 = random(intX + x1, intZ);
+		v3 = random(intX, intZ + z1);
+		v4 = random(intX + x1, intZ + z1);
 		t1 = lerp(v1, v2, dx);
 		t2 = lerp(v3, v4, dx);
 		return lerp(t1, t2, dz);

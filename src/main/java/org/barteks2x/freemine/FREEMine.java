@@ -42,7 +42,7 @@ public class FREEMine {
 	private ChunkGenerator chunkGenerator;
 	private Chunk chunkArray[];
 	private Map<ChunkPosition, Integer> chunkDisplayLists;
-	private long seed = 0;
+	private long seed = 64646;
 	//movement
 	private Timer timer;
 	private float forwardMove = 0, sideMove = 0, upMove = 0, rX = 0, rY = 0;
