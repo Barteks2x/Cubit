@@ -104,8 +104,10 @@ public class FREEMine {
 
 			renderChunks();
 
-			renderText();
+			glDisable(GL_DEPTH_TEST);
 			renderSelection();
+			renderText();
+			glEnable(GL_DEPTH_TEST);
 
 			//Display.sync(maxFPS);
 			Display.update();
@@ -133,16 +135,15 @@ public class FREEMine {
 				}
 			}
 		}
-
-
 	}
 
 	private void renderSelection() {
 		glPushMatrix();
-		//BlockPosition pos = player.getSelectedBlock();
-		//glTranslatef(pos.x, pos.y, pos.z);
+		glDisable(GL_BLEND);
+		BlockPosition pos = player.getSelectedBlock();
+		glTranslatef(pos.x, pos.y, pos.z);
 		glCallList(selectionDisplayList);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glEnable(GL_BLEND);
 		glPopMatrix();
 	}
 
@@ -413,6 +414,10 @@ public class FREEMine {
 		glEndList();
 	}
 
+	private boolean updateChunkDisplayList(ChunkPosition pos) {
+		return true;
+	}
+
 	private void onClose(int i) {
 		Collection<Integer> lists = chunkDisplayLists.values();
 		for (Integer x : lists) {
@@ -421,6 +426,7 @@ public class FREEMine {
 		System.exit(i);
 	}
 	private int itime = 0;
+	private float selectionDistance = 0;
 
 	private void input(int dt) {
 		if (Mouse.isGrabbed() != grabMouse) {
@@ -429,6 +435,7 @@ public class FREEMine {
 		itime += dt;
 		while (Mouse.next()) {
 			if (Mouse.isGrabbed()) {
+				selectionDistance -= Mouse.getDWheel();
 				rX += Mouse.getDX() * mouseSensitivity;
 				rX %= 360;
 				rY = Math.max(-90, Math.min(90, rY - Mouse.getDY() * mouseSensitivity));
@@ -460,9 +467,6 @@ public class FREEMine {
 					itime = 0;
 				}
 			}
-			if (Display.isCloseRequested()) {
-				this.isRunning = false;
-			}
 		}
 
 		double sinRX = Math.sin(Math.toRadians(rX));
@@ -476,10 +480,12 @@ public class FREEMine {
 		player.setY((float)(y - upMove * dt - forwardMove * dt * sinRY));
 		player.setRx(rX);
 		player.setRy(rY);
-		float px = player.getX();
-		float py = player.getY();
-		float pz = player.getZ();
-		player.setSelectedBlock((int)px, (int)py + 2, (int)pz);
+		float pz = player.getZ() + (float)(selectionDistance * cosRX * cosRY * 0.01F);
+		float py = player.getY() + (float)(selectionDistance * sinRY * 0.01F);
+		float px = player.getX() + (float)(-selectionDistance * sinRX * cosRY * 0.01F);
+		System.out.println(px + ", " + py + ", " + pz);
+		player.setSelectedBlock((int)px - (px < 0 ? 1 : 0), (int)py - (py < 0 ? 1 : 0),
+				(int)pz - (pz < 0 ? 1 : 0));
 	}
 
 	private void loadTextures() {
