@@ -22,6 +22,7 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import static org.lwjgl.util.glu.GLU.gluErrorString;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -521,7 +522,7 @@ public class FREEMine {
 	private void errorCheck() {
 		int e = glGetError();
 		if (e != GL_NO_ERROR) {
-			System.out.println("OpenGL Error!\n"+e);
+			System.out.println("OpenGL Error!\n" + e + " - " + gluErrorString(e));
 		}
 	}
 }
