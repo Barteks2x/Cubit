@@ -521,7 +521,7 @@ public class FREEMine {
 	private void errorCheck() {
 		int e = glGetError();
 		if (e != GL_NO_ERROR) {
-			throw new IllegalStateException("OpenGL Error!\nglGetError() : " + e);
+			System.out.println("OpenGL Error!\n"+e);
 		}
 	}
 }
