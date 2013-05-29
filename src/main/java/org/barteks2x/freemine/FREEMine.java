@@ -44,7 +44,7 @@ public class FREEMine {
 	private Chunk chunkArray[];
 	private Map<ChunkPosition, Integer> chunkDisplayLists;
 	private int selectionDisplayList;
-	private long seed = 64646;
+	private long seed = new Random().nextLong();
 	//movement
 	private Timer timer;
 	private float forwardMove = 0, sideMove = 0, upMove = 0, rX = 0, rY = 0;
