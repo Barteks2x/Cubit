@@ -10,7 +10,7 @@ public class ChunkGenerator {
 
 	protected Random rand;
 	protected long seed;
-	INoiseGenerator2d noiseGen;
+	protected INoiseGenerator2d noiseGen;
 
 	public ChunkGenerator(long seed) {
 		this.rand = new Random(seed);

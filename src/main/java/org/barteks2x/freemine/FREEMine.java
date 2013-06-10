@@ -1,12 +1,10 @@
 package org.barteks2x.freemine;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 import org.barteks2x.freemine.Timer;
 import org.barteks2x.freemine.block.Block;
 import org.barteks2x.freemine.generator.ChunkGenerator;
@@ -15,12 +13,6 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.*;
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.UnicodeFont;
-import org.newdawn.slick.font.effects.ColorEffect;
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureLoader;
-import org.newdawn.slick.util.ResourceLoader;
 
 import static org.lwjgl.util.glu.GLU.gluErrorString;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
@@ -28,7 +20,9 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
 import static org.lwjgl.opengl.GL11.*;
 
 public class FREEMine {
+	//Unused. In OpenJDk, the logManager internally only keeps weak references. So the logger can be removed by garbage collector if there is
 
+	private static Logger logger = Logger.getLogger(FREEMine.class.getName());
 	//OpenGL
 	private final String title;
 	private int fov;
@@ -44,7 +38,7 @@ public class FREEMine {
 	private Chunk chunkArray[];
 	private Map<ChunkPosition, Integer> chunkDisplayLists;
 	private int selectionDisplayList;
-	private long seed = new Random().nextLong();
+	private long seed = System.currentTimeMillis();
 	//movement
 	private Timer timer;
 	private float forwardMove = 0, sideMove = 0, upMove = 0, rX = 0, rY = 0;
@@ -53,7 +47,7 @@ public class FREEMine {
 	private boolean grabMouse;
 	private Player player;
 	//Textures and fonts
-	private UnicodeFont font;
+	private BitmapFont font;
 	private DecimalFormat formatter = new DecimalFormat("#.###");
 	private Texture tex;
 	//world constants
@@ -62,7 +56,7 @@ public class FREEMine {
 	private int minWorldChunkZ = -5;
 	private int maxWorldChunkZ = 5;
 	private int minWorldChunkY = -5;
-	private int maxWorldChunkY = 5;
+	private int maxWorldChunkY = 4;
 
 	public static void main(String args[]) {
 		FREEMine fm = new FREEMine();
@@ -70,6 +64,17 @@ public class FREEMine {
 	}
 
 	public FREEMine() {
+		FileHandler fh = null;
+		try {
+			fh = new FileHandler("FREEMine.log");
+		} catch (IOException ex) {
+			Logger.getLogger(FREEMine.class.getName()).log(Level.SEVERE, null, ex);
+		} catch (SecurityException ex) {
+			Logger.getLogger(FREEMine.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		if (fh != null) {
+			logger.addHandler(fh);
+		}
 		this.title = FREEMine.class.getSimpleName() + " " + Version.getVersion();
 		int chunks = (maxWorldChunkX - minWorldChunkX) * (maxWorldChunkY - minWorldChunkY) *
 				(maxWorldChunkZ - minWorldChunkZ);
@@ -100,19 +105,17 @@ public class FREEMine {
 			timer.nextFrame();
 			input(timer.getDelta());
 
-			tex.bind();
+			
 			glLoadIdentity();
-
+			
+			tex.bind();
 			renderChunks();
-
+			renderText();
 			glDisable(GL_DEPTH_TEST);
 			renderSelection();
-			renderText();
 			glEnable(GL_DEPTH_TEST);
-
 			//Display.sync(maxFPS);
 			Display.update();
-			errorCheck();
 			if (Display.isCloseRequested()) {
 				isRunning = false;
 			}
@@ -140,11 +143,9 @@ public class FREEMine {
 
 	private void renderSelection() {
 		glPushMatrix();
-		glDisable(GL_BLEND);
 		BlockPosition pos = player.getSelectedBlock();
 		glTranslatef(pos.x, pos.y, pos.z);
 		glCallList(selectionDisplayList);
-		glEnable(GL_BLEND);
 		glPopMatrix();
 	}
 
@@ -158,10 +159,8 @@ public class FREEMine {
 		String x = formatter.format(player.getX());
 		String y = formatter.format(player.getY());
 		String z = formatter.format(player.getZ());
-		font.drawString(1F, 1F, new StringBuilder("FPS: ").append(timer.getFPS()).append("\n").
-				append("X: ").append(x).append("\nY: ").append(y).append("\nZ: ").append(z).
-				toString());
-
+		font.bind().drawString(0, 0, new StringBuilder("FPS: ").append(timer.getFPS()).append("\n").
+				append("X: ").append(x).append("\nY: ").append(y).append("\nZ: ").append(z).toString());
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrix(perspectiveProjMatrix);
 		glMatrixMode(GL_MODELVIEW);
@@ -213,14 +212,15 @@ public class FREEMine {
 		for (int x = minWorldChunkX; x < maxWorldChunkX; ++x) {
 			for (int y = minWorldChunkY; y < maxWorldChunkY; ++y) {
 				for (int z = minWorldChunkZ; z < maxWorldChunkZ; ++z) {
-					chunkArray[i++] = chunkGenerator.generateChunk(x, y, z);
+					chunkArray[i] = chunkGenerator.generateChunk(x, y, z);
+					++i;
 				}
 			}
 		}
 	}
 
 	private void initDisplayLists() {
-		timer.nextDelta();
+		//timer.nextDelta();
 		for (Chunk chunk : chunkArray) {
 			int displayList;
 			if (!chunkDisplayLists.containsKey(chunk.getPosition())) {
@@ -228,6 +228,30 @@ public class FREEMine {
 				chunkDisplayLists.put(chunk.getPosition(), displayList);
 			} else {
 				displayList = chunkDisplayLists.get(chunk.getPosition());
+			}
+			int cx = chunk.getX();
+			int cy = chunk.getY();
+			int cz = chunk.getZ();
+			Chunk cxm = null, cxp = null, cym = null, cyp=null, czm=null, czp=null;
+			for(Chunk c2 : chunkArray){
+				if(c2.getX()==cx-1 && c2.getY()==cy && c2.getZ()==cz){
+					cxm = c2;
+				}
+				if(c2.getX()==cx+1 && c2.getY()==cy && c2.getZ()==cz){
+					cxp = c2;
+				}
+				if(c2.getX()==cx && c2.getY()==cy-1 && c2.getZ()==cz){
+					cym = c2;
+				}
+				if(c2.getX()==cx && c2.getY()==cy+1 && c2.getZ()==cz){
+					cyp = c2;
+				}
+				if(c2.getX()==cx && c2.getY()==cy && c2.getZ()==cz-1){
+					czm = c2;
+				}
+				if(c2.getX()==cx && c2.getY()==cy && c2.getZ()==cz+1){
+					czp = c2;
+				}
 			}
 			tex.bind();
 			glNewList(displayList, GL_COMPILE);
@@ -238,23 +262,65 @@ public class FREEMine {
 						if (chunk.getBlockAt(x, y, z) != 0) {
 							boolean xp = false, xm = false, yp = false, ym = false, zp = false, zm =
 									false;
-							if (x == Chunk.CHUNK_X - 1 || chunk.getBlockAt(x + 1, y, z) == 0) {
-								xp = true;
+							
+							if (x == Chunk.CHUNK_X - 1){
+								if(cxp==null || cxp.getBlockAt(0, y, z)==0){
+									xp=true;
+								}
+							}else{
+								if(chunk.getBlockAt(x + 1, y, z) == 0){
+									xp=true;
+								}
 							}
-							if (x == 0 || chunk.getBlockAt(x - 1, y, z) == 0) {
-								xm = true;
+							
+							if (x == 0){
+								if(cxm==null || cxm.getBlockAt(Chunk.CHUNK_X-1, y, z)==0){
+									xm=true;
+								}
+							}else{
+								if(chunk.getBlockAt(x - 1, y, z) == 0){
+									xm=true;
+								}
 							}
-							if (y == Chunk.CHUNK_Y - 1 || chunk.getBlockAt(x, y + 1, z) == 0) {
-								yp = true;
+							
+							if (y == Chunk.CHUNK_Y - 1){
+								if(cyp==null || cyp.getBlockAt(x, 0, z)==0){
+									yp=true;
+								}
+							}else{
+								if(chunk.getBlockAt(x, y+1, z) == 0){
+									yp=true;
+								}
 							}
-							if (y == 0 || chunk.getBlockAt(x, y - 1, z) == 0) {
-								ym = true;
+							
+							if (y == 0){
+								if(cym==null || cym.getBlockAt(x, Chunk.CHUNK_Y-1, z)==0){
+									ym=true;
+								}
+							}else{
+								if(chunk.getBlockAt(x, y-1, z) == 0){
+									ym=true;
+								}
 							}
-							if (z == Chunk.CHUNK_Z - 1 || chunk.getBlockAt(x, y, z + 1) == 0) {
-								zp = true;
+							
+							if (z == Chunk.CHUNK_Z - 1){
+								if(czp==null || czp.getBlockAt(x, y, 0)==0){
+									zp=true;
+								}
+							}else{
+								if(chunk.getBlockAt(x, y, z+1) == 0){
+									zp=true;
+								}
 							}
-							if (z == 0 || chunk.getBlockAt(x, y, z - 1) == 0) {
-								zm = true;
+							
+							if (z == 0){
+								if(czm==null || czm.getBlockAt(x, y, Chunk.CHUNK_Z-1)==0){
+									zm=true;
+								}
+							}else{
+								if(chunk.getBlockAt(x, y, z-1) == 0){
+									zm=true;
+								}
 							}
 							Block b = Block.blocks.get(chunk.getBlockAt(x, y, z));
 							if (xp) {
@@ -366,12 +432,11 @@ public class FREEMine {
 			glEnd();
 			glEndList();
 		}
-		System.out.println(timer.nextDelta());
+		//System.out.println(timer.nextDelta());
 		selectionDisplayList = glGenLists(1);
 		glNewList(selectionDisplayList, GL_COMPILE);
 		glBegin(GL_LINES);
 		glColor3f(0, 0, 0);
-		glLineWidth(3);
 
 		glVertex3f(1, 1, 1);
 		glVertex3f(1, 0, 1);
@@ -413,10 +478,6 @@ public class FREEMine {
 		glVertex3f(1, 1, 1);
 		glEnd();
 		glEndList();
-	}
-
-	private boolean updateChunkDisplayList(ChunkPosition pos) {
-		return true;
 	}
 
 	private void onClose(int i) {
@@ -491,7 +552,8 @@ public class FREEMine {
 
 	private void loadTextures() {
 		try {
-			tex = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("texture.png"));
+			tex = TextureLoader.loadTexture(Thread.currentThread().getContextClassLoader().
+					getResourceAsStream("texture.png"));
 		} catch (IOException ex) {
 			Logger.getLogger(FREEMine.class.getName()).log(Level.SEVERE, null, ex);
 			onClose(-1);
@@ -507,22 +569,15 @@ public class FREEMine {
 
 	@SuppressWarnings("unchecked")
 	private void loadFonts() {
-		java.awt.Font awtFont = new java.awt.Font("Times New Roman", java.awt.Font.BOLD, 15);
-		font = new UnicodeFont(awtFont);
-		font.getEffects().add(new ColorEffect(Color.white));
-		font.addAsciiGlyphs();
-		try {
-			font.loadGlyphs();
-		} catch (SlickException ex) {
-			Logger.getLogger(FREEMine.class.getName()).log(Level.SEVERE, null, ex);
-			onClose(-1);
-		}
+		font = new BitmapFont("Font256.png");
+		font.init();
 	}
 
-	private void errorCheck() {
+	private void errorCheck(String msg) {
 		int e = glGetError();
 		if (e != GL_NO_ERROR) {
-			System.out.println("OpenGL Error!\n" + e + " - " + gluErrorString(e));
+			Logger.getLogger(this.getClass().getName()).
+					log(Level.SEVERE, "OpenGL Error! {2} {0} - {1}", new Object[]{e, gluErrorString(e), msg});
 		}
 	}
 }

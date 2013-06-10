@@ -6,7 +6,7 @@ import java.util.Map;
 public abstract class Block {
 	//Block list
 
-	public static Map<Integer, Block> blocks = new HashMap<Integer, Block>(256);
+	public static final Map<Integer, Block> blocks = new HashMap<Integer, Block>(256);
 	//Blocks
 	public static final Block STONE = new BlockStone(1);
 	public static final Block DIRT = new BlockDirt(2);
@@ -52,7 +52,7 @@ public abstract class Block {
 			return false;
 		}
 		final Block other = (Block)obj;
-		if (this.ID != other.ID) {
+		if (this.ID != other.getID()) {
 			return false;
 		}
 		return true;

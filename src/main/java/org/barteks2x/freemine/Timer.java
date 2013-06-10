@@ -18,7 +18,8 @@ public class Timer {
 		long time = getTime();
 		int delta = (int)(time - lastFrame);
 		lastFrame = time;
-		return this.delta = delta;
+		this.delta = delta;
+		return delta;
 	}
 
 	public int getDelta() {

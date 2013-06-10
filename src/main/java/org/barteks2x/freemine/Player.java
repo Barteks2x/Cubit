@@ -2,8 +2,8 @@ package org.barteks2x.freemine;
 
 public class Player {
 
-	private float x, y, z, rx, ry;
-	BlockPosition selectedBlock = new BlockPosition(0, 0, 0);
+	protected float x, y, z, rx, ry;
+	protected BlockPosition selectedBlock = new BlockPosition(0, 0, 0);
 
 	public Player() {
 		x = 0;

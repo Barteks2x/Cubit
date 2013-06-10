@@ -17,7 +17,7 @@ public class Chunk {
 		this.x = x;
 		this.y = y;
 		this.z = z;
-		this.blocks = blocks;
+		System.arraycopy(blocks, 0, this.blocks, 0, SIZE);
 		this.updateBlockCount();
 	}
 

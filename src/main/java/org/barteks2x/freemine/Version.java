@@ -3,7 +3,6 @@ package org.barteks2x.freemine;
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.newdawn.slick.util.ResourceLoader;
 
 public class Version {
 
@@ -11,10 +10,10 @@ public class Version {
 		String version = null;
 		BufferedReader reader = null;
 		try {
-			InputStream is = ResourceLoader.getResourceAsStream("config");
-			File file = new File("config");
+			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(
+					"config");
 			reader = new BufferedReader(new InputStreamReader(is));
-			String line = null;
+			String line;
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("project-version")) {
 					String[] s = line.split("=");
@@ -29,7 +28,9 @@ public class Version {
 			Logger.getLogger(FREEMine.class.getName()).log(Level.SEVERE, null, ex);
 		} finally {
 			try {
-				reader.close();
+				if (reader != null) {
+					reader.close();
+				}
 			} catch (IOException ex) {
 				Logger.getLogger(FREEMine.class.getName()).log(Level.SEVERE, null, ex);
 			}

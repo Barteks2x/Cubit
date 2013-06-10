@@ -4,6 +4,8 @@ import java.util.Random;
 
 public class ValueNoiseGenerator extends NoiseGenerator2d {
 
+	private Random r = new Random();
+
 	public ValueNoiseGenerator(double grid, double persistance, int octaves, double fq, long seed) {
 		super(grid, persistance, octaves, fq, seed);
 	}
@@ -41,8 +43,10 @@ public class ValueNoiseGenerator extends NoiseGenerator2d {
 	}
 
 	private double random(int x, int z) {
-		Random r1 = new Random(x + seed);
-		Random r3 = new Random(z + r1.nextLong());
-		return new Random(seed * r1.nextLong() * r3.nextLong()).nextDouble();
+		//Random r1 = new Random(x + seed);
+		//Random r3 = new Random(z + r1.nextLong());
+		//return new Random(seed * r1.nextLong() * r3.nextLong()).nextDouble();
+		r.setSeed(seed + x * 423894785L + z * 215874376L);
+		return r.nextDouble();
 	}
 }

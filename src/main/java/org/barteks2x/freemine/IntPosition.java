@@ -2,7 +2,7 @@ package org.barteks2x.freemine;
 
 public abstract class IntPosition {
 
-	int x, y, z;
+	protected int x, y, z;
 
 	public IntPosition(int x, int y, int z) {
 		this.x = x;

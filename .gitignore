@@ -1,0 +1,20 @@
+*.class
+.directory
+# Package Files #
+*.jar
+*.war
+*.ear
+/.project
+/.classpath
+/.settings
+# maven
+/target
+
+# various other potential build files
+/build
+/bin
+/dist
+/manifest.mf
+nbactions.xml
+nb-configuration.xml
+nbactions-release-profile.xml
