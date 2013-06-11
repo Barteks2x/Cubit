@@ -4,7 +4,7 @@
 
 	<groupId>org.Barteks2x</groupId>
 	<artifactId>FREEMine</artifactId>
-	<version>0.0.0-pre-alpha</version>
+	<version>0.0-pre-alpha</version>
 	<packaging>jar</packaging>
 
 	<name>FREEMine</name>
