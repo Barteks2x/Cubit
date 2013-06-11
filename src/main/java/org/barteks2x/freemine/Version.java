@@ -15,7 +15,7 @@ public class Version {
 			reader = new BufferedReader(new InputStreamReader(is));
 			String line;
 			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("project-version")) {
+				if (line.startsWith("describe")) {
 					String[] s = line.split("=");
 					if (s.length >= 2) {
 						version = s[1];

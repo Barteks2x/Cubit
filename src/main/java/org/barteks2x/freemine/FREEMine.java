@@ -42,7 +42,7 @@ public class FREEMine {
 	//movement
 	private Timer timer;
 	private float forwardMove = 0, sideMove = 0, upMove = 0, rX = 0, rY = 0;
-	private float playerSpeed = 0.01F;//units per milisecond
+	private float playerSpeed = 0.003F;//units per milisecond
 	private float mouseSensitivity;
 	private boolean grabMouse;
 	private Player player;
@@ -98,6 +98,10 @@ public class FREEMine {
 		loadFonts();
 		loadTextures();
 		generateChunks(seed);
+		IntPosition spawn = chunkGenerator.getSpawnPoint();
+		player.setX(spawn.x);
+		player.setY(spawn.y+1.6F);
+		player.setZ(spawn.z);
 		initDisplayLists();
 		while (isRunning) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -12,7 +12,6 @@
 	
 
 	<properties>
-		<project-version>${project.version}</project-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<natives.version>0.0.6</natives.version>
 		<lwjgl.version>2.8.5</lwjgl.version>
@@ -29,9 +28,9 @@
 			</snapshots>
 		</repository>
 		<repository>
-	      <id>nifty-maven-repo.sourceforge.net</id>
-	      <url>http://nifty-gui.sourceforge.net/nifty-maven-repo/</url>
-	    </repository>
+			<id>nifty-maven-repo.sourceforge.net</id>
+			<url>http://nifty-gui.sourceforge.net/nifty-maven-repo/</url>
+		</repository>
 		<repository>
 			<id>spout-repo</id>
 			<url>http://repo.spout.org</url>
@@ -40,7 +39,16 @@
 			</snapshots>
 		</repository>
 	</repositories>
-
+	<pluginRepositories>
+		<pluginRepository>
+			<id>Github-maven-repo</id>
+			<url>https://github.com/Barteks2x/maven-repo/raw/master/snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -111,6 +119,25 @@
 			</resource>
 		</resources>
 		<plugins>
+			<plugin>
+				<groupId>org.barteks2x</groupId>
+				<artifactId>gitdescribe-maven-plugin-barteks2x</artifactId>
+				<version>1.4-SNAPSHOT</version>
+				<configuration>
+					<outputPrefix></outputPrefix>
+					<outputPostfix></outputPostfix>
+					<match>true</match>
+					<matchValue>[0-9].*</matchValue>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>gitdescribe</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>properties-maven-plugin</artifactId>

@@ -5,6 +5,8 @@ import org.barteks2x.freemine.Chunk;
 import org.barteks2x.freemine.block.Block;
 
 import static org.barteks2x.freemine.BlockInChunkPosition.getIndexFromXYZ;
+import org.barteks2x.freemine.BlockPosition;
+import org.barteks2x.freemine.IntPosition;
 
 public class ChunkGenerator {
 
@@ -28,6 +30,14 @@ public class ChunkGenerator {
 		generateTerrain(x, y, z, blocks);
 		Chunk chunk = new Chunk(x, y, z, blocks);
 		return chunk;
+	}
+
+	public IntPosition getSpawnPoint() {
+		Random r = new Random();
+		int x = r.nextInt(64)-32;
+		int z = r.nextInt(64)-32;
+		int y = (int)(noiseGen.getFBMValueAt(x, z)*32);
+		return new BlockPosition(x, y, z);
 	}
 
 	protected void generateTerrain(int x, int y, int z, int[] blocks) {
