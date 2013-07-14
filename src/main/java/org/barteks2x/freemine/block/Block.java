@@ -57,4 +57,8 @@ public abstract class Block {
 		}
 		return true;
 	}
+
+	public static Block byId(int id) {
+		return blocks.get(id);
+	}
 }

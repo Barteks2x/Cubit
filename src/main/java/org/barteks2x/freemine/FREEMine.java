@@ -20,7 +20,7 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
 import static org.lwjgl.opengl.GL11.*;
 
 public class FREEMine {
-	//Unused. In OpenJDk, the logManager internally only keeps weak references. So the logger can be removed by garbage collector if there is
+	//Unused. In OpenJDk, the logManager internally only keeps weak references. So the logger can be removed by garbage collector if there is no hard reference
 
 	private static Logger logger = Logger.getLogger(FREEMine.class.getName());
 	//OpenGL
@@ -57,6 +57,7 @@ public class FREEMine {
 	private int maxWorldChunkZ = 5;
 	private int minWorldChunkY = -5;
 	private int maxWorldChunkY = 4;
+	private float time;
 
 	public static void main(String args[]) {
 		FREEMine fm = new FREEMine();
@@ -100,7 +101,7 @@ public class FREEMine {
 		generateChunks(seed);
 		IntPosition spawn = chunkGenerator.getSpawnPoint();
 		player.setX(spawn.x);
-		player.setY(spawn.y+1.6F);
+		player.setY(spawn.y + 1.6F);
 		player.setZ(spawn.z);
 		initDisplayLists();
 		while (isRunning) {
@@ -109,17 +110,14 @@ public class FREEMine {
 			timer.nextFrame();
 			input(timer.getDelta());
 
-			
 			glLoadIdentity();
-			
+
 			tex.bind();
 			renderChunks();
-			renderText();
-			glDisable(GL_DEPTH_TEST);
 			renderSelection();
-			glEnable(GL_DEPTH_TEST);
-			//Display.sync(maxFPS);
+			renderText();
 			Display.update();
+			errorCheck("Main");
 			if (Display.isCloseRequested()) {
 				isRunning = false;
 			}
@@ -146,6 +144,11 @@ public class FREEMine {
 	}
 
 	private void renderSelection() {
+		if (player.getSelectedBlock() == null) {
+			return;
+		}
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glColor4f(1F, 1F, 1F, (float)Math.sin(time * .005F) / 4F + .75F);
 		glPushMatrix();
 		BlockPosition pos = player.getSelectedBlock();
 		glTranslatef(pos.x, pos.y, pos.z);
@@ -163,8 +166,15 @@ public class FREEMine {
 		String x = formatter.format(player.getX());
 		String y = formatter.format(player.getY());
 		String z = formatter.format(player.getZ());
+		BlockPosition pos = player.getSelectedBlock();
+		String selx = pos != null ? formatter.format(pos.x) : "no selection";
+		String sely = pos != null ? formatter.format(pos.y) : "no selection";
+		String selz = pos != null ? formatter.format(pos.z) : "no selection";
 		font.bind().drawString(0, 0, new StringBuilder("FPS: ").append(timer.getFPS()).append("\n").
-				append("X: ").append(x).append("\nY: ").append(y).append("\nZ: ").append(z).toString());
+				append("X: ").append(x).append("\nY: ").append(y).append("\nZ: ").append(z).append(
+				"\nselX: ").append(selx).append("\nsely: ").append(sely).append("\nselz: ").append(
+				selz).toString());
+
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrix(perspectiveProjMatrix);
 		glMatrixMode(GL_MODELVIEW);
@@ -225,261 +235,48 @@ public class FREEMine {
 
 	private void initDisplayLists() {
 		//timer.nextDelta();
-		for (Chunk chunk : chunkArray) {
-			int displayList;
-			if (!chunkDisplayLists.containsKey(chunk.getPosition())) {
-				displayList = glGenLists(1);
-				chunkDisplayLists.put(chunk.getPosition(), displayList);
-			} else {
-				displayList = chunkDisplayLists.get(chunk.getPosition());
-			}
-			int cx = chunk.getX();
-			int cy = chunk.getY();
-			int cz = chunk.getZ();
-			Chunk cxm = null, cxp = null, cym = null, cyp=null, czm=null, czp=null;
-			for(Chunk c2 : chunkArray){
-				if(c2.getX()==cx-1 && c2.getY()==cy && c2.getZ()==cz){
-					cxm = c2;
-				}
-				if(c2.getX()==cx+1 && c2.getY()==cy && c2.getZ()==cz){
-					cxp = c2;
-				}
-				if(c2.getX()==cx && c2.getY()==cy-1 && c2.getZ()==cz){
-					cym = c2;
-				}
-				if(c2.getX()==cx && c2.getY()==cy+1 && c2.getZ()==cz){
-					cyp = c2;
-				}
-				if(c2.getX()==cx && c2.getY()==cy && c2.getZ()==cz-1){
-					czm = c2;
-				}
-				if(c2.getX()==cx && c2.getY()==cy && c2.getZ()==cz+1){
-					czp = c2;
+		for (int x = minWorldChunkX; x < maxWorldChunkX; ++x) {
+			for (int y = minWorldChunkY; y < maxWorldChunkY; ++y) {
+				for (int z = minWorldChunkZ; z < maxWorldChunkZ; ++z) {
+					buildChunkDisplayList(x, y, z);
 				}
 			}
-			tex.bind();
-			glNewList(displayList, GL_COMPILE);
-			glBegin(GL_QUADS);
-			for (int x = 0; x < Chunk.CHUNK_X; ++x) {
-				for (int y = 0; y < Chunk.CHUNK_Y; ++y) {
-					for (int z = 0; z < Chunk.CHUNK_Z; ++z) {
-						if (chunk.getBlockAt(x, y, z) != 0) {
-							boolean xp = false, xm = false, yp = false, ym = false, zp = false, zm =
-									false;
-							
-							if (x == Chunk.CHUNK_X - 1){
-								if(cxp==null || cxp.getBlockAt(0, y, z)==0){
-									xp=true;
-								}
-							}else{
-								if(chunk.getBlockAt(x + 1, y, z) == 0){
-									xp=true;
-								}
-							}
-							
-							if (x == 0){
-								if(cxm==null || cxm.getBlockAt(Chunk.CHUNK_X-1, y, z)==0){
-									xm=true;
-								}
-							}else{
-								if(chunk.getBlockAt(x - 1, y, z) == 0){
-									xm=true;
-								}
-							}
-							
-							if (y == Chunk.CHUNK_Y - 1){
-								if(cyp==null || cyp.getBlockAt(x, 0, z)==0){
-									yp=true;
-								}
-							}else{
-								if(chunk.getBlockAt(x, y+1, z) == 0){
-									yp=true;
-								}
-							}
-							
-							if (y == 0){
-								if(cym==null || cym.getBlockAt(x, Chunk.CHUNK_Y-1, z)==0){
-									ym=true;
-								}
-							}else{
-								if(chunk.getBlockAt(x, y-1, z) == 0){
-									ym=true;
-								}
-							}
-							
-							if (z == Chunk.CHUNK_Z - 1){
-								if(czp==null || czp.getBlockAt(x, y, 0)==0){
-									zp=true;
-								}
-							}else{
-								if(chunk.getBlockAt(x, y, z+1) == 0){
-									zp=true;
-								}
-							}
-							
-							if (z == 0){
-								if(czm==null || czm.getBlockAt(x, y, Chunk.CHUNK_Z-1)==0){
-									zm=true;
-								}
-							}else{
-								if(chunk.getBlockAt(x, y, z-1) == 0){
-									zm=true;
-								}
-							}
-							Block b = Block.blocks.get(chunk.getBlockAt(x, y, z));
-							if (xp) {
-								int texid = b.getTextureForSide(0);
-								float tx = (texid & 0xf) / 16f;
-								float ty = (texid >> 4) / 16f;
-								glColor3f(0.7F, 0.7F, 0.7F);
-								glTexCoord2f(tx + 0.0625F, ty);
-								glVertex3f(x + 1, y + 1, z + 1);
-
-								glTexCoord2f(tx + 0.0625F, ty + 0.0625F);
-								glVertex3f(x + 1, y, z + 1);
-
-								glTexCoord2f(tx, ty + 0.0625F);
-								glVertex3f(x + 1, y, z);
-
-								glTexCoord2f(tx, ty);
-								glVertex3f(x + 1, y + 1, z);
-							}
-							if (xm) {
-								int texid = b.getTextureForSide(1);
-								float tx = (texid & 0xf) / 16f;
-								float ty = (texid >> 4) / 16f;
-								glColor3f(0.7F, 0.7F, 0.7F);
-								glTexCoord2f(tx, ty);
-								glVertex3f(x, y + 1, z);
-
-								glTexCoord2f(tx, ty + 0.0625F);
-								glVertex3f(x, y, z);
-
-								glTexCoord2f(tx + 0.0625F, ty + 0.0625F);
-								glVertex3f(x, y, z + 1);
-
-								glTexCoord2f(tx + 0.0625F, ty);
-								glVertex3f(x, y + 1, z + 1);
-							}
-							if (yp) {
-								int texid = b.getTextureForSide(2);
-								float tx = (texid & 0xf) / 16f;
-								float ty = (texid >> 4) / 16f;
-								glColor3f(1.1F, 1.1F, 1.1F);
-								glTexCoord2f(tx + 0.0625F, ty);
-								glVertex3f(x, y + 1, z + 1);
-
-								glTexCoord2f(tx, ty);
-								glVertex3f(x + 1, y + 1, z + 1);
-
-								glTexCoord2f(tx, ty + 0.0625F);
-								glVertex3f(x + 1, y + 1, z);
-
-								glTexCoord2f(tx + 0.0625F, ty + 0.0625F);
-								glVertex3f(x, y + 1, z);
-							}
-							if (ym) {
-								int texid = b.getTextureForSide(3);
-								float tx = (texid & 0xf) / 16f;
-								float ty = (texid >> 4) / 16f;
-								glColor3f(0.6F, 0.6F, 0.6F);
-								glTexCoord2f(tx + 0.0625F, ty + 0.0625F);
-								glVertex3f(x, y, z);
-
-								glTexCoord2f(tx, ty + 0.0625F);
-								glVertex3f(x + 1, y, z);
-
-								glTexCoord2f(tx, ty);
-								glVertex3f(x + 1, y, z + 1);
-
-								glTexCoord2f(tx + 0.0625F, ty);
-								glVertex3f(x, y, z + 1);
-							}
-							if (zp) {
-								int texid = b.getTextureForSide(4);
-								float tx = (texid & 0xf) / 16f;
-								float ty = (texid >> 4) / 16f;
-								glColor3f(0.85F, 0.85F, 0.85F);
-								glTexCoord2f(tx + 0.0625F, ty + 0.0625F);
-								glVertex3f(x, y, z + 1);
-
-								glTexCoord2f(tx, ty + 0.0625F);
-								glVertex3f(x + 1, y, z + 1);
-
-								glTexCoord2f(tx, ty);
-								glVertex3f(x + 1, y + 1, z + 1);
-
-								glTexCoord2f(tx + 0.0625F, ty);
-								glVertex3f(x, y + 1, z + 1);
-							}
-							if (zm) {
-								int texid = b.getTextureForSide(5);
-								float tx = (texid & 0xf) / 16f;
-								float ty = (texid >> 4) / 16f;
-								glColor3f(0.85F, 0.85F, 0.85F);
-								glTexCoord2f(tx + 0.0625F, ty);
-								glVertex3f(x, y + 1, z);
-
-								glTexCoord2f(tx, ty);
-								glVertex3f(x + 1, y + 1, z);
-
-								glTexCoord2f(tx, ty + 0.0625F);
-								glVertex3f(x + 1, y, z);
-
-								glTexCoord2f(tx + 0.0625F, ty + 0.0625F);
-								glVertex3f(x, y, z);
-							}
-						}
-					}
-				}
-			}
-			glEnd();
-			glEndList();
 		}
 		//System.out.println(timer.nextDelta());
 		selectionDisplayList = glGenLists(1);
 		glNewList(selectionDisplayList, GL_COMPILE);
-		glBegin(GL_LINES);
-		glColor3f(0, 0, 0);
+		glBegin(GL_QUADS);
+		int x = 0, y = 0, z = 0;
+		float m = 0.001F;
+		glVertex3f(x + 1 + m, y + 1 + m, z + 1 + m);
+		glVertex3f(x + 1 + m, y - m, z + 1 + m);
+		glVertex3f(x + 1 + m, y - m, z - m);
+		glVertex3f(x + 1 + m, y + 1 + m, z - m);
 
-		glVertex3f(1, 1, 1);
-		glVertex3f(1, 0, 1);
+		glVertex3f(x - m, y + 1 + m, z - m);
+		glVertex3f(x - m, x - m, z - m);
+		glVertex3f(x - m, x - m, z + 1 + m);
+		glVertex3f(x - m, y + 1 + m, z + 1 + m);
 
-		glVertex3f(1, 0, 1);
-		glVertex3f(1, 0, 0);
+		glVertex3f(x - m, y + 1 + m, z + 1 + m);
+		glVertex3f(x + 1 + m, y + 1 + m, z + 1 + m);
+		glVertex3f(x + 1 + m, y + 1 + m, z - m);
+		glVertex3f(x - m, y + 1 + m, z - m);
 
-		glVertex3f(1, 0, 0);
-		glVertex3f(1, 1, 0);
+		glVertex3f(x - m, x - m, z - m);
+		glVertex3f(x + 1 + m, x - m, z - m);
+		glVertex3f(x + 1 + m, x - m, z + 1 + m);
+		glVertex3f(x - m, x - m, z + 1 + m);
 
-		glVertex3f(1, 1, 0);
-		glVertex3f(1, 1, 1);
+		glVertex3f(x - m, x - m, z + 1 + m);
+		glVertex3f(x + 1 + m, x - m, z + 1 + m);
+		glVertex3f(x + 1 + m, y + 1 + m, z + 1 + m);
+		glVertex3f(x - m, y + 1 + m, z + 1 + m);
 
-
-
-		glVertex3f(0, 1, 0);
-		glVertex3f(0, 0, 0);
-
-		glVertex3f(0, 0, 0);
-		glVertex3f(0, 0, 1);
-
-		glVertex3f(0, 0, 1);
-		glVertex3f(0, 1, 1);
-
-		glVertex3f(0, 1, 1);
-		glVertex3f(0, 1, 0);
-
-
-		glVertex3f(0, 1, 0);
-		glVertex3f(1, 1, 0);
-
-		glVertex3f(0, 0, 0);
-		glVertex3f(1, 0, 0);
-
-		glVertex3f(0, 0, 1);
-		glVertex3f(1, 0, 1);
-
-		glVertex3f(0, 1, 1);
-		glVertex3f(1, 1, 1);
+		glVertex3f(x - m, y + 1 + m, z - m);
+		glVertex3f(x + 1 + m, y + 1 + m, z - m);
+		glVertex3f(x + 1 + m, x - m, z - m);
+		glVertex3f(x - m, x - m, z - m);
 		glEnd();
 		glEndList();
 	}
@@ -492,19 +289,79 @@ public class FREEMine {
 		System.exit(i);
 	}
 	private int itime = 0;
-	private float selectionDistance = 0;
+	private int placeid;
 
 	private void input(int dt) {
+		time += dt;
 		if (Mouse.isGrabbed() != grabMouse) {
 			Mouse.setGrabbed(grabMouse);
 		}
 		itime += dt;
 		while (Mouse.next()) {
 			if (Mouse.isGrabbed()) {
-				selectionDistance -= Mouse.getDWheel();
 				rX += Mouse.getDX() * mouseSensitivity;
 				rX %= 360;
 				rY = Math.max(-90, Math.min(90, rY - Mouse.getDY() * mouseSensitivity));
+				if (Mouse.getEventButtonState() == true) {
+					if (Mouse.getEventButton() == 0) {
+						BlockPosition b = player.getSelectedBlock();
+						if (getBlockAt(b.x, b.y, b.z) != null) {
+							Chunk c = getChunkAt(b.x >> 4, b.y >> 4, b.z >> 4);
+							c.setBlockAt(b.x, b.y, b.z, 0);
+							int cx = b.x >> 4;
+							int cy = b.y >> 4;
+							int cz = b.z >> 4;
+							buildChunkDisplayList(cx, cy, cz);
+							if ((b.x & 0xf) == 0) {
+								buildChunkDisplayList(cx - 1, cy, cz);
+							}
+							if ((b.x & 0xf) == 0xf) {
+								buildChunkDisplayList(cx + 1, cy, cz);
+							}
+							if ((b.y & 0xf) == 0) {
+								buildChunkDisplayList(cx, cy - 1, cz);
+							}
+							if ((b.y & 0xf) == 0xf) {
+								buildChunkDisplayList(cx, cy + 1, cz);
+							}
+							if ((b.z & 0xf) == 0) {
+								buildChunkDisplayList(cx, cy, cz - 1);
+							}
+							if ((b.z & 0xf) == 0xf) {
+								buildChunkDisplayList(cx, cy, cz + 1);
+							}
+						}
+					}
+					if (Mouse.getEventButton() == 1) {
+						BlockPosition b = player.getBlockOnSelectedBlock();
+						if (getBlockAt(b.x, b.y, b.z) != null) {
+							Chunk c = getChunkAt(b.x >> 4, b.y >> 4, b.z >> 4);
+							c.setBlockAt(b.x, b.y, b.z, placeid);
+							int cx = b.x >> 4;
+							int cy = b.y >> 4;
+							int cz = b.z >> 4;
+							buildChunkDisplayList(cx, cy, cz);
+							if ((b.x & 0xf) == 0) {
+								buildChunkDisplayList(cx - 1, cy, cz);
+							}
+							if ((b.x & 0xf) == 0xf) {
+								buildChunkDisplayList(cx + 1, cy, cz);
+							}
+							if ((b.y & 0xf) == 0) {
+								buildChunkDisplayList(cx, cy - 1, cz);
+							}
+							if ((b.y & 0xf) == 0xf) {
+								buildChunkDisplayList(cx, cy + 1, cz);
+							}
+							if ((b.z & 0xf) == 0) {
+								buildChunkDisplayList(cx, cy, cz - 1);
+							}
+							if ((b.z & 0xf) == 0xf) {
+								buildChunkDisplayList(cx, cy, cz + 1);
+							}
+						}
+					}
+				}
 			}
 		}
 		while (Keyboard.next()) {
@@ -533,6 +390,11 @@ public class FREEMine {
 					itime = 0;
 				}
 			}
+			String c = String.valueOf(Keyboard.getEventCharacter());
+			try {
+				placeid = Integer.parseInt(c);
+			} catch (NumberFormatException ignore) {
+			}
 		}
 
 		double sinRX = Math.sin(Math.toRadians(rX));
@@ -546,12 +408,247 @@ public class FREEMine {
 		player.setY((float)(y - upMove * dt - forwardMove * dt * sinRY));
 		player.setRx(rX);
 		player.setRy(rY);
-		float pz = player.getZ() + (float)(selectionDistance * cosRX * cosRY * 0.01F);
-		float py = player.getY() + (float)(selectionDistance * sinRY * 0.01F);
-		float px = player.getX() + (float)(-selectionDistance * sinRX * cosRY * 0.01F);
-		//System.out.println(px + ", " + py + ", " + pz);
-		player.setSelectedBlock((int)px - (px < 0 ? 1 : 0), (int)py - (py < 0 ? 1 : 0),
-				(int)pz - (pz < 0 ? 1 : 0));
+		player.setSelectedBlock(null);
+		float px = 0, py = 0, pz = 0;
+		for (float i = 0; i <= 5; i += 0.001F) {
+			int px_int_prev = (int)px - (px < 0 ? 1 : 0);
+			int py_int_prev = (int)py - (py < 0 ? 1 : 0);
+			int pz_int_prev = (int)pz - (pz < 0 ? 1 : 0);
+			pz = player.getZ() + (float)(-i * cosRX * cosRY);
+			py = player.getY() + (float)(-i * sinRY);
+			px = player.getX() + (float)(i * sinRX * cosRY);
+			//System.out.println(px + ", " + py + ", " + pz);
+			int px_int = (int)px - (px < 0 ? 1 : 0);
+			int py_int = (int)py - (py < 0 ? 1 : 0);
+			int pz_int = (int)pz - (pz < 0 ? 1 : 0);
+			Block b = getBlockAt(px_int, py_int, pz_int);
+			if (b != null) {
+				player.setSelectedBlock(px_int, py_int, pz_int);
+				player.setBlockOnSelectedBlock(px_int_prev, py_int_prev, pz_int_prev);
+				break;
+			}
+		}
+	}
+
+	private void buildChunkDisplayList(int cx, int cy, int cz) {
+		Chunk chunk = getChunkAt(cx, cy, cz);
+		if (chunk == null) {
+			return;
+		}
+		int displayList;
+		if (!chunkDisplayLists.containsKey(chunk.getPosition())) {
+			displayList = glGenLists(1);
+			chunkDisplayLists.put(chunk.getPosition(), displayList);
+		} else {
+			displayList = chunkDisplayLists.get(chunk.getPosition());
+		}
+		Chunk cxm = null, cxp = null, cym = null, cyp = null, czm = null, czp = null;
+		cxm = getChunkAt(cx - 1, cy, cz);
+		cxp = getChunkAt(cx + 1, cy, cz);
+		cym = getChunkAt(cx, cy - 1, cz);
+		cyp = getChunkAt(cx, cy + 1, cz);
+		czm = getChunkAt(cx, cy, cz - 1);
+		czp = getChunkAt(cx, cy, cz + 1);
+		tex.bind();
+		glNewList(displayList, GL_COMPILE);
+		glBegin(GL_QUADS);
+		for (int x = 0; x < Chunk.CHUNK_X; ++x) {
+			for (int y = 0; y < Chunk.CHUNK_Y; ++y) {
+				for (int z = 0; z < Chunk.CHUNK_Z; ++z) {
+					if (chunk.getBlockAt(x, y, z) != 0) {
+						boolean xp = false, xm = false, yp = false, ym = false, zp = false, zm =
+								false;
+
+						if (x == Chunk.CHUNK_X - 1) {
+							if (cxp == null || cxp.getBlockAt(0, y, z) == 0) {
+								xp = true;
+							}
+						} else {
+							if (chunk.getBlockAt(x + 1, y, z) == 0) {
+								xp = true;
+							}
+						}
+
+						if (x == 0) {
+							if (cxm == null || cxm.getBlockAt(Chunk.CHUNK_X - 1, y, z) == 0) {
+								xm = true;
+							}
+						} else {
+							if (chunk.getBlockAt(x - 1, y, z) == 0) {
+								xm = true;
+							}
+						}
+
+						if (y == Chunk.CHUNK_Y - 1) {
+							if (cyp == null || cyp.getBlockAt(x, 0, z) == 0) {
+								yp = true;
+							}
+						} else {
+							if (chunk.getBlockAt(x, y + 1, z) == 0) {
+								yp = true;
+							}
+						}
+
+						if (y == 0) {
+							if (cym == null || cym.getBlockAt(x, Chunk.CHUNK_Y - 1, z) == 0) {
+								ym = true;
+							}
+						} else {
+							if (chunk.getBlockAt(x, y - 1, z) == 0) {
+								ym = true;
+							}
+						}
+
+						if (z == Chunk.CHUNK_Z - 1) {
+							if (czp == null || czp.getBlockAt(x, y, 0) == 0) {
+								zp = true;
+							}
+						} else {
+							if (chunk.getBlockAt(x, y, z + 1) == 0) {
+								zp = true;
+							}
+						}
+
+						if (z == 0) {
+							if (czm == null || czm.getBlockAt(x, y, Chunk.CHUNK_Z - 1) == 0) {
+								zm = true;
+							}
+						} else {
+							if (chunk.getBlockAt(x, y, z - 1) == 0) {
+								zm = true;
+							}
+						}
+						Block b = Block.blocks.get(chunk.getBlockAt(x, y, z));
+						if (xp) {
+							int texid = b.getTextureForSide(0);
+							float tx = (texid & 0xf) / 16f;
+							float ty = (texid >> 4) / 16f;
+							glColor3f(0.7F, 0.7F, 0.7F);
+							glTexCoord2f(tx + 0.0625F, ty);
+							glVertex3f(x + 1, y + 1, z + 1);
+
+							glTexCoord2f(tx + 0.0625F, ty + 0.0625F);
+							glVertex3f(x + 1, y, z + 1);
+
+							glTexCoord2f(tx, ty + 0.0625F);
+							glVertex3f(x + 1, y, z);
+
+							glTexCoord2f(tx, ty);
+							glVertex3f(x + 1, y + 1, z);
+						}
+						if (xm) {
+							int texid = b.getTextureForSide(1);
+							float tx = (texid & 0xf) / 16f;
+							float ty = (texid >> 4) / 16f;
+							glColor3f(0.7F, 0.7F, 0.7F);
+							glTexCoord2f(tx, ty);
+							glVertex3f(x, y + 1, z);
+
+							glTexCoord2f(tx, ty + 0.0625F);
+							glVertex3f(x, y, z);
+
+							glTexCoord2f(tx + 0.0625F, ty + 0.0625F);
+							glVertex3f(x, y, z + 1);
+
+							glTexCoord2f(tx + 0.0625F, ty);
+							glVertex3f(x, y + 1, z + 1);
+						}
+						if (yp) {
+							int texid = b.getTextureForSide(2);
+							float tx = (texid & 0xf) / 16f;
+							float ty = (texid >> 4) / 16f;
+							glColor3f(1.1F, 1.1F, 1.1F);
+							glTexCoord2f(tx + 0.0625F, ty);
+							glVertex3f(x, y + 1, z + 1);
+
+							glTexCoord2f(tx, ty);
+							glVertex3f(x + 1, y + 1, z + 1);
+
+							glTexCoord2f(tx, ty + 0.0625F);
+							glVertex3f(x + 1, y + 1, z);
+
+							glTexCoord2f(tx + 0.0625F, ty + 0.0625F);
+							glVertex3f(x, y + 1, z);
+						}
+						if (ym) {
+							int texid = b.getTextureForSide(3);
+							float tx = (texid & 0xf) / 16f;
+							float ty = (texid >> 4) / 16f;
+							glColor3f(0.6F, 0.6F, 0.6F);
+							glTexCoord2f(tx + 0.0625F, ty + 0.0625F);
+							glVertex3f(x, y, z);
+
+							glTexCoord2f(tx, ty + 0.0625F);
+							glVertex3f(x + 1, y, z);
+
+							glTexCoord2f(tx, ty);
+							glVertex3f(x + 1, y, z + 1);
+
+							glTexCoord2f(tx + 0.0625F, ty);
+							glVertex3f(x, y, z + 1);
+						}
+						if (zp) {
+							int texid = b.getTextureForSide(4);
+							float tx = (texid & 0xf) / 16f;
+							float ty = (texid >> 4) / 16f;
+							glColor3f(0.85F, 0.85F, 0.85F);
+							glTexCoord2f(tx + 0.0625F, ty + 0.0625F);
+							glVertex3f(x, y, z + 1);
+
+							glTexCoord2f(tx, ty + 0.0625F);
+							glVertex3f(x + 1, y, z + 1);
+
+							glTexCoord2f(tx, ty);
+							glVertex3f(x + 1, y + 1, z + 1);
+
+							glTexCoord2f(tx + 0.0625F, ty);
+							glVertex3f(x, y + 1, z + 1);
+						}
+						if (zm) {
+							int texid = b.getTextureForSide(5);
+							float tx = (texid & 0xf) / 16f;
+							float ty = (texid >> 4) / 16f;
+							glColor3f(0.85F, 0.85F, 0.85F);
+							glTexCoord2f(tx + 0.0625F, ty);
+							glVertex3f(x, y + 1, z);
+
+							glTexCoord2f(tx, ty);
+							glVertex3f(x + 1, y + 1, z);
+
+							glTexCoord2f(tx, ty + 0.0625F);
+							glVertex3f(x + 1, y, z);
+
+							glTexCoord2f(tx + 0.0625F, ty + 0.0625F);
+							glVertex3f(x, y, z);
+						}
+					}
+				}
+			}
+		}
+		glEnd();
+		glEndList();
+	}
+
+	public Block getBlockAt(int x, int y, int z) {
+		Chunk chunk = getChunkAt(x >> 4, y >> 4, z >> 4);
+		if (chunk == null) {
+			return null;
+		}
+		return Block.byId(chunk.getBlockAt(x, y, z));
+	}
+
+	public Chunk getChunkAt(int x, int y, int z) {
+		if (x >= maxWorldChunkX ||
+				y >= maxWorldChunkY ||
+				z >= maxWorldChunkZ ||
+				x < minWorldChunkX ||
+				y < minWorldChunkY ||
+				z < minWorldChunkZ) {
+			return null;
+		}
+		return chunkArray[(z - minWorldChunkZ) + (y - minWorldChunkY) * (maxWorldChunkZ -
+				minWorldChunkZ) + (x - minWorldChunkX) * (maxWorldChunkY - minWorldChunkY) *
+				(maxWorldChunkZ - minWorldChunkZ)];
 	}
 
 	private void loadTextures() {
@@ -581,7 +678,8 @@ public class FREEMine {
 		int e = glGetError();
 		if (e != GL_NO_ERROR) {
 			Logger.getLogger(this.getClass().getName()).
-					log(Level.SEVERE, "OpenGL Error! {2} {0} - {1}", new Object[]{e, gluErrorString(e), msg});
+					log(Level.SEVERE, "OpenGL Error! {2} {0} - {1}", new Object[]{e, gluErrorString(
+				e), msg});
 		}
 	}
 }

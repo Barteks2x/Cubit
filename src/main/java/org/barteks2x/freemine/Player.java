@@ -3,7 +3,8 @@ package org.barteks2x.freemine;
 public class Player {
 
 	protected float x, y, z, rx, ry;
-	protected BlockPosition selectedBlock = new BlockPosition(0, 0, 0);
+	protected BlockPosition selectedBlock = null;
+	protected BlockPosition blockOnSelected = null;
 
 	public Player() {
 		x = 0;
@@ -57,7 +58,23 @@ public class Player {
 		selectedBlock = new BlockPosition(x, y, z);
 	}
 
+	public void setSelectedBlock(BlockPosition pos) {
+		selectedBlock = pos;
+	}
+
 	public BlockPosition getSelectedBlock() {
 		return selectedBlock;
+	}
+
+	public void setBlockOnSelectedBlock(int x, int y, int z) {
+		blockOnSelected = new BlockPosition(x, y, z);
+	}
+
+	public void setBlockOnSelectedBlock(BlockPosition pos) {
+		blockOnSelected = pos;
+	}
+
+	public BlockPosition getBlockOnSelectedBlock() {
+		return blockOnSelected;
 	}
 }
