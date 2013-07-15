@@ -3,7 +3,7 @@ package org.barteks2x.freemine.block;
 public class BlockCobbleStone extends Block {
 
 	public BlockCobbleStone(int id) {
-		super(id);
+		super(id, "Cobble Stone");
 	}
 
 	@Override

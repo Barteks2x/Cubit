@@ -170,10 +170,16 @@ public class FREEMine {
 		String selx = pos != null ? formatter.format(pos.x) : "no selection";
 		String sely = pos != null ? formatter.format(pos.y) : "no selection";
 		String selz = pos != null ? formatter.format(pos.z) : "no selection";
+		BlockPosition pos2 = player.getBlockOnSelectedBlock();
+		String selx2 = pos2 != null ? formatter.format(pos2.x) : "no selection";
+		String sely2 = pos2 != null ? formatter.format(pos2.y) : "no selection";
+		String selz2 = pos2 != null ? formatter.format(pos2.z) : "no selection";
 		font.bind().drawString(0, 0, new StringBuilder("FPS: ").append(timer.getFPS()).append("\n").
 				append("X: ").append(x).append("\nY: ").append(y).append("\nZ: ").append(z).append(
 				"\nselX: ").append(selx).append("\nsely: ").append(sely).append("\nselz: ").append(
-				selz).toString());
+				selz).append("\nonselX: ").append(selx2).append("\nonselY: ").append(sely2).append(
+				"\nonselZ: ").append(selz2).append("\nplace: ").append(Block.byId(placeid) != null ?
+				Block.byId(placeid).toString() : "no block").toString());
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrix(perspectiveProjMatrix);
@@ -305,7 +311,7 @@ public class FREEMine {
 				if (Mouse.getEventButtonState() == true) {
 					if (Mouse.getEventButton() == 0) {
 						BlockPosition b = player.getSelectedBlock();
-						if (getBlockAt(b.x, b.y, b.z) != null) {
+						if (b != null && getBlockAt(b.x, b.y, b.z) != null) {
 							Chunk c = getChunkAt(b.x >> 4, b.y >> 4, b.z >> 4);
 							c.setBlockAt(b.x, b.y, b.z, 0);
 							int cx = b.x >> 4;
@@ -333,8 +339,9 @@ public class FREEMine {
 						}
 					}
 					if (Mouse.getEventButton() == 1) {
+						Mouse.setGrabbed(false);
 						BlockPosition b = player.getBlockOnSelectedBlock();
-						if (getBlockAt(b.x, b.y, b.z) != null) {
+						if (b != null && getChunkAt(b.x >> 4, b.y >> 4, b.z >> 4) != null) {
 							Chunk c = getChunkAt(b.x >> 4, b.y >> 4, b.z >> 4);
 							c.setBlockAt(b.x, b.y, b.z, placeid);
 							int cx = b.x >> 4;

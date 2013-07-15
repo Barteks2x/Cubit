@@ -3,7 +3,7 @@ package org.barteks2x.freemine.block;
 public class BlockDirt extends Block {
 
 	public BlockDirt(int id) {
-		super(id);
+		super(id, "Dirt");
 	}
 
 	@Override

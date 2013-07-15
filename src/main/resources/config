@@ -1,8 +1,8 @@
 #Properties
-#Sun Jul 14 23:14:41 CEST 2013
+#Mon Jul 15 13:45:33 CEST 2013
 lwjgl.version=2.8.5
-describe=0.0-16-g88b2bcc
-git.commit.count=16
+describe=0.0-17-gea5c9f7
+git.commit.count=17
 natives.version=0.0.6
 slick.version=274
 project.build.sourceEncoding=UTF-8

@@ -13,9 +13,11 @@ public abstract class Block {
 	public static final Block GRASS = new BlockGrass(3);
 	public static final Block COBBLESTONE = new BlockCobbleStone(4);
 	private final int ID;
+	private final String name;
 
 	@SuppressWarnings("LeakingThisInConstructor")
-	public Block(int id) {
+	public Block(int id, String name) {
+		this.name = name;
 		this.ID = id;
 		blocks.put(id, this);
 	}
@@ -60,5 +62,10 @@ public abstract class Block {
 
 	public static Block byId(int id) {
 		return blocks.get(id);
+	}
+
+	@Override
+	public String toString() {
+		return name;
 	}
 }
