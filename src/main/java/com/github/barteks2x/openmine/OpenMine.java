@@ -19,41 +19,41 @@ import static org.lwjgl.util.glu.GLU.*;
 public class OpenMine {
     //Unused. In OpenJDk, the logManager internally only keeps weak references. So the logger can be removed by garbage collector if there is no hard reference
 
-    private static Logger logger = Logger.getLogger(OpenMine.class.getName());
+    private static final Logger logger = Logger.getLogger(OpenMine.class.getName());
     //OpenGL
     private final String title;
     private int fov;
     private float aspectRatio;
     private float zNear, zFar;
     private int width, height;
-    private byte maxFPS = 60;
+    private final byte maxFPS;
     private boolean isRunning = true;
     //Generator
-    private FloatBuffer perspectiveProjMatrix = BufferUtils.createFloatBuffer(16);
-    private FloatBuffer orthographicProjMatrix = BufferUtils.createFloatBuffer(16);
-    private ChunkGenerator chunkGenerator;
-    private Chunk chunkArray[];
-    private Map<ChunkPosition, Integer> chunkDisplayLists;
+    private final FloatBuffer perspectiveProjMatrix = BufferUtils.createFloatBuffer(16);
+    private final FloatBuffer orthographicProjMatrix = BufferUtils.createFloatBuffer(16);
+    private final ChunkGenerator chunkGenerator;
+    private final Chunk chunkArray[];
+    private final Map<ChunkPosition, Integer> chunkDisplayLists;
     private int selectionDisplayList;
-    private long seed = System.currentTimeMillis();
+    private final long seed;
     //movement
-    private Timer timer;
+    private final Timer timer;
     private float forwardMove = 0, sideMove = 0, upMove = 0, rX = 0, rY = 0;
-    private float playerSpeed = 0.003F;//units per milisecond
-    private float mouseSensitivity;
+    private final float playerSpeed = 0.003F;    
+    private final float mouseSensitivity;
     private boolean grabMouse;
-    private Player player;
+    private final Player player;
     //Textures and fonts
     private BitmapFont font;
-    private DecimalFormat formatter = new DecimalFormat("#.###");
+    private final DecimalFormat formatter;
     private Texture tex;
     //world constants
-    private int minWorldChunkX = -5;
-    private int maxWorldChunkX = 5;
-    private int minWorldChunkZ = -5;
-    private int maxWorldChunkZ = 5;
-    private int minWorldChunkY = -5;
-    private int maxWorldChunkY = 4;
+    private final int minWorldChunkX = -5;
+    private final int maxWorldChunkX = 5;
+    private final int minWorldChunkZ = -5;
+    private final int maxWorldChunkZ = 5;
+    private final int minWorldChunkY = -5;
+    private final int maxWorldChunkY = 4;
     private float time;
     private int itime = 0;
     private int placeid;
@@ -68,6 +68,9 @@ public class OpenMine {
     }
 
     public OpenMine() {
+        this.formatter = new DecimalFormat("#.###");
+        this.seed = System.currentTimeMillis();
+        this.maxFPS = 60;
         FileHandler fileHandler = null;
         this.title = OpenMine.class.getSimpleName() + " " + Version.getVersion();
         try {
