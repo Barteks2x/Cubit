@@ -146,7 +146,7 @@
                         <index>true</index>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.barteks2x.freemine.FREEMine</mainClass>
+                            <mainClass>com.github.barteks2x.OpenMine</mainClass>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
@@ -167,14 +167,14 @@
     </build>
     <!-- Source code access -->
     <scm>
-        <developerConnection>scm:git:git@github.com:Barteks2x/FREEMine.git</developerConnection>
-        <connection>scm:git:git://github.com/Barteks2x/FREEMine.git</connection>
-        <url>https://github.com/Barteks2x/FREEMine</url>
+        <developerConnection>scm:git:git@github.com:Barteks2x/OpenMine.git</developerConnection>
+        <connection>scm:git:git://github.com/Barteks2x/OpenMine.git</connection>
+        <url>https://github.com/Barteks2x/OpenMine</url>
     </scm>
 
     <!-- Build server -->
     <ciManagement>
         <system>jenkins</system>
-        <url>https://buildhive.cloudbees.com/job/Barteks2x/job/FREEMine/</url>
+        <url>https://buildhive.cloudbees.com/job/Barteks2x/job/OpenMine</url>
     </ciManagement>
 </project>
