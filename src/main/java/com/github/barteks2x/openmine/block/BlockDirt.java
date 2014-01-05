@@ -1,4 +1,4 @@
-package org.barteks2x.freemine.block;
+package com.github.barteks2x.openmine.block;
 
 public class BlockDirt extends Block {
 

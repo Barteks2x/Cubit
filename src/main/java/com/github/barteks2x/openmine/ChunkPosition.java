@@ -1,4 +1,4 @@
-package org.barteks2x.freemine;
+package com.github.barteks2x.openmine;
 
 public class ChunkPosition extends IntPosition{
 	public ChunkPosition(int x, int y, int z){

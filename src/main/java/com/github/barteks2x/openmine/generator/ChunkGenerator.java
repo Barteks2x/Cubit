@@ -1,12 +1,12 @@
-package org.barteks2x.freemine.generator;
+package com.github.barteks2x.openmine.generator;
 
 import java.util.Random;
-import org.barteks2x.freemine.Chunk;
-import org.barteks2x.freemine.block.Block;
+import com.github.barteks2x.openmine.Chunk;
+import com.github.barteks2x.openmine.block.Block;
 
-import static org.barteks2x.freemine.BlockInChunkPosition.getIndexFromXYZ;
-import org.barteks2x.freemine.BlockPosition;
-import org.barteks2x.freemine.IntPosition;
+import static com.github.barteks2x.openmine.BlockInChunkPosition.getIndexFromXYZ;
+import com.github.barteks2x.openmine.BlockPosition;
+import com.github.barteks2x.openmine.IntPosition;
 
 public class ChunkGenerator {
 

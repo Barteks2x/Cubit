@@ -1,4 +1,4 @@
-package org.barteks2x.freemine;
+package com.github.barteks2x.openmine;
 
 import java.io.*;
 import java.util.logging.Level;
@@ -23,16 +23,16 @@ public class Version {
 				}
 			}
 		} catch (FileNotFoundException ex) {
-			Logger.getLogger(FREEMine.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(OpenMine.class.getName()).log(Level.SEVERE, null, ex);
 		} catch (IOException ex) {
-			Logger.getLogger(FREEMine.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(OpenMine.class.getName()).log(Level.SEVERE, null, ex);
 		} finally {
 			try {
 				if (reader != null) {
 					reader.close();
 				}
 			} catch (IOException ex) {
-				Logger.getLogger(FREEMine.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(OpenMine.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 		return version;

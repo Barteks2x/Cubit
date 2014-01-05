@@ -1,4 +1,4 @@
-package org.barteks2x.freemine.block;
+package com.github.barteks2x.openmine.block;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package org.barteks2x.freemine;
+package com.github.barteks2x.openmine;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,9 +30,6 @@ public class TextureLoader {
 		} catch (IOException ex) {
 			Logger.getLogger(TextureLoader.class.getName()).log(Level.SEVERE, null, ex);
 			return null;
-		} catch (Throwable t) {
-			Logger.getLogger(TextureLoader.class.getName()).log(Level.SEVERE, null, t);
-			return null;
 		}
 	}
 
@@ -41,9 +38,6 @@ public class TextureLoader {
 			return loadTexture(name);
 		} catch (IOException ex) {
 			Logger.getLogger(TextureLoader.class.getName()).log(Level.SEVERE, null, ex);
-			return null;
-		} catch (Throwable t) {
-			Logger.getLogger(TextureLoader.class.getName()).log(Level.SEVERE, null, t);
 			return null;
 		}
 	}

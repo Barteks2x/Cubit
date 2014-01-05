@@ -1,4 +1,4 @@
-package org.barteks2x.freemine.generator;
+package com.github.barteks2x.openmine.generator;
 
 public interface INoiseGenerator2d {
 

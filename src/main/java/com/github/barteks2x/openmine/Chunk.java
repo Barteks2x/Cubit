@@ -1,4 +1,4 @@
-package org.barteks2x.freemine;
+package com.github.barteks2x.openmine;
 
 public class Chunk {
 

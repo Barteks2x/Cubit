@@ -1,4 +1,4 @@
-package org.barteks2x.freemine.generator;
+package com.github.barteks2x.openmine.generator;
 
 import java.util.Random;
 
