@@ -1,3 +1,3 @@
-FREEMine
+OpenMine
 ========
-Freemine is open source block-based sandbox game like Minecraft or Infiniminer.
+OpenMine is open source block-based sandbox game like Minecraft or Infiniminer.
