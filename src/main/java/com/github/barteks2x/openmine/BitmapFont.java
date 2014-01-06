@@ -8,13 +8,11 @@ public class BitmapFont {
     public float texSize = 256;
 
     protected Color color;
-    private int[] ASCIIdisplayLists;
+    private final int[] ASCIIdisplayLists;
     Texture tex;
 
     public BitmapFont(String texture) {
         this(TextureLoader.loadTextureSafe(texture));
-        this.ASCIIdisplayLists = new int[ASCII_CHARS];
-        this.color = new Color(255, 255, 255);
     }
 
     public BitmapFont(Texture texture) {

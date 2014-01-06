@@ -8,6 +8,7 @@ public abstract class Block {
 
     public static final Map<Integer, Block> blocks = new HashMap<Integer, Block>(256);
     //Blocks
+    public static final Block AIR = new BlockAir(0);
     public static final Block STONE = new BlockStone(1);
     public static final Block DIRT = new BlockDirt(2);
     public static final Block GRASS = new BlockGrass(3);
@@ -58,14 +59,19 @@ public abstract class Block {
             return false;
         }
         final Block other = (Block)obj;
-        if(this.ID != other.getID()) {
-            return false;
-        }
-        return true;
+        return this.ID == other.getID();
     }
 
     @Override
     public String toString() {
         return name;
+    }
+    
+    public boolean renderBlock(){
+        return true;
+    }
+    
+    public boolean isTransparent(){
+        return false;
     }
 }

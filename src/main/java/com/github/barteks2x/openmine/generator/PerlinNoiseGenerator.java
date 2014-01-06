@@ -1,6 +1,6 @@
 package com.github.barteks2x.openmine.generator;
 
-public class PerlinNoiseGenerator extends NoiseGenerator2d {
+public class PerlinNoiseGenerator extends ANoiseGenerator2d {
 
     public PerlinNoiseGenerator(double grid, double persistance, int octaves, double fq, long seed) {
         super(grid, persistance, octaves, fq, seed);

@@ -29,13 +29,6 @@
             <id>nifty-maven-repo.sourceforge.net</id>
             <url>http://nifty-gui.sourceforge.net/nifty-maven-repo/</url>
         </repository>
-        <!--<repository>
-                <id>spout-repo</id>
-                <url>http://repo.spout.org</url>
-                <snapshots>
-                        <enabled>true</enabled>
-                </snapshots>
-        </repository>-->
     </repositories>
     <pluginRepositories>
         <pluginRepository>

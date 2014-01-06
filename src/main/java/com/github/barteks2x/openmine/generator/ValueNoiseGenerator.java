@@ -2,9 +2,9 @@ package com.github.barteks2x.openmine.generator;
 
 import java.util.Random;
 
-public class ValueNoiseGenerator extends NoiseGenerator2d {
+public class ValueNoiseGenerator extends ANoiseGenerator2d {
 
-    private Random r = new Random();
+    private final Random r = new Random();
 
     public ValueNoiseGenerator(double grid, double persistance, int octaves, double fq, long seed) {
         super(grid, persistance, octaves, fq, seed);
@@ -43,7 +43,7 @@ public class ValueNoiseGenerator extends NoiseGenerator2d {
     }
 
     private double random(int x, int z) {
-        r.setSeed(seed + (((long)x) << 32 | z));
+        r.setSeed(seed + new Random(x).nextInt() + new Random(z).nextInt());
         return r.nextDouble();
     }
 }

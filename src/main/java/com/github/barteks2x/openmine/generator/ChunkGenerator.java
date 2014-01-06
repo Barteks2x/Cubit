@@ -1,42 +1,18 @@
 package com.github.barteks2x.openmine.generator;
 
+import com.github.barteks2x.openmine.world.Chunk;
 import static com.github.barteks2x.openmine.BlockInChunkPosition.*;
-import com.github.barteks2x.openmine.*;
 import com.github.barteks2x.openmine.block.Block;
-import java.util.Random;
 
-public class ChunkGenerator {
-
-    protected Random rand;
-    protected long seed;
+public class ChunkGenerator extends AChunkGenerator{
     protected INoiseGenerator2d noiseGen;
 
     public ChunkGenerator(long seed) {
-        this.rand = new Random(seed);
-        this.seed = seed;
+        super(seed);
         this.noiseGen = new ValueNoiseGenerator(128, 0.8D, 4, 2.24564D, seed);
     }
-
-    public Chunk generateChunk(int x, int y, int z) {
-        Random r1 = new Random(x);
-        Random r2 = new Random(y);
-        Random r3 = new Random(z);
-        rand.setSeed(seed + r1.nextLong() + r2.nextLong() + r3.nextLong());
-
-        int[] blocks = new int[Chunk.SIZE];
-        generateTerrain(x, y, z, blocks);
-        Chunk chunk = new Chunk(x, y, z, blocks);
-        return chunk;
-    }
-
-    public IntPosition getSpawnPoint() {
-        Random r = new Random();
-        int x = r.nextInt(64) - 32;
-        int z = r.nextInt(64) - 32;
-        int y = (int)(noiseGen.getFBMValueAt(x, z) * 32);
-        return new BlockPosition(x, y, z);
-    }
-
+    
+    @Override
     protected void generateTerrain(int x, int y, int z, int[] blocks) {
         for(int i = 0; i < Chunk.CHUNK_X; ++i) {
             for(int j = 0; j < Chunk.CHUNK_Z; ++j) {
@@ -69,5 +45,10 @@ public class ChunkGenerator {
                 }
             }
         }
+    }
+
+    @Override
+    protected int getApproximateHeightAt(int x, int z) {
+        return (int)(noiseGen.getFBMValueAt(x, z) * 32);
     }
 }

@@ -2,40 +2,39 @@ package com.github.barteks2x.openmine;
 
 public class Player {
 
-    protected float x, y, z, rx, ry;
+    protected final FloatPosition location;
+    protected float rx, ry;
     protected BlockPosition selectedBlock = null;
     protected BlockPosition blockOnSelected = null;
 
     public Player() {
-        x = 0;
-        y = 0;
-        z = 0;
+        this.location = new FloatPosition(0, 0, 0);
         rx = 0;
         ry = 0;
     }
 
     public float getX() {
-        return x;
+        return location.getX();
     }
 
     public void setX(float x) {
-        this.x = x;
+        this.location.setX(x);
     }
 
     public float getY() {
-        return y;
+        return location.getY();
     }
 
     public void setY(float y) {
-        this.y = y;
+        this.location.setY(y);
     }
 
     public float getZ() {
-        return z;
+        return location.getZ();
     }
 
     public void setZ(float z) {
-        this.z = z;
+        this.location.setZ(z);
     }
 
     public float getRx() {
@@ -76,5 +75,9 @@ public class Player {
 
     public BlockPosition getBlockOnSelectedBlock() {
         return blockOnSelected;
+    }
+    
+    public FloatPosition getLocation(){
+        return this.location;
     }
 }

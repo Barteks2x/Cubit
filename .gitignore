@@ -4,6 +4,10 @@
 *.jar
 *.war
 *.ear
+#logs
+*.log
+#linux files
+*.lck
 /.project
 /.classpath
 /.settings

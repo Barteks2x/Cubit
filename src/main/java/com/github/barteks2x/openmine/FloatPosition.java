@@ -1,43 +1,44 @@
 package com.github.barteks2x.openmine;
 
-public abstract class IntPosition {
+public class FloatPosition {
+    protected float x, y, z;
 
-    protected int x, y, z;
-
-    public IntPosition(int x, int y, int z) {
+    public FloatPosition(float x, float y, float z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public int getX() {
+    public float getX() {
         return this.x;
     }
 
-    public int getY() {
+    public float getY() {
         return this.y;
     }
 
-    public int getZ() {
+    public float getZ() {
         return this.z;
     }
 
-    public IntPosition setX(int x) {
+    public FloatPosition setX(float x) {
         this.x = x;
         return this;
     }
 
-    public IntPosition setY(int y) {
+    public FloatPosition setY(float y) {
         this.y = y;
         return this;
     }
 
-    public IntPosition setZ(int z) {
+    public FloatPosition setZ(float z) {
         this.z = z;
         return this;
     }
 
-    public abstract boolean isValid();
+    public boolean isValid(){
+        return true;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -47,15 +48,15 @@ public abstract class IntPosition {
         if(getClass() != obj.getClass()) {
             return false;
         }
-        if(obj == this){
-            return true;
-        }
         IntPosition other = (IntPosition)obj;
         return other.x == this.x && other.y == this.y && other.z == this.z;
     }
 
     @Override
     public int hashCode() {
-        return y ^ x << 10 ^ z << 21;
+        int x_ = Float.floatToIntBits(this.x);
+        int y_ = Float.floatToIntBits(this.y);
+        int z_ = Float.floatToIntBits(this.z);
+        return y_ ^ x_ << 10 ^ z_ << 21;
     }
 }

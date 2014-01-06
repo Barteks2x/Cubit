@@ -1,6 +1,6 @@
 package com.github.barteks2x.openmine.generator;
 
-public abstract class NoiseGenerator2d implements INoiseGenerator2d {
+public abstract class ANoiseGenerator2d implements INoiseGenerator2d {
 
     protected double grid;
     protected double persistance;
@@ -8,7 +8,7 @@ public abstract class NoiseGenerator2d implements INoiseGenerator2d {
     protected double fq;
     protected long seed;
 
-    public NoiseGenerator2d(double grid, double persistance, int octaves, double fq, long seed) {
+    public ANoiseGenerator2d(double grid, double persistance, int octaves, double fq, long seed) {
         this.grid = grid;
         this.persistance = persistance;
         this.octaves = octaves;

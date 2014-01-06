@@ -1,8 +1,10 @@
 package com.github.barteks2x.openmine;
 
+import com.github.barteks2x.openmine.world.Chunk;
 import com.github.barteks2x.openmine.Timer;
 import com.github.barteks2x.openmine.block.Block;
 import com.github.barteks2x.openmine.generator.ChunkGenerator;
+import com.github.barteks2x.openmine.world.World;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
@@ -18,8 +20,8 @@ import static org.lwjgl.util.glu.GLU.*;
 
 public class OpenMine {
     //Unused. In OpenJDk, the logManager internally only keeps weak references. So the logger can be removed by garbage collector if there is no hard reference
-
     private static final Logger logger = Logger.getLogger(OpenMine.class.getName());
+    public int renderDistance = 4;
     //OpenGL
     private final String title;
     private int fov;
@@ -28,18 +30,15 @@ public class OpenMine {
     private int width, height;
     private final byte maxFPS;
     private boolean isRunning = true;
-    //Generator
     private final FloatBuffer perspectiveProjMatrix = BufferUtils.createFloatBuffer(16);
     private final FloatBuffer orthographicProjMatrix = BufferUtils.createFloatBuffer(16);
-    private final ChunkGenerator chunkGenerator;
-    private final Chunk chunkArray[];
-    private final Map<ChunkPosition, Integer> chunkDisplayLists;
+    //Rendering
+    private final Map<Chunk, Integer> chunkDisplayLists;
     private int selectionDisplayList;
-    private final long seed;
     //movement
     private final Timer timer;
     private float forwardMove = 0, sideMove = 0, upMove = 0, rX = 0, rY = 0;
-    private final float playerSpeed = 0.003F;    
+    private final float playerSpeed = 0.003F;
     private final float mouseSensitivity;
     private boolean grabMouse;
     private final Player player;
@@ -47,16 +46,11 @@ public class OpenMine {
     private BitmapFont font;
     private final DecimalFormat formatter;
     private Texture tex;
-    //world constants
-    private final int minWorldChunkX = -5;
-    private final int maxWorldChunkX = 5;
-    private final int minWorldChunkZ = -5;
-    private final int maxWorldChunkZ = 5;
-    private final int minWorldChunkY = -5;
-    private final int maxWorldChunkY = 4;
     private float time;
     private int itime = 0;
     private int placeid;
+
+    private final World world;
 
     public static void main(String args[]) {
         OpenMine fm = new OpenMine();
@@ -69,7 +63,7 @@ public class OpenMine {
 
     public OpenMine() {
         this.formatter = new DecimalFormat("#.###");
-        this.seed = System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
         this.maxFPS = 60;
         FileHandler fileHandler = null;
         this.title = OpenMine.class.getSimpleName() + " " + Version.getVersion();
@@ -83,37 +77,11 @@ public class OpenMine {
         if(fileHandler != null) {
             logger.addHandler(fileHandler);
         }
-
-        int chunks = (maxWorldChunkX - minWorldChunkX) * (maxWorldChunkY - minWorldChunkY)
-                * (maxWorldChunkZ - minWorldChunkZ);
-        this.chunkArray = new Chunk[chunks];
-        chunkGenerator = new ChunkGenerator(seed);
+        this.world = new World(new ChunkGenerator(seed), seed);
         timer = new Timer();
         player = new Player();
         mouseSensitivity = 0.6F;
-        this.chunkDisplayLists = new HashMap<ChunkPosition, Integer>(chunks);
-    }
-
-    public Block getBlockAt(int x, int y, int z) {
-        Chunk chunk = getChunkAt(x >> 4, y >> 4, z >> 4);
-        if(chunk == null) {
-            return null;
-        }
-        return Block.byId(chunk.getBlockAt(x, y, z));
-    }
-
-    public Chunk getChunkAt(int x, int y, int z) {
-        if(x >= maxWorldChunkX
-                || y >= maxWorldChunkY
-                || z >= maxWorldChunkZ
-                || x < minWorldChunkX
-                || y < minWorldChunkY
-                || z < minWorldChunkZ) {
-            return null;
-        }
-        return chunkArray[(z - minWorldChunkZ) + (y - minWorldChunkY) * (maxWorldChunkZ
-                - minWorldChunkZ) + (x - minWorldChunkX) * (maxWorldChunkY - minWorldChunkY)
-                * (maxWorldChunkZ - minWorldChunkZ)];
+        this.chunkDisplayLists = new HashMap<Chunk, Integer>();
     }
 
     public FloatBuffer asFloatBuffer(float[] data) {
@@ -125,17 +93,16 @@ public class OpenMine {
         this.width = width;
         this.height = height;
         this.fov = 60;
-        this.aspectRatio = (float)width / (float)height;
+        this.aspectRatio = (float)width / height;
         zNear = 0.1F;
         zFar = 200F;
         initDisplay();
         initGL();
         loadFonts();
         loadTextures();
-        generateChunks(seed);
-        IntPosition spawn = chunkGenerator.getSpawnPoint();
+        FloatPosition spawn = world.getSpawnLocation();
         player.setX(spawn.x);
-        player.setY(spawn.y + 1.6F);
+        player.setY(spawn.y);
         player.setZ(spawn.z);
         initDisplayLists();
         while(isRunning) {
@@ -147,6 +114,7 @@ public class OpenMine {
             glLoadIdentity();
 
             tex.bind();
+            this.generateDisplayListsNearLocation(player.getLocation());
             renderChunks();
             renderSelection();
             renderText();
@@ -160,17 +128,26 @@ public class OpenMine {
     }
 
     private void renderChunks() {
-
         glRotated(player.getRy(), 1, 0, 0);
         glRotated(player.getRx(), 0, 1, 0);
         glTranslatef(-player.getX(), -player.getY(), -player.getZ());
-
-        for(int x = minWorldChunkX; x < maxWorldChunkX; ++x) {
-            for(int y = minWorldChunkY; y < maxWorldChunkY; ++y) {
-                for(int z = minWorldChunkZ; z < maxWorldChunkZ; ++z) {
+        FloatPosition spawn = new FloatPosition(player.getX(), player.getY(), player.getZ());
+        int spawnChunkX = MathHelper.floor(spawn.getX() / 16F);
+        int spawnChunkY = MathHelper.floor(spawn.getY() / 16F);
+        int spawnChunkZ = MathHelper.floor(spawn.getZ() / 16F);
+        for(int x = -renderDistance; x <= renderDistance; ++x) {
+            for(int y = -renderDistance; y <= renderDistance; ++y) {
+                for(int z = -renderDistance; z <= renderDistance; ++z) {
+                    int chunkX = spawnChunkX + x;
+                    int chunkY = spawnChunkY + y;
+                    int chunkZ = spawnChunkZ + z;
+                    int d = getChunkDisplayList(chunkX, chunkY, chunkZ);
+                    if(d == -1) {
+                        continue;
+                    }
                     glPushMatrix();
-                    glTranslatef(x << 4, y << 4, z << 4);
-                    glCallList(chunkDisplayLists.get(new ChunkPosition(x, y, z)));
+                    glTranslatef(chunkX << 4, chunkY << 4, chunkZ << 4);
+                    glCallList(d);
                     glPopMatrix();
                 }
             }
@@ -208,13 +185,13 @@ public class OpenMine {
         String selx2 = pos2 != null ? formatter.format(pos2.x) : "no selection";
         String sely2 = pos2 != null ? formatter.format(pos2.y) : "no selection";
         String selz2 = pos2 != null ? formatter.format(pos2.z) : "no selection";
-        font.bind().drawString(0, 0, new StringBuilder("FPS: ").append(timer.getFPS()).append("\n").
+        BitmapFont f = font.bind();
+        f.drawString(0, 0, new StringBuilder("FPS: ").append(timer.getFPS()).append("\n").
                 append("X: ").append(x).append("\nY: ").append(y).append("\nZ: ").append(z).append(
                         "\nselX: ").append(selx).append("\nsely: ").append(sely).append("\nselz: ").append(
                         selz).append("\nonselX: ").append(selx2).append("\nonselY: ").append(sely2).append(
                         "\nonselZ: ").append(selz2).append("\nplace: ").append(Block.byId(placeid) != null
                         ? Block.byId(placeid).toString() : "no block").toString());
-
         glMatrixMode(GL_PROJECTION);
         glLoadMatrix(perspectiveProjMatrix);
         glMatrixMode(GL_MODELVIEW);
@@ -261,27 +238,12 @@ public class OpenMine {
         Mouse.setGrabbed(true);
     }
 
-    private void generateChunks(long seed) {
-        int i = 0;
-        for(int x = minWorldChunkX; x < maxWorldChunkX; ++x) {
-            for(int y = minWorldChunkY; y < maxWorldChunkY; ++y) {
-                for(int z = minWorldChunkZ; z < maxWorldChunkZ; ++z) {
-                    chunkArray[i] = chunkGenerator.generateChunk(x, y, z);
-                    ++i;
-                }
-            }
-        }
-    }
-
     private void initDisplayLists() {
         //timer.nextDelta();
-        for(int x = minWorldChunkX; x < maxWorldChunkX; ++x) {
-            for(int y = minWorldChunkY; y < maxWorldChunkY; ++y) {
-                for(int z = minWorldChunkZ; z < maxWorldChunkZ; ++z) {
-                    buildChunkDisplayList(x, y, z);
-                }
-            }
-        }
+        FloatPosition pos = world.getSpawnLocation();
+        world.generateChunksNearSpawn();
+        this.generateDisplayListsNearLocation(pos);
+        
         //System.out.println(timer.nextDelta());
         selectionDisplayList = glGenLists(1);
         glNewList(selectionDisplayList, GL_COMPILE);
@@ -320,6 +282,31 @@ public class OpenMine {
         glEnd();
         glEndList();
     }
+    
+    private void generateDisplayListsNearLocation(FloatPosition pos){
+        Set<ChunkPosition> chunkDisplayListsToCompile = new HashSet<ChunkPosition>(20);
+        for(int x = -renderDistance; x <= renderDistance; ++x) {
+            for(int y = -renderDistance; y <= renderDistance; ++y) {
+                for(int z = -renderDistance; z <= renderDistance; ++z) {
+                    int chunkX = MathHelper.floor(pos.x / 16F) + x;
+                    int chunkY = MathHelper.floor(pos.y / 16F) + y;
+                    int chunkZ = MathHelper.floor(pos.z / 16F) + z;
+                    if(getChunkDisplayList(chunkX, chunkY, chunkZ) == -1){
+                        chunkDisplayListsToCompile.add(new ChunkPosition(chunkX, chunkY, chunkZ));
+                        chunkDisplayListsToCompile.add(new ChunkPosition(chunkX + 1, chunkY, chunkZ));
+                        chunkDisplayListsToCompile.add(new ChunkPosition(chunkX - 1 , chunkY, chunkZ));
+                        chunkDisplayListsToCompile.add(new ChunkPosition(chunkX, chunkY + 1, chunkZ));
+                        chunkDisplayListsToCompile.add(new ChunkPosition(chunkX, chunkY - 1, chunkZ));
+                        chunkDisplayListsToCompile.add(new ChunkPosition(chunkX, chunkY, chunkZ + 1));
+                        chunkDisplayListsToCompile.add(new ChunkPosition(chunkX, chunkY, chunkZ - 1));
+                    }
+                }
+            }
+        }
+        for(ChunkPosition p : chunkDisplayListsToCompile){
+            buildChunkDisplayList(p.x, p.y, p.z);
+        }
+    }
 
     private void onClose(int i) {
         Collection<Integer> lists = chunkDisplayLists.values();
@@ -343,9 +330,8 @@ public class OpenMine {
                 if(Mouse.getEventButtonState() == true) {
                     if(Mouse.getEventButton() == 0) {
                         BlockPosition b = player.getSelectedBlock();
-                        if(b != null && getBlockAt(b.x, b.y, b.z) != null) {
-                            Chunk c = getChunkAt(b.x >> 4, b.y >> 4, b.z >> 4);
-                            c.setBlockAt(b.x, b.y, b.z, 0);
+                        if(b != null) {
+                            world.setBlockAt(b.x, b.y, b.z, Block.AIR);
                             int cx = b.x >> 4;
                             int cy = b.y >> 4;
                             int cz = b.z >> 4;
@@ -373,9 +359,8 @@ public class OpenMine {
                     if(Mouse.getEventButton() == 1) {
                         Mouse.setGrabbed(false);
                         BlockPosition b = player.getBlockOnSelectedBlock();
-                        if(b != null && getChunkAt(b.x >> 4, b.y >> 4, b.z >> 4) != null) {
-                            Chunk c = getChunkAt(b.x >> 4, b.y >> 4, b.z >> 4);
-                            c.setBlockAt(b.x, b.y, b.z, placeid);
+                        if(b != null) {
+                            world.setBlockAt(b.x, b.y, b.z, Block.byId(placeid));
                             int cx = b.x >> 4;
                             int cy = b.y >> 4;
                             int cz = b.z >> 4;
@@ -460,8 +445,8 @@ public class OpenMine {
             int px_int = (int)px - (px < 0 ? 1 : 0);
             int py_int = (int)py - (py < 0 ? 1 : 0);
             int pz_int = (int)pz - (pz < 0 ? 1 : 0);
-            Block b = getBlockAt(px_int, py_int, pz_int);
-            if(b != null) {
+            Block b = world.getBlockAt(px_int, py_int, pz_int);
+            if(b != Block.AIR) {
                 player.setSelectedBlock(px_int, py_int, pz_int);
                 player.setBlockOnSelectedBlock(px_int_prev, py_int_prev, pz_int_prev);
                 break;
@@ -470,94 +455,31 @@ public class OpenMine {
     }
 
     private void buildChunkDisplayList(int cx, int cy, int cz) {
-        Chunk chunk = getChunkAt(cx, cy, cz);
-        if(chunk == null) {
-            return;
-        }
-        int displayList;
-        if(!chunkDisplayLists.containsKey(chunk.getPosition())) {
+        Chunk c = world.getChunkAt(cx, cy, cz);
+        int displayList = getChunkDisplayList(cx, cy, cz);
+        if(displayList == -1) {
             displayList = glGenLists(1);
-            chunkDisplayLists.put(chunk.getPosition(), displayList);
-        } else {
-            displayList = chunkDisplayLists.get(chunk.getPosition());
+            chunkDisplayLists.put(c, displayList);
         }
-        Chunk cxm = null, cxp = null, cym = null, cyp = null, czm = null, czp = null;
-        cxm = getChunkAt(cx - 1, cy, cz);
-        cxp = getChunkAt(cx + 1, cy, cz);
-        cym = getChunkAt(cx, cy - 1, cz);
-        cyp = getChunkAt(cx, cy + 1, cz);
-        czm = getChunkAt(cx, cy, cz - 1);
-        czp = getChunkAt(cx, cy, cz + 1);
+        boolean xp, xm, yp, ym, zp, zm;
         tex.bind();
         glNewList(displayList, GL_COMPILE);
         glBegin(GL_QUADS);
+
         for(int x = 0; x < Chunk.CHUNK_X; ++x) {
             for(int y = 0; y < Chunk.CHUNK_Y; ++y) {
                 for(int z = 0; z < Chunk.CHUNK_Z; ++z) {
-                    if(chunk.getBlockAt(x, y, z) != 0) {
-                        boolean xp = false, xm = false, yp = false, ym = false, zp = false, zm
-                                = false;
-
-                        if(x == Chunk.CHUNK_X - 1) {
-                            if(cxp == null || cxp.getBlockAt(0, y, z) == 0) {
-                                xp = true;
-                            }
-                        } else {
-                            if(chunk.getBlockAt(x + 1, y, z) == 0) {
-                                xp = true;
-                            }
-                        }
-
-                        if(x == 0) {
-                            if(cxm == null || cxm.getBlockAt(Chunk.CHUNK_X - 1, y, z) == 0) {
-                                xm = true;
-                            }
-                        } else {
-                            if(chunk.getBlockAt(x - 1, y, z) == 0) {
-                                xm = true;
-                            }
-                        }
-
-                        if(y == Chunk.CHUNK_Y - 1) {
-                            if(cyp == null || cyp.getBlockAt(x, 0, z) == 0) {
-                                yp = true;
-                            }
-                        } else {
-                            if(chunk.getBlockAt(x, y + 1, z) == 0) {
-                                yp = true;
-                            }
-                        }
-
-                        if(y == 0) {
-                            if(cym == null || cym.getBlockAt(x, Chunk.CHUNK_Y - 1, z) == 0) {
-                                ym = true;
-                            }
-                        } else {
-                            if(chunk.getBlockAt(x, y - 1, z) == 0) {
-                                ym = true;
-                            }
-                        }
-
-                        if(z == Chunk.CHUNK_Z - 1) {
-                            if(czp == null || czp.getBlockAt(x, y, 0) == 0) {
-                                zp = true;
-                            }
-                        } else {
-                            if(chunk.getBlockAt(x, y, z + 1) == 0) {
-                                zp = true;
-                            }
-                        }
-
-                        if(z == 0) {
-                            if(czm == null || czm.getBlockAt(x, y, Chunk.CHUNK_Z - 1) == 0) {
-                                zm = true;
-                            }
-                        } else {
-                            if(chunk.getBlockAt(x, y, z - 1) == 0) {
-                                zm = true;
-                            }
-                        }
-                        Block b = Block.blocks.get(chunk.getBlockAt(x, y, z));
+                    int worldX = x | (cx << 4);
+                    int worldY = y | (cy << 4);
+                    int worldZ = z | (cz << 4);
+                    if(world.getBlockAt(worldX, worldY, worldZ).renderBlock()) {
+                        xp = world.getBlockAt(worldX + 1, worldY, worldZ).isTransparent();
+                        xm = world.getBlockAt(worldX - 1, worldY, worldZ).isTransparent();
+                        yp = world.getBlockAt(worldX, worldY + 1, worldZ).isTransparent();
+                        ym = world.getBlockAt(worldX, worldY - 1, worldZ).isTransparent();
+                        zp = world.getBlockAt(worldX, worldY, worldZ + 1).isTransparent();
+                        zm = world.getBlockAt(worldX, worldY, worldZ - 1).isTransparent();
+                        Block b = world.getBlockAt(worldX, worldY, worldZ);
                         if(xp) {
                             int texid = b.getTextureForSide(0);
                             float tx = (texid & 0xf) / 16f;
@@ -690,8 +612,13 @@ public class OpenMine {
         int e = glGetError();
         if(e != GL_NO_ERROR) {
             Logger.getLogger(this.getClass().getName()).
-                    log(Level.SEVERE, "OpenGL Error! {2} {0} - {1}", new Object[] {e, gluErrorString(
-                                e), msg});
+                    log(Level.SEVERE, "OpenGL Error! {2} {0} - {1}",
+                            new Object[] {e, gluErrorString(e), msg});
         }
+    }
+
+    private int getChunkDisplayList(int chunkX, int chunkY, int chunkZ) {
+        Integer d = chunkDisplayLists.get(world.getChunkAt(chunkX, chunkY, chunkZ));
+        return d == null ? -1 : d;
     }
 }
