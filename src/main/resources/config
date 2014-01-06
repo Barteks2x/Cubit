@@ -1,7 +1,7 @@
 #Properties
-#Sun Jan 05 21:10:01 CET 2014
+#Mon Jan 06 19:25:32 CET 2014
 lwjgl.version=2.8.5
-describe=0.0-21-gfc0e224
-git.commit.count=21
+describe=0.0-24-ge47885a
+git.commit.count=24
 project.build.sourceEncoding=UTF-8
 junit.version=4.11

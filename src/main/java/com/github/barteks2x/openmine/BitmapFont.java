@@ -1,13 +1,12 @@
 package com.github.barteks2x.openmine;
 
+import java.awt.Color;
 import static org.lwjgl.opengl.GL11.*;
-import org.lwjgl.util.Color;
 
 public class BitmapFont {
     private static final int ASCII_CHARS = 256;
     public float texSize = 256;
 
-    protected Color color;
     private final int[] ASCIIdisplayLists;
     Texture tex;
 
@@ -17,7 +16,6 @@ public class BitmapFont {
 
     public BitmapFont(Texture texture) {
         this.ASCIIdisplayLists = new int[ASCII_CHARS];
-        this.color = new Color(255, 255, 255);
         this.tex = texture;
         int startDispList = glGenLists(ASCII_CHARS);
         for(int i = 0; i < ASCII_CHARS; ++i) {
@@ -25,17 +23,18 @@ public class BitmapFont {
         }
     }
 
-    public BitmapFont drawString(float x, float y, String text) {
+    public BitmapFont drawString(float x, float y, float scale, Color color, String text) {
         char[] chars = text.toCharArray();
         glPushMatrix();
-        glColor3f(1, 1, 1);
+        glScalef(scale, scale, scale);
+        glColor4f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, color.getAlpha() / 255F);
         int line = 0;
-        glTranslatef(x, 0, y);
+        glTranslatef(x, y, 0);
         for(int i = 0; i < chars.length; ++i) {
             if(chars[i] == '\n') {
                 line++;
                 glLoadIdentity();
-                glTranslatef(x, 0, y);
+                glTranslatef(x, y, 0);
                 glTranslatef(0, 16 * line, 0);
                 continue;
             }
@@ -76,18 +75,5 @@ public class BitmapFont {
             glEndList();
         }
         return this;
-    }
-
-    public BitmapFont setColor(Color c) {
-        this.color = c;
-        return this;
-    }
-
-    public BitmapFont setColor(byte r, byte g, byte b) {
-        return this.setColor(new Color(r, g, b));
-    }
-
-    public Color getColor() {
-        return this.color;
     }
 }

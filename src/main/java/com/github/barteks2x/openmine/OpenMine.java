@@ -5,6 +5,7 @@ import com.github.barteks2x.openmine.Timer;
 import com.github.barteks2x.openmine.block.Block;
 import com.github.barteks2x.openmine.generator.ChunkGenerator;
 import com.github.barteks2x.openmine.world.World;
+import java.awt.Color;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
@@ -186,12 +187,13 @@ public class OpenMine {
         String sely2 = pos2 != null ? formatter.format(pos2.y) : "no selection";
         String selz2 = pos2 != null ? formatter.format(pos2.z) : "no selection";
         BitmapFont f = font.bind();
-        f.drawString(0, 0, new StringBuilder("FPS: ").append(timer.getFPS()).append("\n").
+        f.drawString(0, 0, 1, Color.WHITE, new StringBuilder("FPS: ").append(timer.getFPS()).append("\n").
                 append("X: ").append(x).append("\nY: ").append(y).append("\nZ: ").append(z).append(
                         "\nselX: ").append(selx).append("\nsely: ").append(sely).append("\nselz: ").append(
                         selz).append("\nonselX: ").append(selx2).append("\nonselY: ").append(sely2).append(
                         "\nonselZ: ").append(selz2).append("\nplace: ").append(Block.byId(placeid) != null
                         ? Block.byId(placeid).toString() : "no block").toString());
+        f.drawString((Display.getWidth() / 2F)/3F - 8, (Display.getHeight() / 2F) / 3F - 8, 3, Color.ORANGE, "X");
         glMatrixMode(GL_PROJECTION);
         glLoadMatrix(perspectiveProjMatrix);
         glMatrixMode(GL_MODELVIEW);
@@ -427,9 +429,9 @@ public class OpenMine {
         double sinRY = Math.sin(Math.toRadians(rY));
         float x = player.getX(), y = player.getY(), z = player.getZ();
 
-        player.setZ((float)(z - sideMove * dt * sinRX - forwardMove * dt * cosRX * cosRY));
-        player.setX((float)(x - sideMove * dt * cosRX + forwardMove * dt * sinRX * cosRY));
-        player.setY((float)(y - upMove * dt - forwardMove * dt * sinRY));
+        player.setZ((float)(z - sideMove * dt * sinRX - forwardMove * dt * cosRX /*** cosRY**/));
+        player.setX((float)(x - sideMove * dt * cosRX + forwardMove * dt * sinRX /*** cosRY**/));
+        player.setY((float)(y - upMove * dt/** - forwardMove * dt * sinRY**/));
         player.setRx(rX);
         player.setRy(rY);
         player.setSelectedBlock(null);
