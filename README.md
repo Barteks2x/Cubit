@@ -1,3 +1,3 @@
-OpenMine
+Cubit
 ========
-OpenMine is open source block-based sandbox game like Minecraft or Infiniminer.
+Cubit is open source block-based sandbox game like Minecraft or Infiniminer.
