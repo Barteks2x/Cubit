@@ -1,0 +1,118 @@
+/* 
+ * The MIT License
+ *
+ * Copyright 2014 Bartosz Skrzypczak.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+package com.github.barteks2x.cubit.generator;
+
+import com.github.barteks2x.cubit.location.BlockLocation;
+import com.github.barteks2x.cubit.location.Vec3I;
+import com.github.barteks2x.cubit.world.IChunk;
+import com.github.barteks2x.cubit.location.ChunkLocation;
+import com.github.barteks2x.cubit.world.AWorldBase;
+import com.github.barteks2x.cubit.world.IChunkFactory;
+import com.github.barteks2x.cubit.world.chunkloader.IChunkLoader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public abstract class AChunkGenerator<T extends IChunk<T>> implements
+        IChunkLoader<T> {
+
+    protected final Random rand;
+    protected final long seed;
+    protected final IChunkFactory<T> chunkBuilder;
+
+    private AWorldBase<T> world = null;
+
+    protected AChunkGenerator(IChunkFactory<T> chunkBuilder, long seed) {
+        this.rand = new Random(seed);
+        this.seed = seed;
+        this.chunkBuilder = chunkBuilder;
+    }
+
+    public void init(AWorldBase<T> world) {
+        if (this.world != null) {
+            throw new AlreadyInitializedException();
+        }
+        this.world = world;
+    }
+
+    public T generateChunk(ChunkLocation<T> location) {
+        T chunk = this.chunkBuilder.clear().setLocation(location).build();
+        generateTerrain(location, chunk);
+        return chunk;
+    }
+
+    @Override
+    public BlockLocation getSpawnPoint() {
+        this.rand.setSeed(seed);
+        int x = rand.nextInt(64) - 32;
+        int z = rand.nextInt(64) - 32;
+        int y = getApproximateHeightAt(x, z);
+        return new BlockLocation(world, x, y, z);
+    }
+
+    protected abstract void generateTerrain(ChunkLocation<T> locationn, T chunk);
+
+    protected abstract int getApproximateHeightAt(int x, int z);
+
+    public T loadChunk(ChunkLocation<T> location) {
+        return this.generateChunk(location);
+    }
+
+    public T getChunk(ChunkLocation<T> location) {
+        return null;
+    }
+
+    public void unloadChunk(ChunkLocation<T> location) {
+    }
+
+    public void unloadChunks() {
+    }
+
+    public void tick() {
+    }
+
+    public boolean canChainChunkLoaders() {
+        return false;
+    }
+
+    @Override
+    public void addChainedChunkLoader(IChunkLoader<T> loader) {
+        throw new UnsupportedOperationException(
+                "Chunk generator doesn't support chained chunk loaders.");
+    }
+
+    @Override
+    public boolean removeChainedChunkLoader(IChunkLoader<T> loader) {
+        throw new UnsupportedOperationException(
+                "Chunk generator doesn't support chained chunk loaders.");
+    }
+
+    public List<IChunkLoader<T>> getChainedChunkLoaders() {
+        return new ArrayList<IChunkLoader<T>>(0);
+    }
+
+    public boolean hasChunk(ChunkLocation<T> location) {
+        return false;
+    }
+}

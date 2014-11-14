@@ -1,7 +1,8 @@
 #Properties
-#Mon Jan 06 19:25:32 CET 2014
+#Thu Nov 13 22:03:31 CET 2014
 lwjgl.version=2.8.5
-describe=0.0-24-ge47885a
-git.commit.count=24
+netbeans.hint.license=gpl30
+describe=0.0-25-g66fd08b
+git.commit.count=25
 project.build.sourceEncoding=UTF-8
 junit.version=4.11

@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.barteks2x</groupId>
-    <artifactId>OpenMine</artifactId>
+    <artifactId>Cubit</artifactId>
     <version>pre-alpha-0.0</version>
     <packaging>jar</packaging>
 
-    <name>OpenMine</name>
+    <name>Cubit</name>
     <url>http://maven.apache.org</url>
 	
 
@@ -15,6 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lwjgl.version>2.8.5</lwjgl.version>
         <junit.version>4.11</junit.version>
+        <netbeans.hint.license>gpl30</netbeans.hint.license>
     </properties>
     <repositories>
         <repository>
@@ -139,7 +140,7 @@
                         <index>true</index>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.github.barteks2x.OpenMine</mainClass>
+                            <mainClass>com.github.barteks2x.cubit.Cubit</mainClass>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
@@ -152,8 +153,8 @@
                 <version>3.1</version>
                 <configuration>
                     <showDeprecation>true</showDeprecation>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
         </plugins>
