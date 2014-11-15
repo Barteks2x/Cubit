@@ -21,11 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit.world;
+package com.github.barteks2x.cubit.world.chunk;
 
 import com.github.barteks2x.cubit.block.Block;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
+import com.github.barteks2x.cubit.world.CubitWorld;
 
 /**
  * Basic chunk interface for block storage.
@@ -94,7 +95,7 @@ public interface IChunk {
      * @return World containing the chunk. Null if chunk it not loaded yet or
      *         has been unloaded.
      */
-    public AWorldBase getWorld();
+    public CubitWorld getWorld();
 
     /**
      * @return true if load method has been calles and unload method has not

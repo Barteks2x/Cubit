@@ -23,8 +23,11 @@
  */
 package com.github.barteks2x.cubit;
 
+import com.github.barteks2x.cubit.render.TextureLoader;
+import com.github.barteks2x.cubit.render.Texture;
+import com.github.barteks2x.cubit.world.chunk.ChunkCube8Factory;
 import com.github.barteks2x.cubit.block.Block;
-import com.github.barteks2x.cubit.generator.HeightmapChunkGenerator;
+import com.github.barteks2x.cubit.world.generator.HeightmapChunkGenerator;
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.EntityLocation;
@@ -38,14 +41,13 @@ import com.github.barteks2x.cubit.render.block.IBlockTextureManager;
 import com.github.barteks2x.cubit.render.block.SpritesheetTextureManager;
 import com.github.barteks2x.cubit.util.MathUtil;
 import com.github.barteks2x.cubit.util.logging.LoggerFactory;
-import com.github.barteks2x.cubit.world.AWorldBase;
-import com.github.barteks2x.cubit.world.BasicWorld;
-import com.github.barteks2x.cubit.world.ChunkCube16;
-import com.github.barteks2x.cubit.world.IChunk;
-import com.github.barteks2x.cubit.world.IChunkFactory;
+import com.github.barteks2x.cubit.world.CubitWorld;
+import com.github.barteks2x.cubit.world.chunk.ChunkCube8;
+import com.github.barteks2x.cubit.world.chunk.IChunk;
+import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
 import com.github.barteks2x.cubit.world.IWorld;
 import com.github.barteks2x.cubit.world.chunkloader.IChunkLoader;
-import com.github.barteks2x.cubit.world.chunkloader.RAMChunkCube16Loader;
+import com.github.barteks2x.cubit.world.chunkloader.RAMChunkLoader;
 import java.awt.Color;
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -115,14 +117,14 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.util.glu.GLU.gluErrorString;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
 
-public class CubitMain<Chunk extends IChunk, World extends AWorldBase<Chunk>> {
+public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
 
     private static final Logger logger = LoggerFactory.getLogger(CubitMain.class);
 
-    private static CubitMain<ChunkCube16, BasicWorld> instance;
+    private static CubitMain<ChunkCube8, CubitWorld<ChunkCube8>> instance;
     private static final int TICKRATE = 20;
     private static final long UPDATE_TIME = 1000000000L / TICKRATE;
-    public int renderDistance = 64;
+    private int renderDistance = 64;
     //OpenGL
     private final String title;
     private int fov;
@@ -218,9 +220,7 @@ public class CubitMain<Chunk extends IChunk, World extends AWorldBase<Chunk>> {
     private void renderChunks() {
         glRotated(player.getRy(), 1, 0, 0);
         glRotated(player.getRx(), 0, 1, 0);
-        glTranslatef((float)-player.getX(),
-                (float)-player.getY(),
-                (float)-player.getZ());
+        glTranslatef((float)-player.getX(), (float)-player.getY(), (float)-player.getZ());
 
         ChunkLocation<Chunk> playerChunkLoc = this.getPlayerChunkLocation();
 
@@ -230,10 +230,9 @@ public class CubitMain<Chunk extends IChunk, World extends AWorldBase<Chunk>> {
         int yStep = chunkSize.getY();
         int zStep = chunkSize.getZ();
 
-        int playerX = playerChunkLoc.getX() * xStep;
-        int playerY = playerChunkLoc.getY() * yStep;
-        int playerZ = playerChunkLoc.getZ() * zStep;
-
+        //int playerX = playerChunkLoc.getX() * xStep;
+        //int playerY = playerChunkLoc.getY() * yStep;
+        //int playerZ = playerChunkLoc.getZ() * zStep;
         int radiusX = MathUtil.floor(renderDistance / (double)xStep) * xStep + xStep;
         int radiusY = MathUtil.floor(renderDistance / (double)yStep) * yStep + yStep;
         int radiusZ = MathUtil.floor(renderDistance / (double)zStep) * zStep + zStep;
@@ -241,20 +240,17 @@ public class CubitMain<Chunk extends IChunk, World extends AWorldBase<Chunk>> {
         for(int x = -radiusX; x <= radiusX; x += xStep) {
             for(int y = -radiusY; y <= radiusY; y += yStep) {
                 for(int z = -radiusZ; z <= radiusZ; z += yStep) {
-                    int worldX = -playerX + x;
-                    int worldY = -playerY + y;
-                    int worldZ = -playerZ + z;
-
-                    int chunkX = MathUtil.floor(worldX / (double)xStep);
-                    int chunkY = MathUtil.floor(worldY / (double)yStep);
-                    int chunkZ = MathUtil.floor(worldZ / (double)zStep);
+                    int chunkX = MathUtil.floor(x / (double)xStep);
+                    int chunkY = MathUtil.floor(y / (double)yStep);
+                    int chunkZ = MathUtil.floor(z / (double)zStep);
                     //System.out.printf("(%d, %d, %d)\n", chunkX, chunkY, chunkZ);
-                    int d = getChunkDisplayList(playerChunkLoc.add(chunkX, chunkY, chunkZ));
+                    ChunkLocation<Chunk> loc = playerChunkLoc.add(chunkX, chunkY, chunkZ);
+                    int d = getChunkDisplayList(loc);
                     if(d == -1) {
                         continue;
                     }
                     glPushMatrix();
-                    glTranslatef(x, y, z);
+                    glTranslatef(loc.getX() * xStep, loc.getY() * yStep, loc.getZ() * zStep);
                     glCallList(d);
                     glPopMatrix();
                 }
@@ -595,22 +591,24 @@ public class CubitMain<Chunk extends IChunk, World extends AWorldBase<Chunk>> {
         return new ChunkLocation<Chunk>(world, this.chunkFactory.getChunkSize(), blockLoc);
     }
 
-    public static CubitMain<ChunkCube16, BasicWorld> getGame() {
+    public static CubitMain<ChunkCube8, CubitWorld<ChunkCube8>> getGame() {
         return instance;
     }
 
     public static void main(String args[]) throws IOException {
         LoggerFactory.initLoggers();
         long seed = System.nanoTime();
-        IChunkFactory<ChunkCube16> factory = new ChunkCube16Factory();
+        IChunkFactory<ChunkCube8> factory = new ChunkCube8Factory();
 
-        IChunkLoader<ChunkCube16> chunkLoader = new RAMChunkCube16Loader();
-        IChunkLoader<ChunkCube16> chunkGenerator = new HeightmapChunkGenerator<ChunkCube16>(factory, seed);
+        IChunkLoader<ChunkCube8> chunkLoader = new RAMChunkLoader<ChunkCube8>();
+        IChunkLoader<ChunkCube8> chunkGenerator = new HeightmapChunkGenerator<ChunkCube8>(factory, seed);
         chunkLoader.addChainedChunkLoader(chunkGenerator);
 
-        BasicWorld world = BasicWorld.newWorld().setChunkLoader(chunkLoader).setSeed(seed).build();
+        CubitWorld.CubitWorldBuilder<ChunkCube8> builder = CubitWorld.newWorld(ChunkCube8.class);
+        CubitWorld<ChunkCube8> world =
+                builder.setChunkFactory(factory).setChunkLoader(chunkLoader).setSeed(seed).build();
 
-        instance = new CubitMain<ChunkCube16, BasicWorld>(world, factory, chunkLoader);
+        instance = new CubitMain<ChunkCube8, CubitWorld<ChunkCube8>>(world, factory, chunkLoader);
         instance.start(800, 600);
     }
 

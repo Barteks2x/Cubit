@@ -24,8 +24,8 @@
 package com.github.barteks2x.cubit.location;
 
 import com.github.barteks2x.cubit.util.MathUtil;
-import com.github.barteks2x.cubit.world.AWorldBase;
-import com.github.barteks2x.cubit.world.IChunk;
+import com.github.barteks2x.cubit.world.CubitWorld;
+import com.github.barteks2x.cubit.world.chunk.IChunk;
 import com.github.barteks2x.cubit.world.IWorld;
 
 /**

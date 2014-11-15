@@ -23,30 +23,31 @@
  */
 package com.github.barteks2x.cubit;
 
-import java.nio.ByteBuffer;
-import static org.lwjgl.opengl.GL11.*;
+public interface IConfig {
 
-public class Texture {
+    /**
+     * This method returns config value for given config option name and type.
+     * Several config options with the same name and different type are allowed.
+     * <p>
+     * @param <T>          Value type
+     * @param name         Name of config value, dot separated path
+     * @param defaultValue Default value returned if config option not found
+     * <p>
+     * @return Value for given config option, default value if not found
+     */
+    public <T> T get(String name, T defaultValue);
 
-    protected int texID;
+    /**
+     * This method sets config value for given config option name and type.
+     * Several config options with the same name and different type are allowed.
+     * <p>
+     * @param <T>   Value type
+     * @param name  Name of config value, dot separated path
+     * @param value Value to set
+     */
+    public <T> void set(String name, T value);
 
-    public Texture(int width, int height, ByteBuffer buf) {
-        this(width, height, buf, GL_NEAREST, GL_NEAREST);
-    }
+    public void reload();
 
-    public Texture(int width, int height, ByteBuffer buf, int magFilter, int minFilter) {
-        texID = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, texID);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-    }
-
-    public void bind() {
-        glBindTexture(GL_TEXTURE_2D, texID);
-    }
+    public void save();
 }

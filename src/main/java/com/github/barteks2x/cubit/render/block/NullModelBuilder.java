@@ -25,7 +25,7 @@ package com.github.barteks2x.cubit.render.block;
 
 import com.github.barteks2x.cubit.render.Quad;
 import com.github.barteks2x.cubit.render.Vertex;
-import com.github.barteks2x.cubit.world.AWorldBase;
+import com.github.barteks2x.cubit.world.CubitWorld;
 import com.github.barteks2x.cubit.world.IWorld;
 import java.util.ArrayList;
 import java.util.Collections;

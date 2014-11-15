@@ -21,16 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit.world;
+package com.github.barteks2x.cubit.world.generator;
 
-import com.github.barteks2x.cubit.generator.AChunkGenerator;
+/**
+ *
+ * @author bartosz
+ */
+public class AlreadyInitializedException extends RuntimeException {
 
-public interface IChunkGeneratorBuilder<T extends IChunk> {
+    public AlreadyInitializedException() {
+    }
 
-    public IChunkGeneratorBuilder<T> setSeed(long seed);
-    
-    public IChunkGeneratorBuilder<T> setChunkFactory(IChunkFactory<T> factory);
-    
-    public AChunkGenerator<T> build();
+    public AlreadyInitializedException(String string) {
+        super(string);
+    }
+
+    public AlreadyInitializedException(String string, Throwable thrwbl) {
+        super(string, thrwbl);
+    }
+
+    public AlreadyInitializedException(Throwable thrwbl) {
+        super(thrwbl);
+    }
+
+    public AlreadyInitializedException(String string, Throwable thrwbl, boolean bln, boolean bln1) {
+        super(string, thrwbl, bln, bln1);
+    }
 
 }

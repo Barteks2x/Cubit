@@ -27,7 +27,7 @@ import com.github.barteks2x.cubit.block.Block;
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.EntityLocation;
 import com.github.barteks2x.cubit.location.Vec3D;
-import com.github.barteks2x.cubit.world.AWorldBase;
+import com.github.barteks2x.cubit.world.CubitWorld;
 import com.github.barteks2x.cubit.world.IWorld;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;

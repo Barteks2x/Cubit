@@ -24,27 +24,27 @@
 package com.github.barteks2x.cubit.location;
 
 import com.github.barteks2x.cubit.util.MathUtil;
-import com.github.barteks2x.cubit.world.AWorldBase;
-import com.github.barteks2x.cubit.world.IChunk;
+import com.github.barteks2x.cubit.world.CubitWorld;
+import com.github.barteks2x.cubit.world.chunk.IChunk;
 
 public class ChunkLocation<C extends IChunk> extends Vec3I {
 
-    private final AWorldBase<C> world;
+    private final CubitWorld<C> world;
     private final Vec3I chunkSize;
 
-    public ChunkLocation(AWorldBase<C> world, Vec3I size, int x, int y, int z) {
+    public ChunkLocation(CubitWorld<C> world, Vec3I size, int x, int y, int z) {
         super(x, y, z);
         this.world = world;
         this.chunkSize = size;
     }
 
-    public ChunkLocation(AWorldBase<C> world, Vec3I size, Vec3I loc) {
+    public ChunkLocation(CubitWorld<C> world, Vec3I size, Vec3I loc) {
         super(loc);
         this.world = world;
         this.chunkSize = size;
     }
 
-    public ChunkLocation(AWorldBase<C> world, Vec3I size, BlockLocation loc) {
+    public ChunkLocation(CubitWorld<C> world, Vec3I size, BlockLocation loc) {
         super(loc.div(size));
         this.world = world;
         this.chunkSize = size;
@@ -102,7 +102,7 @@ public class ChunkLocation<C extends IChunk> extends Vec3I {
         return this.div(vec.getX(), vec.getY(), vec.getZ());
     }
 
-    public AWorldBase<C> getWorld() {
+    public CubitWorld<C> getWorld() {
         return this.world;
     }
 

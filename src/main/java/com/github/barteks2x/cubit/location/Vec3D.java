@@ -23,7 +23,7 @@
  */
 package com.github.barteks2x.cubit.location;
 
-import com.github.barteks2x.cubit.world.AWorldBase;
+import com.github.barteks2x.cubit.world.CubitWorld;
 
 public class Vec3D {
 

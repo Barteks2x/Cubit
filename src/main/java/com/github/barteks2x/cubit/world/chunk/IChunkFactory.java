@@ -21,17 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit.generator;
+package com.github.barteks2x.cubit.world.chunk;
 
-public class PerlinNoiseGenerator extends ANoiseGenerator2d {
+import com.github.barteks2x.cubit.world.chunk.IChunk;
+import com.github.barteks2x.cubit.location.ChunkLocation;
+import com.github.barteks2x.cubit.location.Vec3I;
 
-    public PerlinNoiseGenerator(double grid, double persistance, int octaves, double fq, long seed) {
-        super(grid, persistance, octaves, fq, seed);
-    }
-
-    @Override
-    public double getRawValueAt(double x, double z) {
-        //TODO Perlin Noise Generator
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+/**
+ * Used to construct new chunks for given world with specific location and block data.
+ * @param <T>
+ */
+public interface IChunkFactory<T extends IChunk> {
+    public IChunkFactory<T> clear();
+    public IChunkFactory<T> setLocation(ChunkLocation<T> loc);
+    public T build();
+    public Vec3I getChunkSize();
 }

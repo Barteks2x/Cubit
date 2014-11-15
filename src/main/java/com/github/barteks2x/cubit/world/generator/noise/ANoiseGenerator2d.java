@@ -21,7 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit.generator;
+package com.github.barteks2x.cubit.world.generator.noise;
+
+import com.github.barteks2x.cubit.world.generator.noise.INoiseGenerator2d;
 
 public abstract class ANoiseGenerator2d implements INoiseGenerator2d {
 

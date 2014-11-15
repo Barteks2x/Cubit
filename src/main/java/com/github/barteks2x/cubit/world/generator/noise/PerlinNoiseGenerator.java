@@ -21,14 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit;
+package com.github.barteks2x.cubit.world.generator.noise;
 
-public class MathHelper {
-    public static int floor(float f){
-        return (int)(f < 0 ? f - 1 : f);
+public class PerlinNoiseGenerator extends ANoiseGenerator2d {
+
+    public PerlinNoiseGenerator(double grid, double persistance, int octaves, double fq, long seed) {
+        super(grid, persistance, octaves, fq, seed);
     }
-    public static int floor(double d){
-        return (int)(d < 0 ? d - 1 : d);
+
+    @Override
+    public double getRawValueAt(double x, double z) {
+        //TODO Perlin Noise Generator
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
 }

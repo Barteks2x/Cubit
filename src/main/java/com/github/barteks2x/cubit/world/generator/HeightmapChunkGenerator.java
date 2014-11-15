@@ -21,14 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit.generator;
+package com.github.barteks2x.cubit.world.generator;
 
-import com.github.barteks2x.cubit.world.IChunk;
+import com.github.barteks2x.cubit.world.generator.noise.INoiseGenerator2d;
+import com.github.barteks2x.cubit.world.generator.noise.ValueNoiseGenerator;
+import com.github.barteks2x.cubit.world.chunk.IChunk;
 import com.github.barteks2x.cubit.block.Block;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
-import com.github.barteks2x.cubit.world.AWorldBase;
-import com.github.barteks2x.cubit.world.IChunkFactory;
+import com.github.barteks2x.cubit.world.CubitWorld;
+import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
 
 public class HeightmapChunkGenerator<T extends IChunk> extends AChunkGenerator<T> {
 

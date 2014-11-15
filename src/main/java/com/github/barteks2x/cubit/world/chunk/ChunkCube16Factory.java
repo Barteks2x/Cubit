@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.barteks2x.cubit;
+package com.github.barteks2x.cubit.world.chunk;
 
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
-import com.github.barteks2x.cubit.world.ChunkCube16;
-import com.github.barteks2x.cubit.world.IChunkFactory;
+import com.github.barteks2x.cubit.world.chunk.ChunkCube16;
+import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
 
 /**
  *
