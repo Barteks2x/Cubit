@@ -32,7 +32,7 @@ import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
  *
  * @author Bartosz Skrzypczak
  */
-class ChunkCube16Factory implements IChunkFactory<ChunkCube16> {
+public class ChunkCube16Factory implements IChunkFactory<ChunkCube16> {
 
     private ChunkLocation<ChunkCube16> location;
     @Override

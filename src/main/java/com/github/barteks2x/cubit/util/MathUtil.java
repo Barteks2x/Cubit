@@ -41,7 +41,7 @@ public class MathUtil {
      * <p>
      * @return x modulo p, result is not negative
      */
-    public static int modP(int a, int b) {
+    public static int mod(int a, int b) {
         return (((a % b) + b) % b);
     }
 

@@ -49,4 +49,9 @@ public class Texture {
     public void bind() {
         glBindTexture(GL_TEXTURE_2D, texID);
     }
+
+    public void delete() {
+        glDeleteTextures(texID);
+        texID = -1;
+    }
 }

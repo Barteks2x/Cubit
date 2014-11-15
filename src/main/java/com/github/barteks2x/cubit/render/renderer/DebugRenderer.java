@@ -52,7 +52,7 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
  *
  * @author Bartosz Skrzypczak
  */
-public class DebugRenderer implements IRenderer {
+public class DebugRenderer implements IRenderer<Player> {
 
     private final FloatBuffer orthographicProjMatrix = BufferUtils.createFloatBuffer(16);
     private final BitmapFont font;
@@ -70,7 +70,7 @@ public class DebugRenderer implements IRenderer {
         this.font = font;
         this.timer = timer;
         this.chunkSize = chunkSize;
-        this.updateWindowsDimensions(width, height);
+        this.updateWindowDimensions(width, height);
     }
 
     @Override
@@ -134,13 +134,13 @@ public class DebugRenderer implements IRenderer {
     }
 
     @Override
-    public final void updateWindowsDimensions(int width, int height) {
+    public final void updateWindowDimensions(int width, int height) {
         glPushMatrix();
         {
             glMatrixMode(GL_PROJECTION);
-            glLoadIdentity();
             glOrtho(0, width, height, 0, -1, 1);
             glGetFloat(GL_PROJECTION_MATRIX, orthographicProjMatrix);
+            glMatrixMode(GL_MODELVIEW);
         }
         glPopMatrix();
 
@@ -149,6 +149,11 @@ public class DebugRenderer implements IRenderer {
     private ChunkLocation<? extends IChunk> getPlayerChunkLocation(Player player) {
         BlockLocation blockLoc = new BlockLocation(player.getLocation());
         return new ChunkLocation<IChunk>(null, this.chunkSize, blockLoc);
+    }
+
+    @Override
+    public void onExit() {
+        font.delete();
     }
 
 }

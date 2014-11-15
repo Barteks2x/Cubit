@@ -101,4 +101,11 @@ public class BitmapFont {
         }
         return this;
     }
+
+    public void delete() {
+        for(int i : ASCIIdisplayLists) {
+            glDeleteLists(i, 1);
+        }
+        this.tex.delete();
+    }
 }

@@ -53,7 +53,7 @@ public class ChunkLocation<C extends IChunk> extends Vec3I {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 83 * hash + this.world.hashCode();
+        hash = 83 * hash + (this.world == null ? 0 : this.world.hashCode());
         hash = 83 * hash + this.getX();
         hash = 83 * hash + this.getY();
         hash = 83 * hash + this.getZ();

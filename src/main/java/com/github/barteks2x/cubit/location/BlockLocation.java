@@ -66,9 +66,9 @@ public class BlockLocation extends Vec3I {
     public BlockLocation modP(Vec3I vec) {
         return new BlockLocation(
                 this.getWorld(),
-                MathUtil.modP(this.getX(), vec.getX()),
-                MathUtil.modP(this.getY(), vec.getY()),
-                MathUtil.modP(this.getZ(), vec.getZ()));
+                MathUtil.mod(this.getX(), vec.getX()),
+                MathUtil.mod(this.getY(), vec.getY()),
+                MathUtil.mod(this.getZ(), vec.getZ()));
     }
 
     @Override

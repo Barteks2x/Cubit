@@ -30,7 +30,7 @@ import com.github.barteks2x.cubit.world.chunk.IChunk;
  *
  * @author Bartosz Skrzypczak
  */
-public class ChunkRenderer<Chunk extends IChunk> implements IRenderer {
+public class ChunkRenderer<Chunk extends IChunk> implements IRenderer<Player> {
 
     @Override
     public void render() {
@@ -43,7 +43,12 @@ public class ChunkRenderer<Chunk extends IChunk> implements IRenderer {
     }
 
     @Override
-    public void updateWindowsDimensions(int width, int height) {
+    public void updateWindowDimensions(int width, int height) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onExit() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

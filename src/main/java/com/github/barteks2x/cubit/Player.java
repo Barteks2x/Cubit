@@ -204,7 +204,7 @@ public class Player {
             BlockLocation blockPos = this.getSelectionLocation();
             if(Mouse.getEventButton() == 0 && blockPos != null) {
                 this.getLocation().getWorld().setBlockAt(blockPos, Block.AIR);
-                CubitMain.getGame().blockRenderUpdate(blockPos);
+                CubitMain.getGame().onBlockUpdate(blockPos);
             }
             blockPos = this.getPlaceBlockLocation();
             if(Mouse.getEventButton() == 1 && blockPos != null) {
@@ -213,7 +213,7 @@ public class Player {
                 Block block = world.getBlockRegistry().fromID(placeid);
                 if(block != null) {
                     world.setBlockAt(blockPos, block);
-                    CubitMain.getGame().blockRenderUpdate(blockPos);
+                    CubitMain.getGame().onBlockUpdate(blockPos);
                 }
             }
 
