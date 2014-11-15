@@ -38,6 +38,7 @@ import com.github.barteks2x.cubit.render.block.IBlockTextureManager;
 import com.github.barteks2x.cubit.render.block.SpritesheetTextureManager;
 import com.github.barteks2x.cubit.util.MathUtil;
 import com.github.barteks2x.cubit.util.logging.LoggerFactory;
+import com.github.barteks2x.cubit.world.AWorldBase;
 import com.github.barteks2x.cubit.world.BasicWorld;
 import com.github.barteks2x.cubit.world.ChunkCube16;
 import com.github.barteks2x.cubit.world.IChunk;
@@ -105,6 +106,7 @@ import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glRotated;
+import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTexCoord2f;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.opengl.GL11.glTranslatef;
@@ -113,14 +115,14 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.util.glu.GLU.gluErrorString;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
 
-public class CubitMain {
+public class CubitMain<Chunk extends IChunk, World extends AWorldBase<Chunk>> {
 
     private static final Logger logger = LoggerFactory.getLogger(CubitMain.class);
 
-    private static final CubitMain instance = new CubitMain();
+    private static CubitMain<ChunkCube16, BasicWorld> instance;
     private static final int TICKRATE = 20;
     private static final long UPDATE_TIME = 1000000000L / TICKRATE;
-    public int renderDistance = 4;
+    public int renderDistance = 64;
     //OpenGL
     private final String title;
     private int fov;
@@ -131,7 +133,7 @@ public class CubitMain {
     private final FloatBuffer perspectiveProjMatrix = BufferUtils.createFloatBuffer(16);
     private final FloatBuffer orthographicProjMatrix = BufferUtils.createFloatBuffer(16);
     //Rendering
-    private final Map<ChunkLocation<ChunkCube16>, Integer> chunkDisplayLists;
+    private final Map<ChunkLocation<Chunk>, Integer> chunkDisplayLists;
     private int selectionDisplayList;
     //movement
     private final Timer timer;
@@ -144,24 +146,19 @@ public class CubitMain {
     private double time;
     public int placeid;
 
-    private final BasicWorld world;
+    private final World world;
 
     private long lastUpdateTime = System.nanoTime();
 
     private final IBlockTextureManager textureManager;
 
-    public CubitMain() {
-        long seed = System.currentTimeMillis();
+    private final IChunkFactory<Chunk> chunkFactory;
 
+    public CubitMain(World world, IChunkFactory<Chunk> chunkFactory, IChunkLoader<Chunk> chunkLoader) {
+        this.chunkFactory = chunkFactory;
         this.title = "Cubit " + Version.getVersion();
 
-        IChunkFactory<ChunkCube16> chunkFactory = new ChunkCube16Factory();
-
-        IChunkLoader<ChunkCube16> chunkLoader = new RAMChunkCube16Loader();
-        IChunkLoader<ChunkCube16> chunkGenerator = new HeightmapChunkGenerator<ChunkCube16>(chunkFactory, seed);
-        chunkLoader.addChainedChunkLoader(chunkGenerator);
-
-        this.world = BasicWorld.newWorld().setChunkLoader(chunkLoader).setSeed(seed).build();
+        this.world = world;//BasicWorld.newWorld().setChunkLoader(chunkLoader).setSeed(seed).build();
 
         timer = new Timer();
         player = new Player(world);
@@ -169,7 +166,7 @@ public class CubitMain {
 
         this.world.joinPlayer(player);
 
-        this.chunkDisplayLists = new HashMap<ChunkLocation<ChunkCube16>, Integer>(10000);
+        this.chunkDisplayLists = new HashMap<ChunkLocation<Chunk>, Integer>(10000);
         this.textureManager = new SpritesheetTextureManager();
     }
 
@@ -225,35 +222,39 @@ public class CubitMain {
                 (float)-player.getY(),
                 (float)-player.getZ());
 
-        ChunkLocation<ChunkCube16> playerChunkLoc = this.getPlayerChunkLocation();
-
-        int playerX = playerChunkLoc.getX();
-        int playerY = playerChunkLoc.getY();
-        int playerZ = playerChunkLoc.getZ();
+        ChunkLocation<Chunk> playerChunkLoc = this.getPlayerChunkLocation();
 
         Vec3I chunkSize = playerChunkLoc.getChunkSize();
+
         int xStep = chunkSize.getX();
         int yStep = chunkSize.getY();
         int zStep = chunkSize.getZ();
 
-        int radiusX = MathUtil.ceil(renderDistance / (double)xStep) * xStep;
-        int radiusY = MathUtil.ceil(renderDistance / (double)yStep) * yStep;
-        int radiusZ = MathUtil.ceil(renderDistance / (double)zStep) * zStep;
+        int playerX = playerChunkLoc.getX() * xStep;
+        int playerY = playerChunkLoc.getY() * yStep;
+        int playerZ = playerChunkLoc.getZ() * zStep;
+
+        int radiusX = MathUtil.floor(renderDistance / (double)xStep) * xStep + xStep;
+        int radiusY = MathUtil.floor(renderDistance / (double)yStep) * yStep + yStep;
+        int radiusZ = MathUtil.floor(renderDistance / (double)zStep) * zStep + zStep;
+
         for(int x = -radiusX; x <= radiusX; x += xStep) {
             for(int y = -radiusY; y <= radiusY; y += yStep) {
                 for(int z = -radiusZ; z <= radiusZ; z += yStep) {
-                    int chunkX = playerX + x;
-                    int chunkY = playerY + y;
-                    int chunkZ = playerZ + z;
-                    int d = getChunkDisplayList(playerChunkLoc.add(x, y, z));
+                    int worldX = -playerX + x;
+                    int worldY = -playerY + y;
+                    int worldZ = -playerZ + z;
+
+                    int chunkX = MathUtil.floor(worldX / (double)xStep);
+                    int chunkY = MathUtil.floor(worldY / (double)yStep);
+                    int chunkZ = MathUtil.floor(worldZ / (double)zStep);
+                    //System.out.printf("(%d, %d, %d)\n", chunkX, chunkY, chunkZ);
+                    int d = getChunkDisplayList(playerChunkLoc.add(chunkX, chunkY, chunkZ));
                     if(d == -1) {
                         continue;
                     }
                     glPushMatrix();
-                    int xTranslate = MathUtil.floor(chunkX/(double)xStep);
-                    int yTranslate = MathUtil.floor(chunkY/(double)yStep);
-                    int zTranslate = MathUtil.floor(chunkZ/(double)zStep);
-                    glTranslatef(xTranslate, yTranslate, zTranslate);
+                    glTranslatef(x, y, z);
                     glCallList(d);
                     glPopMatrix();
                 }
@@ -351,8 +352,7 @@ public class CubitMain {
             Display.setDisplayMode(new DisplayMode(width, height));
             Display.create();
         } catch(LWJGLException ex) {
-            Logger.getLogger(CubitMain.class.getName()).log(Level.SEVERE, null,
-                    ex);
+            Logger.getLogger(CubitMain.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -426,13 +426,15 @@ public class CubitMain {
     }
 
     private void generateDisplayListsNearLocation(BlockLocation pos) {
-        Set<ChunkLocation<ChunkCube16>> chunkDisplayListsToCompile =
-                new HashSet<ChunkLocation<ChunkCube16>>(20000);
-        ChunkLocation<ChunkCube16> chunkLoc = new ChunkLocation<ChunkCube16>(world, ChunkCube16.chunkSize(), pos);
-        for(int x = -renderDistance; x <= renderDistance; ++x) {
-            for(int y = -renderDistance; y <= renderDistance; ++y) {
-                for(int z = -renderDistance; z <= renderDistance; ++z) {
-                    ChunkLocation<ChunkCube16> loc = chunkLoc.add(x, y, z);
+        Set<ChunkLocation<Chunk>> chunkDisplayListsToCompile = new HashSet<ChunkLocation<Chunk>>(20000);
+        ChunkLocation<Chunk> chunkLoc = new ChunkLocation<Chunk>(world, this.chunkFactory.getChunkSize(), pos);
+        int radiusX = renderDistance / chunkFactory.getChunkSize().getX();
+        int radiusY = renderDistance / chunkFactory.getChunkSize().getY();
+        int radiusZ = renderDistance / chunkFactory.getChunkSize().getZ();
+        for(int x = -radiusX; x <= radiusX; ++x) {
+            for(int y = -radiusY; y <= radiusY; ++y) {
+                for(int z = -radiusZ; z <= radiusZ; ++z) {
+                    ChunkLocation<Chunk> loc = chunkLoc.add(x, y, z);
                     if(getChunkDisplayList(loc) != -1) {
                         continue;
                     }
@@ -440,17 +442,10 @@ public class CubitMain {
                         continue;
                     }
                     chunkDisplayListsToCompile.add(loc);
-                    //chunkDisplayListsToCompile.add(loc.add(1, 0, 0));
-                    //chunkDisplayListsToCompile.add(loc.add(-1, 0, 0));
-                    //chunkDisplayListsToCompile.add(loc.add(0, 1, 0));
-                    //chunkDisplayListsToCompile.add(loc.add(0, -1, 0));
-                    //chunkDisplayListsToCompile.add(loc.add(0, 0, 1));
-                    //chunkDisplayListsToCompile.add(loc.add(0, 0, -1));
-
                 }
             }
         }
-        for(ChunkLocation<ChunkCube16> position : chunkDisplayListsToCompile) {
+        for(ChunkLocation<Chunk> position : chunkDisplayListsToCompile) {
             if(world.isChunkLoaded(position)) {
                 buildChunkDisplayList(position);
             }
@@ -473,31 +468,30 @@ public class CubitMain {
     }
 
     public void blockRenderUpdate(BlockLocation blockPos) {
-        ChunkLocation<ChunkCube16> chunkPos =
-                new ChunkLocation<ChunkCube16>(world, ChunkCube16.chunkSize(),
-                        blockPos);
+        ChunkLocation<Chunk> chunkPos = new ChunkLocation<Chunk>(world, this.chunkFactory.getChunkSize(), blockPos);
+        Vec3I chunkSize = chunkPos.getChunkSize();
         buildChunkDisplayList(chunkPos);
-        if((blockPos.getX() & 0xf) == 0) {
+        if(MathUtil.modP(blockPos.getX(), chunkSize.getX()) == 0) {
             buildChunkDisplayList(chunkPos.add(-1, 0, 0));
         }
-        if((blockPos.getX() & 0xf) == 0xf) {
+        if(MathUtil.modP(blockPos.getX(), chunkSize.getX()) == chunkSize.getX() - 1) {
             buildChunkDisplayList(chunkPos.add(1, 0, 0));
         }
-        if((blockPos.getY() & 0xf) == 0) {
+        if(MathUtil.modP(blockPos.getY(), chunkSize.getY()) == 0) {
             buildChunkDisplayList(chunkPos.add(0, -1, 0));
         }
-        if((blockPos.getY() & 0xf) == 0xf) {
+        if(MathUtil.modP(blockPos.getY(), chunkSize.getY()) == chunkSize.getY() - 1) {
             buildChunkDisplayList(chunkPos.add(0, 1, 0));
         }
-        if((blockPos.getZ() & 0xf) == 0) {
+        if(MathUtil.modP(blockPos.getZ(), chunkSize.getZ()) == 0) {
             buildChunkDisplayList(chunkPos.add(0, 0, -1));
         }
-        if((blockPos.getZ() & 0xf) == 0xf) {
+        if(MathUtil.modP(blockPos.getZ(), chunkSize.getZ()) == chunkSize.getZ() - 1) {
             buildChunkDisplayList(chunkPos.add(0, 0, 1));
         }
     }
 
-    private void buildChunkDisplayList(ChunkLocation<ChunkCube16> pos) {
+    private void buildChunkDisplayList(ChunkLocation<Chunk> pos) {
         int displayList = getChunkDisplayList(pos);
         if(displayList == -1) {
             displayList = glGenLists(1);
@@ -508,12 +502,16 @@ public class CubitMain {
         glNewList(displayList, GL_COMPILE);
         glBegin(GL_QUADS);
 
-        final int maxX = ChunkCube16.chunkSize().getX();
-        final int maxY = ChunkCube16.chunkSize().getY();
-        final int maxZ = ChunkCube16.chunkSize().getZ();
+        Vec3I chunkSize = this.chunkFactory.getChunkSize();
+
+        final int maxX = chunkSize.getX();
+        final int maxY = chunkSize.getY();
+        final int maxZ = chunkSize.getZ();
+
         int chunkXBase = pos.getX() * maxX;
         int chunkYBase = pos.getY() * maxY;
         int chunkZBase = pos.getZ() * maxZ;
+
         for(int x = 0; x < maxX; ++x) {
             for(int y = 0; y < maxY; ++y) {
                 for(int z = 0; z < maxZ; ++z) {
@@ -521,7 +519,6 @@ public class CubitMain {
                     int worldY = y + chunkYBase;
                     int worldZ = z + chunkZBase;
                     this.drawBlock(world, worldX, worldY, worldZ, x, y, z);
-
                 }
             }
         }
@@ -532,11 +529,9 @@ public class CubitMain {
     private void loadTextures() {
         try {
             tex = TextureLoader.loadTexture(Thread.currentThread().
-                    getContextClassLoader().
-                    getResourceAsStream("texture.png"));
+                    getContextClassLoader().getResourceAsStream("texture.png"));
         } catch(IOException ex) {
-            Logger.getLogger(CubitMain.class.getName()).log(Level.SEVERE, null,
-                    ex);
+            Logger.getLogger(CubitMain.class.getName()).log(Level.SEVERE, null, ex);
             onClose(-1);
         }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -553,12 +548,11 @@ public class CubitMain {
         int e = glGetError();
         if(e != GL_NO_ERROR) {
             Logger.getLogger(this.getClass().getName()).
-                    log(Level.SEVERE, "OpenGL Error! {2} {0} - {1}",
-                            new Object[]{e, gluErrorString(e), msg});
+                    log(Level.SEVERE, "OpenGL Error! {2} {0} - {1}", new Object[]{e, gluErrorString(e), msg});
         }
     }
 
-    private int getChunkDisplayList(ChunkLocation<ChunkCube16> pos) {
+    private int getChunkDisplayList(ChunkLocation<Chunk> pos) {
         Integer d = chunkDisplayLists.get(pos);
         return d == null ? -1 : d;
     }
@@ -579,19 +573,15 @@ public class CubitMain {
         int i = 0;
         for(Vertex vertex : verticies) {
             Color color = vertex.getColor();
-            glColor3f(color.getRed() / 255F, color.getGreen() / 255F, color.
-                    getBlue() / 255F);
+            glColor3f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F);
             glTexCoord2f(tx[i], ty[i]);
             Vec3D pos = vertex.getPosition();
-            glVertex3f((float)pos.getX() + x, (float)pos.getY() + y,
-                    (float)pos.getZ() + z);
+            glVertex3f((float)pos.getX() + x, (float)pos.getY() + y, (float)pos.getZ() + z);
             i++;
         }
     }
 
-    private void drawBlock(IWorld world,
-            int wX, int wY, int wZ,
-            int x, int y, int z) {
+    private void drawBlock(IWorld world, int wX, int wY, int wZ, int x, int y, int z) {
         Block block = this.world.getBlockAt(wX, wY, wZ);
         IBlockModelBuilder modelBuilder = block.getModelBuilder();
         List<Quad> quads = modelBuilder.build(textureManager, world, wX, wY, wZ);
@@ -600,17 +590,27 @@ public class CubitMain {
         }
     }
 
-    private ChunkLocation<ChunkCube16> getPlayerChunkLocation() {
+    private ChunkLocation<Chunk> getPlayerChunkLocation() {
         BlockLocation blockLoc = new BlockLocation(player.getLocation());
-        return new ChunkLocation<ChunkCube16>(world, ChunkCube16.chunkSize(), blockLoc);
+        return new ChunkLocation<Chunk>(world, this.chunkFactory.getChunkSize(), blockLoc);
     }
 
-    public static CubitMain getGame() {
+    public static CubitMain<ChunkCube16, BasicWorld> getGame() {
         return instance;
     }
 
     public static void main(String args[]) throws IOException {
         LoggerFactory.initLoggers();
+        long seed = System.nanoTime();
+        IChunkFactory<ChunkCube16> factory = new ChunkCube16Factory();
+
+        IChunkLoader<ChunkCube16> chunkLoader = new RAMChunkCube16Loader();
+        IChunkLoader<ChunkCube16> chunkGenerator = new HeightmapChunkGenerator<ChunkCube16>(factory, seed);
+        chunkLoader.addChainedChunkLoader(chunkGenerator);
+
+        BasicWorld world = BasicWorld.newWorld().setChunkLoader(chunkLoader).setSeed(seed).build();
+
+        instance = new CubitMain<ChunkCube16, BasicWorld>(world, factory, chunkLoader);
         instance.start(800, 600);
     }
 

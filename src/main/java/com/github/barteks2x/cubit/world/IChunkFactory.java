@@ -24,6 +24,7 @@
 package com.github.barteks2x.cubit.world;
 
 import com.github.barteks2x.cubit.location.ChunkLocation;
+import com.github.barteks2x.cubit.location.Vec3I;
 
 /**
  * Used to construct new chunks for given world with specific location and block data.
@@ -33,4 +34,5 @@ public interface IChunkFactory<T extends IChunk> {
     public IChunkFactory<T> clear();
     public IChunkFactory<T> setLocation(ChunkLocation<T> loc);
     public T build();
+    public Vec3I getChunkSize();
 }

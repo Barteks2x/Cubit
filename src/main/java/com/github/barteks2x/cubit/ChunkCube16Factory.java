@@ -18,6 +18,7 @@
 package com.github.barteks2x.cubit;
 
 import com.github.barteks2x.cubit.location.ChunkLocation;
+import com.github.barteks2x.cubit.location.Vec3I;
 import com.github.barteks2x.cubit.world.ChunkCube16;
 import com.github.barteks2x.cubit.world.IChunkFactory;
 
@@ -43,6 +44,11 @@ class ChunkCube16Factory implements IChunkFactory<ChunkCube16> {
     @Override
     public ChunkCube16 build() {
         return new ChunkCube16(location);
+    }
+
+    @Override
+    public Vec3I getChunkSize() {
+        return ChunkCube16.chunkSize();
     }
 
 }
