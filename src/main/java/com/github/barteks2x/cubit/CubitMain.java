@@ -24,7 +24,6 @@
 package com.github.barteks2x.cubit;
 
 import com.github.barteks2x.cubit.block.Block;
-import com.github.barteks2x.cubit.generator.AChunkGenerator;
 import com.github.barteks2x.cubit.generator.HeightmapChunkGenerator;
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.ChunkLocation;
@@ -38,7 +37,6 @@ import com.github.barteks2x.cubit.render.block.IBlockModelBuilder;
 import com.github.barteks2x.cubit.render.block.IBlockTextureManager;
 import com.github.barteks2x.cubit.render.block.SpritesheetTextureManager;
 import com.github.barteks2x.cubit.util.logging.LoggerFactory;
-import com.github.barteks2x.cubit.world.AWorldBase;
 import com.github.barteks2x.cubit.world.BasicWorld;
 import com.github.barteks2x.cubit.world.ChunkCube16;
 import com.github.barteks2x.cubit.world.IChunk;
@@ -114,12 +112,13 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.util.glu.GLU.gluErrorString;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
 
-public class Cubit {
+public class CubitMain {
 
-    private static final Logger logger = LoggerFactory.getLogger(Cubit.class);
+    private static final Logger logger = LoggerFactory.getLogger(CubitMain.class);
 
-    private static final Cubit instance = new Cubit();
-    private static final long UPDATE_TIME = 1000000000L / 20L;
+    private static final CubitMain instance = new CubitMain();
+    private static final int TICKRATE = 20;
+    private static final long UPDATE_TIME = 1000000000L / TICKRATE;
     public int renderDistance = 4;
     //OpenGL
     private final String title;
@@ -139,7 +138,7 @@ public class Cubit {
     private final Timer timer;
     final double mouseSensitivity;
     private boolean grabMouse;
-    private final Player<BasicWorld> player;
+    private final Player player;
     //Textures and fonts
     private BitmapFont font;
     private Texture tex;
@@ -152,35 +151,39 @@ public class Cubit {
 
     private final IBlockTextureManager textureManager;
 
-    public Cubit() {
+    public CubitMain() {
         long seed = System.currentTimeMillis();
-        FileHandler fileHandler = null;
-        this.title = Cubit.class.getSimpleName() + " " + Version.getVersion();
+
+        this.title = "Cubit " + Version.getVersion();
 
         IChunkFactory<ChunkCube16> chunkFactory = new ChunkCube16Factory();
+
         IChunkLoader<ChunkCube16> chunkLoader = new RAMChunkCube16Loader();
-        IChunkLoader<ChunkCube16> chunkGenerator =
-                new HeightmapChunkGenerator<ChunkCube16>(chunkFactory, seed);
+        IChunkLoader<ChunkCube16> chunkGenerator = new HeightmapChunkGenerator<ChunkCube16>(chunkFactory, seed);
         chunkLoader.addChainedChunkLoader(chunkGenerator);
-        this.world = new BasicWorld(chunkLoader, seed);
+
+        this.world = BasicWorld.newWorld().setChunkLoader(chunkLoader).setSeed(seed).build();
+
         timer = new Timer();
-        player = new Player<BasicWorld>(world);
+        player = new Player(world);
         mouseSensitivity = 0.6F;
-        this.chunkDisplayLists =
-                new HashMap<ChunkLocation<ChunkCube16>, Integer>(10000);
+
+        this.world.joinPlayer(player);
+
+        this.chunkDisplayLists = new HashMap<ChunkLocation<ChunkCube16>, Integer>(10000);
         this.textureManager = new SpritesheetTextureManager();
     }
 
     public FloatBuffer asFloatBuffer(float[] data) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
-        return (FloatBuffer) buffer.put(data).flip();
+        return (FloatBuffer)buffer.put(data).flip();
     }
 
     private void start(int width, int height) {
         this.width = width;
         this.height = height;
         this.fov = 60;
-        this.aspectRatio = (double) width / height;
+        this.aspectRatio = (double)width / height;
         zNear = 0.1F;
         zFar = 200F;
         initDisplay();
@@ -188,37 +191,30 @@ public class Cubit {
         loadFonts();
         loadTextures();
         Vec3I spawn = world.getSpawnPoint();
-        player.setPosition(new EntityLocation<BasicWorld>(world, spawn));
+        player.setPosition(new EntityLocation(world, spawn));
         initDisplayLists();
-        while (isRunning) {
+        while(isRunning) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             timer.nextFrame();
-            if (System.nanoTime() - this.lastUpdateTime > UPDATE_TIME) {
+            if(System.nanoTime() - this.lastUpdateTime > UPDATE_TIME) {
                 input();
                 this.lastUpdateTime = System.nanoTime();
+                world.tick(TICKRATE);
             }
 
             Vec3I chunkSize = ChunkCube16.chunkSize();
-            ChunkLocation<ChunkCube16> pos = new ChunkLocation<ChunkCube16>(
-                    chunkSize, player.getLocation());
-            world.loadChunksWithinRadius(pos,
-                    this.renderDistance,
-                    this.renderDistance,
-                    this.renderDistance);
 
             glLoadIdentity();
 
             tex.bind();
-            this.generateDisplayListsNearLocation(
-                    new ChunkLocation<ChunkCube16>(ChunkCube16.chunkSize(),
-                            player.getLocation()));
+            this.generateDisplayListsNearLocation(new BlockLocation(player.getLocation()));
             renderChunks();
             renderSelection();
             renderText();
             Display.update();
             errorCheck("Main");
-            if (Display.isCloseRequested()) {
+            if(Display.isCloseRequested()) {
                 isRunning = false;
             }
         }
@@ -228,26 +224,24 @@ public class Cubit {
     private void renderChunks() {
         glRotated(player.getRy(), 1, 0, 0);
         glRotated(player.getRx(), 0, 1, 0);
-        glTranslatef((float) -player.getX(),
-                (float) -player.getY(),
-                (float) -player.getZ());
+        glTranslatef((float)-player.getX(),
+                (float)-player.getY(),
+                (float)-player.getZ());
 
-        ChunkLocation<ChunkCube16> playerChunkLoc =
-                new ChunkLocation<ChunkCube16>(ChunkCube16.chunkSize(),
-                        player.getLocation());
+        ChunkLocation<ChunkCube16> playerChunkLoc = this.getPlayerChunkLocation();
 
         int playerX = playerChunkLoc.getX();
         int playerY = playerChunkLoc.getY();
         int playerZ = playerChunkLoc.getZ();
 
-        for (int x = -renderDistance; x <= renderDistance; ++x) {
-            for (int y = -renderDistance; y <= renderDistance; ++y) {
-                for (int z = -renderDistance; z <= renderDistance; ++z) {
+        for(int x = -renderDistance; x <= renderDistance; ++x) {
+            for(int y = -renderDistance; y <= renderDistance; ++y) {
+                for(int z = -renderDistance; z <= renderDistance; ++z) {
                     int chunkX = playerX + x;
                     int chunkY = playerY + y;
                     int chunkZ = playerZ + z;
                     int d = getChunkDisplayList(playerChunkLoc.add(x, y, z));
-                    if (d == -1) {
+                    if(d == -1) {
                         continue;
                     }
                     glPushMatrix();
@@ -260,11 +254,11 @@ public class Cubit {
     }
 
     private void renderSelection() {
-        if (player.getSelectedBlock() == null) {
+        if(player.getSelectedBlock() == null) {
             return;
         }
         glBindTexture(GL_TEXTURE_2D, 0);
-        glColor4f(1F, 1F, 1F, (float) Math.sin(time * .005F) / 4F + .75F);
+        glColor4f(1F, 1F, 1F, (float)Math.sin(time * .005F) / 4F + .75F);
         glPushMatrix();
         BlockLocation pos = player.getSelectedBlock();
         glTranslatef(pos.getX(), pos.getY(), pos.getZ());
@@ -284,19 +278,19 @@ public class Cubit {
 
         Color fpsColor;
         int fps = timer.getFPS();
-        if (fps <= 1) {
+        if(fps <= 1) {
             fpsColor = Color.RED.darker();
-        } else if (fps <= 10) {
+        } else if(fps <= 10) {
             fpsColor = Color.RED;
-        } else if (fps <= 20) {
+        } else if(fps <= 20) {
             fpsColor = Color.ORANGE.darker();
-        } else if (fps < 28) {
+        } else if(fps < 28) {
             fpsColor = Color.ORANGE;
-        } else if (fps <= 35) {
+        } else if(fps <= 35) {
             fpsColor = Color.YELLOW;
-        } else if (fps <= 58) {
+        } else if(fps <= 58) {
             fpsColor = Color.GREEN;
-        } else if (fps <= 98) {
+        } else if(fps <= 98) {
             fpsColor = Color.GREEN.brighter();
         } else {
             fpsColor = Color.WHITE;
@@ -309,50 +303,34 @@ public class Cubit {
         double playerY = player.getY();
         double playerZ = player.getZ();
 
-        ChunkLocation<ChunkCube16> chunkPos = new ChunkLocation<ChunkCube16>(
-                ChunkCube16.chunkSize(),
-                player.getLocation());
-        int playerChunkX = chunkPos.getX();
-        int playerChunkY = chunkPos.getY();
-        int playerChunkZ = chunkPos.getZ();
-        font.drawString(0, y, 1, Color.WHITE, String.format(
-                "PlayerPosition(%.3f, %.3f, %.3f)", playerX, playerY, playerZ));
+        ChunkLocation<? extends IChunk> chunkLoc = this.getPlayerChunkLocation();
+        int chunkX = chunkLoc.getX();
+        int chunkY = chunkLoc.getY();
+        int chunkZ = chunkLoc.getZ();
+        font.drawString(0, y, 1, Color.WHITE, String.format("Location(%.3f, %.3f, %.3f)", playerX, playerY, playerZ));
         y += 16;
-        font.drawString(0, y, 1, Color.WHITE, String.format(
-                "PlayerChunk(%d, %d, %d)", playerChunkX, playerChunkY,
-                playerChunkZ));
+        font.drawString(0, y, 1, Color.WHITE, String.format("PlayerChunk(%d, %d, %d)", chunkX, chunkY, chunkZ));
         y += 16;
 
         BlockLocation selectedPos = player.getSelectedBlock();
-        String selx = selectedPos != null ? String.format("%d", selectedPos.
-                getX()) : "no selection";
-        String sely = selectedPos != null ? String.format("%d", selectedPos.
-                getY()) : "no selection";
-        String selz = selectedPos != null ? String.format("%d", selectedPos.
-                getZ()) : "no selection";
-        font.drawString(0, y, 1, Color.WHITE, String.format(
-                "Selection(%s, %s, %s)", selx, sely, selz));
+        String selx = selectedPos != null ? String.format("%d", selectedPos.getX()) : "no selection";
+        String sely = selectedPos != null ? String.format("%d", selectedPos.getY()) : "no selection";
+        String selz = selectedPos != null ? String.format("%d", selectedPos.getZ()) : "no selection";
+        font.drawString(0, y, 1, Color.WHITE, String.format("Selection(%s, %s, %s)", selx, sely, selz));
         y += 16;
 
         BlockLocation blockOnSelected = player.getBlockOnSelectedBlock();
-        selx = blockOnSelected != null ? String.format("%d", blockOnSelected.
-                getX()) : "no selection";
-        sely = blockOnSelected != null ? String.format("%d", blockOnSelected.
-                getY()) : "no selection";
-        selz = blockOnSelected != null ? String.format("%d", blockOnSelected.
-                getZ()) : "no selection";
-        font.drawString(0, y, 1, Color.WHITE, String.format(
-                "BlockOnSelection(%s, %s, %s)", selx, sely, selz));
+        selx = blockOnSelected != null ? String.format("%d", blockOnSelected.getX()) : "no selection";
+        sely = blockOnSelected != null ? String.format("%d", blockOnSelected.getY()) : "no selection";
+        selz = blockOnSelected != null ? String.format("%d", blockOnSelected.getZ()) : "no selection";
+        font.drawString(0, y, 1, Color.WHITE, String.format("BlockOnSelection(%s, %s, %s)", selx, sely, selz));
         y += 16;
 
         Block placeBlock = this.world.getBlockRegistry().fromID(placeid);
-        String place = placeBlock == null ? "No block to place" : placeBlock.
-                toString();
-        font.drawString(0, y, 1, Color.WHITE, String.format("PlaceBlock(%s)",
-                place));
+        String place = placeBlock == null ? "No block to place" : placeBlock.toString();
+        font.drawString(0, y, 1, Color.WHITE, String.format("PlaceBlock(%s)", place));
 
-        font.drawString((Display.getWidth() / 2F) / 3F - 8,
-                (Display.getHeight() / 2F) / 3F - 8, 3, Color.ORANGE, "X");
+        font.drawString((Display.getWidth() / 2F) / 3F - 8, (Display.getHeight() / 2F) / 3F - 8, 3, Color.ORANGE, "X");
         glMatrixMode(GL_PROJECTION);
         glLoadMatrix(perspectiveProjMatrix);
         glMatrixMode(GL_MODELVIEW);
@@ -364,8 +342,8 @@ public class Cubit {
             Display.setTitle(title);
             Display.setDisplayMode(new DisplayMode(width, height));
             Display.create();
-        } catch (LWJGLException ex) {
-            Logger.getLogger(Cubit.class.getName()).log(Level.SEVERE, null,
+        } catch(LWJGLException ex) {
+            Logger.getLogger(CubitMain.class.getName()).log(Level.SEVERE, null,
                     ex);
         }
     }
@@ -373,7 +351,7 @@ public class Cubit {
     private void initGL() {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(fov, (float) aspectRatio, (float) zNear, (float) zFar);
+        gluPerspective(fov, (float)aspectRatio, (float)zNear, (float)zFar);
         glViewport(0, 0, width, height);
         glMatrixMode(GL_MODELVIEW);
 
@@ -439,17 +417,18 @@ public class Cubit {
         glEndList();
     }
 
-    private void generateDisplayListsNearLocation(ChunkLocation<ChunkCube16> pos) {
+    private void generateDisplayListsNearLocation(BlockLocation pos) {
         Set<ChunkLocation<ChunkCube16>> chunkDisplayListsToCompile =
                 new HashSet<ChunkLocation<ChunkCube16>>(20000);
-        for (int x = -renderDistance; x <= renderDistance; ++x) {
-            for (int y = -renderDistance; y <= renderDistance; ++y) {
-                for (int z = -renderDistance; z <= renderDistance; ++z) {
-                    ChunkLocation<ChunkCube16> loc = pos.add(x, y, z);
-                    if (getChunkDisplayList(loc) != -1) {
+        ChunkLocation<ChunkCube16> chunkLoc = new ChunkLocation<ChunkCube16>(world, ChunkCube16.chunkSize(), pos);
+        for(int x = -renderDistance; x <= renderDistance; ++x) {
+            for(int y = -renderDistance; y <= renderDistance; ++y) {
+                for(int z = -renderDistance; z <= renderDistance; ++z) {
+                    ChunkLocation<ChunkCube16> loc = chunkLoc.add(x, y, z);
+                    if(getChunkDisplayList(loc) != -1) {
                         continue;
                     }
-                    if (this.world.getChunkAt(loc) == null) {
+                    if(this.world.getChunkAt(loc) == null) {
                         continue;
                     }
                     chunkDisplayListsToCompile.add(loc);
@@ -463,21 +442,23 @@ public class Cubit {
                 }
             }
         }
-        for (ChunkLocation<ChunkCube16> position : chunkDisplayListsToCompile) {
-            if(world.isChunkLoaded(position)) buildChunkDisplayList(position);
+        for(ChunkLocation<ChunkCube16> position : chunkDisplayListsToCompile) {
+            if(world.isChunkLoaded(position)) {
+                buildChunkDisplayList(position);
+            }
         }
     }
 
     private void onClose(int i) {
         Collection<Integer> lists = chunkDisplayLists.values();
-        for (Integer x : lists) {
+        for(Integer x : lists) {
             glDeleteLists(x, 1);
         }
         System.exit(i);
     }
 
     private void input() {
-        if (Mouse.isGrabbed() != grabMouse) {
+        if(Mouse.isGrabbed() != grabMouse) {
             Mouse.setGrabbed(grabMouse);
         }
         player.update();
@@ -488,29 +469,29 @@ public class Cubit {
                 new ChunkLocation<ChunkCube16>(world, ChunkCube16.chunkSize(),
                         blockPos);
         buildChunkDisplayList(chunkPos);
-        if ((blockPos.getX() & 0xf) == 0) {
+        if((blockPos.getX() & 0xf) == 0) {
             buildChunkDisplayList(chunkPos.add(-1, 0, 0));
         }
-        if ((blockPos.getX() & 0xf) == 0xf) {
+        if((blockPos.getX() & 0xf) == 0xf) {
             buildChunkDisplayList(chunkPos.add(1, 0, 0));
         }
-        if ((blockPos.getY() & 0xf) == 0) {
+        if((blockPos.getY() & 0xf) == 0) {
             buildChunkDisplayList(chunkPos.add(0, -1, 0));
         }
-        if ((blockPos.getY() & 0xf) == 0xf) {
+        if((blockPos.getY() & 0xf) == 0xf) {
             buildChunkDisplayList(chunkPos.add(0, 1, 0));
         }
-        if ((blockPos.getZ() & 0xf) == 0) {
+        if((blockPos.getZ() & 0xf) == 0) {
             buildChunkDisplayList(chunkPos.add(0, 0, -1));
         }
-        if ((blockPos.getZ() & 0xf) == 0xf) {
+        if((blockPos.getZ() & 0xf) == 0xf) {
             buildChunkDisplayList(chunkPos.add(0, 0, 1));
         }
     }
 
     private void buildChunkDisplayList(ChunkLocation<ChunkCube16> pos) {
         int displayList = getChunkDisplayList(pos);
-        if (displayList == -1) {
+        if(displayList == -1) {
             displayList = glGenLists(1);
             chunkDisplayLists.put(pos, displayList);
         }
@@ -525,9 +506,9 @@ public class Cubit {
         int chunkXBase = pos.getX() * maxX;
         int chunkYBase = pos.getY() * maxY;
         int chunkZBase = pos.getZ() * maxZ;
-        for (int x = 0; x < maxX; ++x) {
-            for (int y = 0; y < maxY; ++y) {
-                for (int z = 0; z < maxZ; ++z) {
+        for(int x = 0; x < maxX; ++x) {
+            for(int y = 0; y < maxY; ++y) {
+                for(int z = 0; z < maxZ; ++z) {
                     int worldX = x + chunkXBase;
                     int worldY = y + chunkYBase;
                     int worldZ = z + chunkZBase;
@@ -545,8 +526,8 @@ public class Cubit {
             tex = TextureLoader.loadTexture(Thread.currentThread().
                     getContextClassLoader().
                     getResourceAsStream("texture.png"));
-        } catch (IOException ex) {
-            Logger.getLogger(Cubit.class.getName()).log(Level.SEVERE, null,
+        } catch(IOException ex) {
+            Logger.getLogger(CubitMain.class.getName()).log(Level.SEVERE, null,
                     ex);
             onClose(-1);
         }
@@ -562,7 +543,7 @@ public class Cubit {
 
     private void errorCheck(String msg) {
         int e = glGetError();
-        if (e != GL_NO_ERROR) {
+        if(e != GL_NO_ERROR) {
             Logger.getLogger(this.getClass().getName()).
                     log(Level.SEVERE, "OpenGL Error! {2} {0} - {1}",
                             new Object[]{e, gluErrorString(e), msg});
@@ -588,14 +569,14 @@ public class Cubit {
         float tx[] = new float[]{texX + sizeInv, texX + sizeInv, texX, texX};
         float ty[] = new float[]{texY, texY + sizeInv, texY + sizeInv, texY};
         int i = 0;
-        for (Vertex vertex : verticies) {
+        for(Vertex vertex : verticies) {
             Color color = vertex.getColor();
             glColor3f(color.getRed() / 255F, color.getGreen() / 255F, color.
                     getBlue() / 255F);
             glTexCoord2f(tx[i], ty[i]);
             Vec3D pos = vertex.getPosition();
-            glVertex3f((float) pos.getX() + x, (float) pos.getY() + y,
-                    (float) pos.getZ() + z);
+            glVertex3f((float)pos.getX() + x, (float)pos.getY() + y,
+                    (float)pos.getZ() + z);
             i++;
         }
     }
@@ -606,12 +587,17 @@ public class Cubit {
         Block block = this.world.getBlockAt(wX, wY, wZ);
         IBlockModelBuilder modelBuilder = block.getModelBuilder();
         List<Quad> quads = modelBuilder.build(textureManager, world, wX, wY, wZ);
-        for (Quad quad : quads) {
+        for(Quad quad : quads) {
             drawQuad(quad, x, y, z);
         }
     }
 
-    public static Cubit getGame() {
+    private ChunkLocation<ChunkCube16> getPlayerChunkLocation() {
+        BlockLocation blockLoc = new BlockLocation(player.getLocation());
+        return new ChunkLocation<ChunkCube16>(world, ChunkCube16.chunkSize(), blockLoc);
+    }
+
+    public static CubitMain getGame() {
         return instance;
     }
 
@@ -621,6 +607,6 @@ public class Cubit {
     }
 
     public static Logger getLogger() {
-        return Logger.getLogger(Cubit.class.getName());
+        return Logger.getLogger(CubitMain.class.getName());
     }
 }

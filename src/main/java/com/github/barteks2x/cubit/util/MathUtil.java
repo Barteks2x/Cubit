@@ -44,4 +44,8 @@ public class MathUtil {
     public static int modP(int a, int b) {
         return (((a % b) + b) % b);
     }
+
+    public static int ceil(double d) {
+        return (int)Math.ceil(d);
+    }
 }

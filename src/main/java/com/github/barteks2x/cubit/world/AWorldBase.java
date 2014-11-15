@@ -24,6 +24,7 @@
 package com.github.barteks2x.cubit.world;
 
 import com.github.barteks2x.cubit.MathHelper;
+import com.github.barteks2x.cubit.Player;
 import com.github.barteks2x.cubit.block.Block;
 import com.github.barteks2x.cubit.generator.AChunkGenerator;
 import com.github.barteks2x.cubit.location.BlockLocation;
@@ -37,7 +38,7 @@ import com.github.barteks2x.cubit.world.chunkloader.IChunkLoader;
  * <p>
  * @param <Chunk> Chunk class used by this world
  */
-public abstract class AWorldBase<Chunk extends IChunk<Chunk>> implements IWorld {
+public abstract class AWorldBase<Chunk extends IChunk> implements IWorld {
 
     private final IChunkLoader<Chunk> chunkLoader;
     protected final long seed;
@@ -59,6 +60,10 @@ public abstract class AWorldBase<Chunk extends IChunk<Chunk>> implements IWorld 
 
         this.blockRegistry = new BlockRegistry(this);
         this.registerBlocks();
+    }
+
+    public Chunk getChunkAt(BlockLocation location) {
+        return this.getChunkAt(this.toChunkLocation(location));
     }
 
     public Chunk getChunkAt(int x, int y, int z) {
@@ -83,8 +88,6 @@ public abstract class AWorldBase<Chunk extends IChunk<Chunk>> implements IWorld 
         return this.chunkLoader.hasChunk(this.toChunkLocation(location));
     }
 
-    public abstract Chunk getChunkAt(BlockLocation location);
-
     @Override
     public Block getBlockAt(int x, int y, int z) {
         return this.getBlockAt(new BlockLocation(this, x, y, z));
@@ -92,10 +95,10 @@ public abstract class AWorldBase<Chunk extends IChunk<Chunk>> implements IWorld 
 
     @Override
     public Block getBlockAt(BlockLocation location) {
-        if (!this.isValidBlockLocation(location)) {
+        if(!this.isValidBlockLocation(location)) {
             return Block.AIR;
         }
-        if (!this.isChunkLoaded(location)) {
+        if(!this.isChunkLoaded(location)) {
             return Block.AIR;
         }
         Chunk chunk = this.getChunkAt(location);
@@ -114,20 +117,25 @@ public abstract class AWorldBase<Chunk extends IChunk<Chunk>> implements IWorld 
 
     @Override
     public boolean setBlockAt(BlockLocation location, Block block) {
-        if (!this.isValidBlockLocation(location)) {
+        if(!this.isValidBlockLocation(location)) {
             return false;
         }
-        if (!this.isChunkLoaded(location)) {
+        if(!this.isChunkLoaded(location)) {
             return false;
         }
 
         Chunk chunk = this.getChunkAt(location);
         BlockLocation locInChunk = location.modP(chunk.getSize());
-        return chunk.setBlockAt(
-                locInChunk.getX(),
-                locInChunk.getY(),
-                locInChunk.getZ(),
-                block);
+        int localX = locInChunk.getX();
+        int localY = locInChunk.getY();
+        int localZ = locInChunk.getZ();
+        Block old = chunk.getBlockAt(localX, localY, localZ);
+        boolean success = chunk.setBlockAt(localX, localY, localZ, block);
+        if(success) {
+            assert chunk.getBlockAt(localX, localY, localZ) == block : "Wrong block after setting block!";
+            this.onBlockUpdate(location, old, block);
+        }
+        return success;
     }
 
     public Chunk loadChunkAt(ChunkLocation<Chunk> location) {
@@ -137,17 +145,6 @@ public abstract class AWorldBase<Chunk extends IChunk<Chunk>> implements IWorld 
     @Override
     public Vec3I getSpawnPoint() {
         return this.spawnPoint;
-    }
-
-    public void loadChunksWithinRadius(ChunkLocation<Chunk> location,
-            int radiusX, int radiusY, int radiusZ) {
-        for (int x = -radiusX; x <= radiusX; ++x) {
-            for (int y = -radiusY; y <= radiusY; ++y) {
-                for (int z = -radiusZ; z <= radiusZ; ++z) {
-                    loadChunkAt(location.add(x, y, z));
-                }
-            }
-        }
     }
 
     @Override
@@ -160,15 +157,21 @@ public abstract class AWorldBase<Chunk extends IChunk<Chunk>> implements IWorld 
         this.spawnPoint = loc;
     }
 
-    protected abstract void onBlockUpdate(int x, int y, int z);
+    protected abstract void onBlockUpdate(BlockLocation location, Block old, Block updated);
+    
+    protected abstract void onChunkLoad(ChunkLocation<Chunk> location);
 
     protected abstract Vec3I getChunkSize();
-
-    public abstract ChunkLocation<Chunk> toChunkLocation(BlockLocation location);
+    
+    public abstract void joinPlayer(Player player);
 
     private void registerBlocks() {
-        for (Block block : Block.blocks) {
+        for(Block block : Block.blocks) {
             this.blockRegistry.registerBlock(block);
         }
+    }
+
+    public ChunkLocation<Chunk> toChunkLocation(BlockLocation location) {
+        return new ChunkLocation<Chunk>(this, ChunkCube16.chunkSize(), location);
     }
 }

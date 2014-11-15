@@ -6,6 +6,8 @@
 *.ear
 #logs
 *.log
+#Numbered logs
+*.log.*
 #linux files
 *.lck
 /.project

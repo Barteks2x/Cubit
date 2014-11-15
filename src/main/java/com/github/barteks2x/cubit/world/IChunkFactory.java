@@ -29,7 +29,7 @@ import com.github.barteks2x.cubit.location.ChunkLocation;
  * Used to construct new chunks for given world with specific location and block data.
  * @param <T>
  */
-public interface IChunkFactory<T extends IChunk<T>> {
+public interface IChunkFactory<T extends IChunk> {
     public IChunkFactory<T> clear();
     public IChunkFactory<T> setLocation(ChunkLocation<T> loc);
     public T build();

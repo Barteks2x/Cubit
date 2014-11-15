@@ -19,7 +19,7 @@ package com.github.barteks2x.cubit.world;
 import com.github.barteks2x.cubit.generator.AChunkGenerator;
 import com.github.barteks2x.cubit.generator.HeightmapChunkGenerator;
 
-public class HeightmapChunkGeneratorBuilder<T extends IChunk<T>> implements
+public class HeightmapChunkGeneratorBuilder<T extends IChunk> implements
         IChunkGeneratorBuilder<T> {
 
     private long seed;

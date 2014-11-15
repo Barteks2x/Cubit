@@ -30,7 +30,7 @@ import com.github.barteks2x.cubit.location.Vec3I;
 import com.github.barteks2x.cubit.world.AWorldBase;
 import com.github.barteks2x.cubit.world.IChunkFactory;
 
-public class HeightmapChunkGenerator<T extends IChunk<T>> extends AChunkGenerator<T> {
+public class HeightmapChunkGenerator<T extends IChunk> extends AChunkGenerator<T> {
 
     private final INoiseGenerator2d noiseGen;
 
@@ -46,7 +46,6 @@ public class HeightmapChunkGenerator<T extends IChunk<T>> extends AChunkGenerato
 
     @Override
     protected void generateTerrain(ChunkLocation<T> location, T chunk) {
-        System.out.println("Generating!"+location);
         Vec3I chunkSize = chunk.getSize();
         final int maxX = chunkSize.getX(),
                 maxY = chunkSize.getY(),

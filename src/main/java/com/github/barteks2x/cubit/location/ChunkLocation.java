@@ -27,7 +27,7 @@ import com.github.barteks2x.cubit.util.MathUtil;
 import com.github.barteks2x.cubit.world.AWorldBase;
 import com.github.barteks2x.cubit.world.IChunk;
 
-public class ChunkLocation<C extends IChunk<C>> extends Vec3I {
+public class ChunkLocation<C extends IChunk> extends Vec3I {
 
     private final AWorldBase<C> world;
     private final Vec3I chunkSize;
@@ -47,15 +47,6 @@ public class ChunkLocation<C extends IChunk<C>> extends Vec3I {
     public ChunkLocation(AWorldBase<C> world, Vec3I size, BlockLocation loc) {
         super(loc.div(size));
         this.world = world;
-        this.chunkSize = size;
-    }
-
-    public ChunkLocation(Vec3I size,
-            EntityLocation<? extends AWorldBase<C>> loc) {
-        super(MathUtil.floor(loc.getX() / size.getX()), 
-                MathUtil.floor(loc.getY() / size.getY()), 
-                MathUtil.floor(loc.getZ() / size.getZ()));
-        this.world = loc.getWorld();
         this.chunkSize = size;
     }
 
@@ -97,17 +88,17 @@ public class ChunkLocation<C extends IChunk<C>> extends Vec3I {
     }
 
     @Override
-    public Vec3I add(Vec3I vec) {
+    public ChunkLocation<C> add(Vec3I vec) {
         return this.add(vec.getX(), vec.getY(), vec.getZ());
     }
 
     @Override
-    public Vec3I div(int x, int y, int z) {
+    public ChunkLocation<C> div(int x, int y, int z) {
         return new ChunkLocation<C>(this.world, this.chunkSize, super.div(x, y, z));
     }
 
     @Override
-    public Vec3I div(Vec3I vec) {
+    public ChunkLocation<C> div(Vec3I vec) {
         return this.div(vec.getX(), vec.getY(), vec.getZ());
     }
 

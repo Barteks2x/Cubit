@@ -34,7 +34,7 @@ import java.util.List;
  * <p>
  * @param <T> Chunk class supported by the chunk loader.
  */
-public interface IChunkLoader<T extends IChunk<T>> {
+public interface IChunkLoader<T extends IChunk> {
 
     /**
      * This method returns chunk at given location or loads/generates it if not

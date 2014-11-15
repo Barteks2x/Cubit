@@ -27,15 +27,22 @@ import com.github.barteks2x.cubit.util.MathUtil;
 import com.github.barteks2x.cubit.world.IWorld;
 
 public class BlockLocation extends Vec3I {
+
     private final IWorld world;
+
     public BlockLocation(IWorld world, int x, int y, int z) {
         super(x, y, z);
         this.world = world;
     }
 
-    public IWorld getWorld(){
+    public BlockLocation(EntityLocation el) {
+        this(el.getWorld(), MathUtil.floor(el.getX()), MathUtil.floor(el.getY()), MathUtil.floor(el.getZ()));
+    }
+
+    public IWorld getWorld() {
         return this.world;
     }
+
     @Override
     public boolean isValid() {
         return true;
@@ -45,16 +52,16 @@ public class BlockLocation extends Vec3I {
     public BlockLocation add(int x, int y, int z) {
         return new BlockLocation(this.getWorld(), this.getX() + x, this.getY() + y, this.getZ() + z);
     }
-    
+
     @Override
     public BlockLocation mod(Vec3I vec) {
         return new BlockLocation(
-                this.getWorld(), 
+                this.getWorld(),
                 this.getX() % vec.getX(),
                 this.getY() % vec.getY(),
                 this.getZ() % vec.getZ());
     }
-    
+
     @Override
     public BlockLocation modP(Vec3I vec) {
         return new BlockLocation(

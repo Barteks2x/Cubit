@@ -25,7 +25,7 @@ package com.github.barteks2x.cubit.world;
 
 import com.github.barteks2x.cubit.generator.AChunkGenerator;
 
-public interface IChunkGeneratorBuilder<T extends IChunk<T>> {
+public interface IChunkGeneratorBuilder<T extends IChunk> {
 
     public IChunkGeneratorBuilder<T> setSeed(long seed);
     

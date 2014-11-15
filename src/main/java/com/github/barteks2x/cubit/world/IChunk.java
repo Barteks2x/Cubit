@@ -29,9 +29,8 @@ import com.github.barteks2x.cubit.location.Vec3I;
 
 /**
  * Basic chunk interface for block storage.
- * @param <T> the class that imlements IChunk
  */
-public interface IChunk<T extends IChunk<T>> {
+public interface IChunk {
 
     /**
      * @return x (positive towards north) location of the chunk. Chunk at x
@@ -55,7 +54,7 @@ public interface IChunk<T extends IChunk<T>> {
      * @return Location of the chunk. Location contains information about chunk
      *         size.
      */
-    public ChunkLocation<T> getLocation();
+    public ChunkLocation<? extends IChunk> getLocation();
 
     /**
      * @return Chunk size. X, Y and Z must be positive.
@@ -95,7 +94,7 @@ public interface IChunk<T extends IChunk<T>> {
      * @return World containing the chunk. Null if chunk it not loaded yet or
      *         has been unloaded.
      */
-    public AWorldBase<T> getWorld();
+    public AWorldBase getWorld();
 
     /**
      * @return true if load method has been calles and unload method has not
@@ -113,14 +112,6 @@ public interface IChunk<T extends IChunk<T>> {
     /**
      * Called before loading chunk into world. This method does NOT
      * load the chunk into world. This method does NOT load any data from disk.
-     * <p>
-     * @param world World into which the chunk is loaded.
      */
-    public void load(AWorldBase<T> world);
-
-    /**
-     * Called after loading chunk into world. When this method is called chunk
-     * already contains block data.
-     */
-    public void postLoad();
+    public void load();
 }

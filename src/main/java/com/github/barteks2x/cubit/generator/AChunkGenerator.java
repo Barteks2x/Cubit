@@ -34,8 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class AChunkGenerator<T extends IChunk<T>> implements
-        IChunkLoader<T> {
+public abstract class AChunkGenerator<T extends IChunk> implements IChunkLoader<T> {
 
     protected final Random rand;
     protected final long seed;
@@ -75,23 +74,29 @@ public abstract class AChunkGenerator<T extends IChunk<T>> implements
 
     protected abstract int getApproximateHeightAt(int x, int z);
 
+    @Override
     public T loadChunk(ChunkLocation<T> location) {
         return this.generateChunk(location);
     }
 
+    @Override
     public T getChunk(ChunkLocation<T> location) {
         return null;
     }
 
+    @Override
     public void unloadChunk(ChunkLocation<T> location) {
     }
 
+    @Override
     public void unloadChunks() {
     }
 
+    @Override
     public void tick() {
     }
 
+    @Override
     public boolean canChainChunkLoaders() {
         return false;
     }
@@ -108,10 +113,12 @@ public abstract class AChunkGenerator<T extends IChunk<T>> implements
                 "Chunk generator doesn't support chained chunk loaders.");
     }
 
+    @Override
     public List<IChunkLoader<T>> getChainedChunkLoaders() {
         return new ArrayList<IChunkLoader<T>>(0);
     }
 
+    @Override
     public boolean hasChunk(ChunkLocation<T> location) {
         return false;
     }

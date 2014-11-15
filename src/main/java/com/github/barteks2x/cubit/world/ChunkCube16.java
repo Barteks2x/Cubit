@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 //and here is how it's used
 //I extend IChunk<ChunKCube16>
 //T is ChunkCube16 and extends IChunk<T>
-public class ChunkCube16 implements IChunk<ChunkCube16> {
+public class ChunkCube16 implements IChunk {
 
     private static final Logger logger = LoggerFactory.getLogger(
             ChunkCube16.class);
@@ -131,17 +131,13 @@ public class ChunkCube16 implements IChunk<ChunkCube16> {
     }
 
     @Override
-    public void load(AWorldBase<ChunkCube16> world) {
+    public void load() {
         if (this.isLoaded) {
             throw new RuntimeException("Chunk already loaded!");
         }
         if (this.canLoad) {
             this.isLoaded = true;
         }
-    }
-
-    @Override
-    public void postLoad() {
     }
 
     @Override
