@@ -23,9 +23,9 @@
  */
 package com.github.barteks2x.cubit.render.renderer;
 
-import com.github.barteks2x.cubit.BitmapFont;
+import com.github.barteks2x.cubit.render.BitmapFont;
 import com.github.barteks2x.cubit.Player;
-import com.github.barteks2x.cubit.Timer;
+import com.github.barteks2x.cubit.util.Timer;
 import com.github.barteks2x.cubit.block.Block;
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.ChunkLocation;

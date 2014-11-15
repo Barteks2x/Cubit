@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit;
+package com.github.barteks2x.cubit.util;
 
 import com.github.barteks2x.cubit.util.logging.LoggerFactory;
 import java.io.*;
