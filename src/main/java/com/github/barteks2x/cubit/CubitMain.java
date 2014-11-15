@@ -36,6 +36,7 @@ import com.github.barteks2x.cubit.render.Vertex;
 import com.github.barteks2x.cubit.render.block.IBlockModelBuilder;
 import com.github.barteks2x.cubit.render.block.IBlockTextureManager;
 import com.github.barteks2x.cubit.render.block.SpritesheetTextureManager;
+import com.github.barteks2x.cubit.util.MathUtil;
 import com.github.barteks2x.cubit.util.logging.LoggerFactory;
 import com.github.barteks2x.cubit.world.BasicWorld;
 import com.github.barteks2x.cubit.world.ChunkCube16;
@@ -127,10 +128,8 @@ public class CubitMain {
     private double zNear, zFar;
     private int width, height;
     private boolean isRunning = true;
-    private final FloatBuffer perspectiveProjMatrix = BufferUtils.
-            createFloatBuffer(16);
-    private final FloatBuffer orthographicProjMatrix = BufferUtils.
-            createFloatBuffer(16);
+    private final FloatBuffer perspectiveProjMatrix = BufferUtils.createFloatBuffer(16);
+    private final FloatBuffer orthographicProjMatrix = BufferUtils.createFloatBuffer(16);
     //Rendering
     private final Map<ChunkLocation<ChunkCube16>, Integer> chunkDisplayLists;
     private int selectionDisplayList;
@@ -203,8 +202,6 @@ public class CubitMain {
                 world.tick(TICKRATE);
             }
 
-            Vec3I chunkSize = ChunkCube16.chunkSize();
-
             glLoadIdentity();
 
             tex.bind();
@@ -234,9 +231,17 @@ public class CubitMain {
         int playerY = playerChunkLoc.getY();
         int playerZ = playerChunkLoc.getZ();
 
-        for(int x = -renderDistance; x <= renderDistance; ++x) {
-            for(int y = -renderDistance; y <= renderDistance; ++y) {
-                for(int z = -renderDistance; z <= renderDistance; ++z) {
+        Vec3I chunkSize = playerChunkLoc.getChunkSize();
+        int xStep = chunkSize.getX();
+        int yStep = chunkSize.getY();
+        int zStep = chunkSize.getZ();
+
+        int radiusX = MathUtil.ceil(renderDistance / (double)xStep) * xStep;
+        int radiusY = MathUtil.ceil(renderDistance / (double)yStep) * yStep;
+        int radiusZ = MathUtil.ceil(renderDistance / (double)zStep) * zStep;
+        for(int x = -radiusX; x <= radiusX; x += xStep) {
+            for(int y = -radiusY; y <= radiusY; y += yStep) {
+                for(int z = -radiusZ; z <= radiusZ; z += yStep) {
                     int chunkX = playerX + x;
                     int chunkY = playerY + y;
                     int chunkZ = playerZ + z;
@@ -245,7 +250,10 @@ public class CubitMain {
                         continue;
                     }
                     glPushMatrix();
-                    glTranslatef(chunkX << 4, chunkY << 4, chunkZ << 4);
+                    int xTranslate = MathUtil.floor(chunkX/(double)xStep);
+                    int yTranslate = MathUtil.floor(chunkY/(double)yStep);
+                    int zTranslate = MathUtil.floor(chunkZ/(double)zStep);
+                    glTranslatef(xTranslate, yTranslate, zTranslate);
                     glCallList(d);
                     glPopMatrix();
                 }
