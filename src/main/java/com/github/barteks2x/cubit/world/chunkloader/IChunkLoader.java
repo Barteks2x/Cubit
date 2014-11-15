@@ -25,7 +25,7 @@ package com.github.barteks2x.cubit.world.chunkloader;
 
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.ChunkLocation;
-import com.github.barteks2x.cubit.world.IChunk;
+import com.github.barteks2x.cubit.world.chunk.IChunk;
 import java.util.List;
 
 /**

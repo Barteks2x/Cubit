@@ -21,7 +21,7 @@ package com.github.barteks2x.cubit.world;
  *
  * @author Bartosz Skrzypczak
  */
-class IncompleteBuildException extends RuntimeException {
+public class IncompleteBuildException extends RuntimeException {
 
     public IncompleteBuildException(String no_world_specified) {
     }

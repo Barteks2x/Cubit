@@ -15,40 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.barteks2x.cubit;
+package com.github.barteks2x.cubit.world.chunk;
 
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
-import com.github.barteks2x.cubit.world.ChunkCube16;
-import com.github.barteks2x.cubit.world.IChunkFactory;
+import com.github.barteks2x.cubit.world.chunk.ChunkCube8;
+import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
 
 /**
  *
  * @author Bartosz Skrzypczak
  */
-class ChunkCube16Factory implements IChunkFactory<ChunkCube16> {
+public class ChunkCube8Factory implements IChunkFactory<ChunkCube8> {
 
-    private ChunkLocation<ChunkCube16> location;
+    private ChunkLocation<ChunkCube8> location;
     @Override
-    public IChunkFactory<ChunkCube16> clear() {
+    public IChunkFactory<ChunkCube8> clear() {
         this.location = null;
         return this;
     }
 
     @Override
-    public IChunkFactory<ChunkCube16> setLocation(ChunkLocation<ChunkCube16> loc) {
+    public IChunkFactory<ChunkCube8> setLocation(ChunkLocation<ChunkCube8> loc) {
         this.location = loc;
         return this;
     }
 
     @Override
-    public ChunkCube16 build() {
-        return new ChunkCube16(location);
+    public ChunkCube8 build() {
+        return new ChunkCube8(location);
     }
 
     @Override
     public Vec3I getChunkSize() {
-        return ChunkCube16.chunkSize();
+        return ChunkCube8.chunkSize();
     }
 
 }

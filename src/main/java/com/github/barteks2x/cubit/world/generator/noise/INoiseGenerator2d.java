@@ -21,33 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit.world;
+package com.github.barteks2x.cubit.world.generator.noise;
 
-public interface IConfig {
+public interface INoiseGenerator2d {
 
-    /**
-     * This method returns config value for given config option name and type.
-     * Several config options with the same name and different type are allowed.
-     * <p>
-     * @param <T>          Value type
-     * @param name         Name of config value, dot separated path
-     * @param defaultValue Default value returned if config option not found
-     * <p>
-     * @return Value for given config option, default value if not found
-     */
-    public <T> T get(String name, T defaultValue);
+    double getRawValueAt(double x, double z);
 
-    /**
-     * This method sets config value for given config option name and type.
-     * Several config options with the same name and different type are allowed.
-     * <p>
-     * @param <T>   Value type
-     * @param name  Name of config value, dot separated path
-     * @param value Value to set
-     */
-    public <T> void set(String name, T value);
-
-    public void reload();
-
-    public void save();
+    double getValueOctaves(int x, int z);
 }

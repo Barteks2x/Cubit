@@ -21,11 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit.generator;
+package com.github.barteks2x.cubit.world.generator;
 
-public interface INoiseGenerator2d {
+import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
+import com.github.barteks2x.cubit.world.chunk.IChunk;
+import com.github.barteks2x.cubit.world.generator.AChunkGenerator;
 
-    double getRawValueAt(double x, double z);
+public interface IChunkGeneratorBuilder<T extends IChunk> {
 
-    double getValueOctaves(int x, int z);
+    public IChunkGeneratorBuilder<T> setSeed(long seed);
+    
+    public IChunkGeneratorBuilder<T> setChunkFactory(IChunkFactory<T> factory);
+    
+    public AChunkGenerator<T> build();
+
 }

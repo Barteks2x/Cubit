@@ -21,8 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit;
+package com.github.barteks2x.cubit.render;
 
+import com.github.barteks2x.cubit.render.Texture;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;

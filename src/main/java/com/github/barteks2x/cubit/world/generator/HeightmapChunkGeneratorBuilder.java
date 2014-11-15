@@ -14,10 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.barteks2x.cubit.world;
+package com.github.barteks2x.cubit.world.generator;
 
-import com.github.barteks2x.cubit.generator.AChunkGenerator;
-import com.github.barteks2x.cubit.generator.HeightmapChunkGenerator;
+import com.github.barteks2x.cubit.world.IWorld;
+import com.github.barteks2x.cubit.world.IncompleteBuildException;
+import com.github.barteks2x.cubit.world.generator.IChunkGeneratorBuilder;
+import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
+import com.github.barteks2x.cubit.world.chunk.IChunk;
+import com.github.barteks2x.cubit.world.generator.AChunkGenerator;
+import com.github.barteks2x.cubit.world.generator.HeightmapChunkGenerator;
 
 public class HeightmapChunkGeneratorBuilder<T extends IChunk> implements
         IChunkGeneratorBuilder<T> {

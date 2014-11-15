@@ -23,15 +23,15 @@
  */
 package com.github.barteks2x.cubit.world;
 
-import com.github.barteks2x.cubit.MathHelper;
 import com.github.barteks2x.cubit.Player;
 import com.github.barteks2x.cubit.block.Block;
-import com.github.barteks2x.cubit.generator.AChunkGenerator;
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.EntityLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
 import com.github.barteks2x.cubit.util.MathUtil;
+import com.github.barteks2x.cubit.world.chunk.IChunk;
+import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
 import com.github.barteks2x.cubit.world.chunkloader.IChunkLoader;
 import java.util.HashSet;
 import java.util.Set;

@@ -23,8 +23,11 @@
  */
 package com.github.barteks2x.cubit;
 
+import com.github.barteks2x.cubit.render.TextureLoader;
+import com.github.barteks2x.cubit.render.Texture;
+import com.github.barteks2x.cubit.world.chunk.ChunkCube8Factory;
 import com.github.barteks2x.cubit.block.Block;
-import com.github.barteks2x.cubit.generator.HeightmapChunkGenerator;
+import com.github.barteks2x.cubit.world.generator.HeightmapChunkGenerator;
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.EntityLocation;
@@ -39,9 +42,9 @@ import com.github.barteks2x.cubit.render.block.SpritesheetTextureManager;
 import com.github.barteks2x.cubit.util.MathUtil;
 import com.github.barteks2x.cubit.util.logging.LoggerFactory;
 import com.github.barteks2x.cubit.world.CubitWorld;
-import com.github.barteks2x.cubit.world.ChunkCube8;
-import com.github.barteks2x.cubit.world.IChunk;
-import com.github.barteks2x.cubit.world.IChunkFactory;
+import com.github.barteks2x.cubit.world.chunk.ChunkCube8;
+import com.github.barteks2x.cubit.world.chunk.IChunk;
+import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
 import com.github.barteks2x.cubit.world.IWorld;
 import com.github.barteks2x.cubit.world.chunkloader.IChunkLoader;
 import com.github.barteks2x.cubit.world.chunkloader.RAMChunkLoader;
@@ -121,7 +124,7 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
     private static CubitMain<ChunkCube8, CubitWorld<ChunkCube8>> instance;
     private static final int TICKRATE = 20;
     private static final long UPDATE_TIME = 1000000000L / TICKRATE;
-    public int renderDistance = 64;
+    private int renderDistance = 64;
     //OpenGL
     private final String title;
     private int fov;

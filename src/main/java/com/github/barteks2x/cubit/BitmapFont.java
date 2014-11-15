@@ -23,6 +23,8 @@
  */
 package com.github.barteks2x.cubit;
 
+import com.github.barteks2x.cubit.render.TextureLoader;
+import com.github.barteks2x.cubit.render.Texture;
 import java.awt.Color;
 import static org.lwjgl.opengl.GL11.*;
 
