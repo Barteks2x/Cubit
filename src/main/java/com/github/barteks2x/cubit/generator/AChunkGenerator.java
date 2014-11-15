@@ -27,7 +27,7 @@ import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
 import com.github.barteks2x.cubit.world.IChunk;
 import com.github.barteks2x.cubit.location.ChunkLocation;
-import com.github.barteks2x.cubit.world.AWorldBase;
+import com.github.barteks2x.cubit.world.CubitWorld;
 import com.github.barteks2x.cubit.world.IChunkFactory;
 import com.github.barteks2x.cubit.world.chunkloader.IChunkLoader;
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public abstract class AChunkGenerator<T extends IChunk> implements IChunkLoader<
     protected final long seed;
     protected final IChunkFactory<T> chunkBuilder;
 
-    private AWorldBase<T> world = null;
+    private CubitWorld<T> world = null;
 
     protected AChunkGenerator(IChunkFactory<T> chunkBuilder, long seed) {
         this.rand = new Random(seed);
@@ -48,7 +48,7 @@ public abstract class AChunkGenerator<T extends IChunk> implements IChunkLoader<
         this.chunkBuilder = chunkBuilder;
     }
 
-    public void init(AWorldBase<T> world) {
+    public void init(CubitWorld<T> world) {
         if (this.world != null) {
             throw new AlreadyInitializedException();
         }

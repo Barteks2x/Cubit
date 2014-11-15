@@ -27,7 +27,7 @@ import com.github.barteks2x.cubit.world.IChunk;
 import com.github.barteks2x.cubit.block.Block;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
-import com.github.barteks2x.cubit.world.AWorldBase;
+import com.github.barteks2x.cubit.world.CubitWorld;
 import com.github.barteks2x.cubit.world.IChunkFactory;
 
 public class HeightmapChunkGenerator<T extends IChunk> extends AChunkGenerator<T> {

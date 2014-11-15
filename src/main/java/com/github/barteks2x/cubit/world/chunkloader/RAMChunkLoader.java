@@ -18,7 +18,7 @@ package com.github.barteks2x.cubit.world.chunkloader;
 
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.ChunkLocation;
-import com.github.barteks2x.cubit.world.ChunkCube16;
+import com.github.barteks2x.cubit.world.IChunk;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,24 +28,24 @@ import java.util.Map;
  *
  * @author Bartosz Skrzypczak
  */
-public class RAMChunkCube16Loader implements IChunkLoader<ChunkCube16> {
+public class RAMChunkLoader<Chunk extends IChunk> implements IChunkLoader<Chunk> {
 
-    private final Map<ChunkLocation<ChunkCube16>, ChunkCube16> chunks;
+    private final Map<ChunkLocation<Chunk>, Chunk> chunks;
 
-    private final List<IChunkLoader<ChunkCube16>> chained;
+    private final List<IChunkLoader<Chunk>> chained;
 
-    public RAMChunkCube16Loader() {
-        this.chunks = new HashMap<ChunkLocation<ChunkCube16>, ChunkCube16>(21 * 21 * 21);
-        this.chained = new ArrayList<IChunkLoader<ChunkCube16>>(2);
+    public RAMChunkLoader() {
+        this.chunks = new HashMap<ChunkLocation<Chunk>, Chunk>(21 * 21 * 21);
+        this.chained = new ArrayList<IChunkLoader<Chunk>>(2);
     }
 
     @Override
-    public ChunkCube16 loadChunk(ChunkLocation<ChunkCube16> location) {
+    public Chunk loadChunk(ChunkLocation<Chunk> location) {
         if(this.hasChunk(location)) {
             return this.getChunk(location);
         }
-        for(IChunkLoader<ChunkCube16> loader : chained) {
-            ChunkCube16 chunk = loader.loadChunk(location);
+        for(IChunkLoader<Chunk> loader : chained) {
+            Chunk chunk = loader.loadChunk(location);
             if(chunk == null) {
                 continue;
             }
@@ -59,12 +59,12 @@ public class RAMChunkCube16Loader implements IChunkLoader<ChunkCube16> {
     }
 
     @Override
-    public ChunkCube16 getChunk(ChunkLocation<ChunkCube16> location) {
+    public Chunk getChunk(ChunkLocation<Chunk> location) {
         if(this.chunks.containsKey(location)) {
             return this.chunks.get(location);
         }
-        for(IChunkLoader<ChunkCube16> loader : chained) {
-            ChunkCube16 chunk = loader.getChunk(location);
+        for(IChunkLoader<Chunk> loader : chained) {
+            Chunk chunk = loader.getChunk(location);
             if(chunk != null) {
                 return chunk;
             }
@@ -73,7 +73,7 @@ public class RAMChunkCube16Loader implements IChunkLoader<ChunkCube16> {
     }
 
     @Override
-    public void unloadChunk(ChunkLocation<ChunkCube16> location) {
+    public void unloadChunk(ChunkLocation<Chunk> location) {
         //TODO: unload chunk
     }
 
@@ -92,13 +92,13 @@ public class RAMChunkCube16Loader implements IChunkLoader<ChunkCube16> {
     }
 
     @Override
-    public void addChainedChunkLoader(IChunkLoader<ChunkCube16> loader) {
+    public void addChainedChunkLoader(IChunkLoader<Chunk> loader) {
         this.removeChainedChunkLoader(loader);
         chained.add(loader);
     }
 
     @Override
-    public boolean removeChainedChunkLoader(IChunkLoader<ChunkCube16> loader) {
+    public boolean removeChainedChunkLoader(IChunkLoader<Chunk> loader) {
         if(this.chained.contains(loader)) {
             this.chained.remove(loader);
             return true;
@@ -107,16 +107,16 @@ public class RAMChunkCube16Loader implements IChunkLoader<ChunkCube16> {
     }
 
     @Override
-    public List<IChunkLoader<ChunkCube16>> getChainedChunkLoaders() {
-        return new ArrayList<IChunkLoader<ChunkCube16>>(chained);
+    public List<IChunkLoader<Chunk>> getChainedChunkLoaders() {
+        return new ArrayList<IChunkLoader<Chunk>>(chained);
     }
 
     @Override
-    public boolean hasChunk(ChunkLocation<ChunkCube16> location) {
+    public boolean hasChunk(ChunkLocation<Chunk> location) {
         if(this.chunks.containsKey(location)) {
             return true;
         }
-        for(IChunkLoader<ChunkCube16> loader : chained) {
+        for(IChunkLoader<Chunk> loader : chained) {
             if(loader.hasChunk(location)) {
                 return true;
             }
@@ -126,7 +126,7 @@ public class RAMChunkCube16Loader implements IChunkLoader<ChunkCube16> {
 
     @Override
     public BlockLocation getSpawnPoint() {
-        for(IChunkLoader<ChunkCube16> loader : chained) {
+        for(IChunkLoader<Chunk> loader : chained) {
             BlockLocation loc = loader.getSpawnPoint();
             if(loc != null) {
                 return loc;

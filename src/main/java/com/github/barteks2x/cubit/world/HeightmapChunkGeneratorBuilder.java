@@ -35,7 +35,7 @@ public class HeightmapChunkGeneratorBuilder<T extends IChunk> implements
     @Override
     public AChunkGenerator<T> build() {
         if (this.world == null) {
-            throw new IncompleterBuildException("No world specified.");
+            throw new IncompleteBuildException("No world specified.");
         }
         return new HeightmapChunkGenerator<T>(chunkFactory, seed);
     }

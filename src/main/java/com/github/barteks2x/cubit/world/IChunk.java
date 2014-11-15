@@ -94,7 +94,7 @@ public interface IChunk {
      * @return World containing the chunk. Null if chunk it not loaded yet or
      *         has been unloaded.
      */
-    public AWorldBase getWorld();
+    public CubitWorld getWorld();
 
     /**
      * @return true if load method has been calles and unload method has not

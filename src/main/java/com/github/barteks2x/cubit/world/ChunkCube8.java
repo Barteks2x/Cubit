@@ -35,42 +35,40 @@ import java.util.logging.Logger;
  * @author Bartosz Skrzypczak
  */
 //and here is how it's used
-//I extend IChunk<ChunKCube16>
-//T is ChunkCube16 and extends IChunk<T>
-public class ChunkCube16 implements IChunk {
+//I extend IChunk<ChunKCube8>
+//T is ChunkCube8 extends IChunk<T>
+public class ChunkCube8 implements IChunk {
 
-    private static final Logger logger = LoggerFactory.getLogger(ChunkCube16.class);
-    private static final Vec3I SIZE = new Vec3I(16, 16, 16);
+    private static final Logger logger = LoggerFactory.getLogger(ChunkCube8.class);
+    private static final Vec3I SIZE = new Vec3I(8, 8, 8);
     private static final Block EMPTY_BLOCK = Block.AIR;
 
-    private final ChunkLocation<ChunkCube16> location;
+    private final ChunkLocation<ChunkCube8> location;
     private final int[][][] blocks;
     private boolean isLoaded;
     private boolean canLoad;
 
-    public ChunkCube16(ChunkLocation<ChunkCube16> location) {
+    public ChunkCube8(ChunkLocation<ChunkCube8> location) {
         this(location, EMPTY_BLOCK);
     }
 
-    public ChunkCube16(ChunkLocation<ChunkCube16> location, Block fill) {
+    public ChunkCube8(ChunkLocation<ChunkCube8> location, Block fill) {
         this.blocks = new int[SIZE.getX()][SIZE.getY()][SIZE.getZ()];
-        CubitWorld<ChunkCube16> world = location.getWorld();
+        CubitWorld<ChunkCube8> world = location.getWorld();
         this.location = location;
         ArrayUtil.fill(this.blocks, world.getBlockRegistry().getID(EMPTY_BLOCK));
     }
 
-    public ChunkCube16(ChunkLocation<ChunkCube16> location, Block[][][] data) {
+    public ChunkCube8(ChunkLocation<ChunkCube8> location, Block[][][] data) {
         this.blocks = new int[SIZE.getX()][SIZE.getY()][SIZE.getZ()];
-        CubitWorld<ChunkCube16> world = location.getWorld();
+        CubitWorld<ChunkCube8> world = location.getWorld();
         this.location = location;
         ArrayUtil.clone(blocks, this.blocks);
     }
     
     @Override
     public String toString() {
-        return new StringBuilder(100).append("Position: (").append(
-                this.location.
-                toString()).toString();
+        return new StringBuilder(100).append("Position: (").append(this.location.toString()).toString();
     }
 
     @Override
@@ -104,12 +102,12 @@ public class ChunkCube16 implements IChunk {
     }
 
     @Override
-    public ChunkLocation<ChunkCube16> getLocation() {
+    public ChunkLocation<ChunkCube8> getLocation() {
         return this.location;
     }
 
     @Override
-    public CubitWorld<ChunkCube16> getWorld() {
+    public CubitWorld<ChunkCube8> getWorld() {
         return this.getLocation().getWorld();
     }
 
