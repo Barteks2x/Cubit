@@ -124,8 +124,7 @@ public class ChunkLocation<C extends IChunk> extends Vec3I {
          */
         StringBuilder sb = new StringBuilder(52);
         //ChunkLocation(%d, %d, %d)
-        return sb.append("ChunkLocation(").append(this.getX()).append(", ").
-                append(this.getY()).append(", ").append(this.getZ()).append(")").
-                toString();
+        return sb.append("ChunkLocation(").append(this.getX()).append(", ").append(this.getY()).append(", ").
+                append(this.getZ()).append(")").toString();
     }
 }

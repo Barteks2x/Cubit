@@ -70,4 +70,22 @@ public class BlockLocation extends Vec3I {
                 MathUtil.modP(this.getY(), vec.getY()),
                 MathUtil.modP(this.getZ(), vec.getZ()));
     }
+
+    @Override
+    public String toString() {
+        /*
+         * Maximum length is:
+         * BlockLoaction( 14
+         * X 11 (max 10 digits+sign)
+         * Y 11
+         * Z 11
+         * , 4
+         * ) 1
+         * total 52
+         */
+        StringBuilder sb = new StringBuilder(52);
+        //BlockLocation(%d, %d, %d)
+        return sb.append("BlockLocation(").append(this.getX()).append(", ").append(this.getY()).append(", ").
+                append(this.getZ()).append(")").toString();
+    }
 }

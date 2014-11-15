@@ -24,9 +24,11 @@
 package com.github.barteks2x.cubit.location;
 
 import com.github.barteks2x.cubit.world.CubitWorld;
+import java.text.DecimalFormat;
 
 public class Vec3D {
 
+    private static final DecimalFormat format = new DecimalFormat("#.##");
     private final double x, y, z;
 
     public Vec3D(double x, double y, double z) {
@@ -67,13 +69,13 @@ public class Vec3D {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if(obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if(getClass() != obj.getClass()) {
             return false;
         }
-        Vec3I other = (Vec3I) obj;
+        Vec3I other = (Vec3I)obj;
         return other.getX() == this.getX() && other.getY() == this.getY() &&
                 other.getZ() == this.getZ();
     }
@@ -96,5 +98,18 @@ public class Vec3D {
         result += z_;
 
         return result;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(55);
+        //ChunkLocation(%d, %d, %d)
+        return sb.append("Vec3D(").
+                append(format.format(this.getX())).
+                append(", ").
+                append(format.format(this.getY())).
+                append(", ").
+                append(format.format(this.getZ())).
+                append(")").toString();
     }
 }

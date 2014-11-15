@@ -39,6 +39,8 @@ import com.github.barteks2x.cubit.render.Vertex;
 import com.github.barteks2x.cubit.render.block.IBlockModelBuilder;
 import com.github.barteks2x.cubit.render.block.IBlockTextureManager;
 import com.github.barteks2x.cubit.render.block.SpritesheetTextureManager;
+import com.github.barteks2x.cubit.render.renderer.DebugRenderer;
+import com.github.barteks2x.cubit.render.renderer.IRenderer;
 import com.github.barteks2x.cubit.util.MathUtil;
 import com.github.barteks2x.cubit.util.logging.LoggerFactory;
 import com.github.barteks2x.cubit.world.CubitWorld;
@@ -146,7 +148,6 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
     private BitmapFont font;
     private Texture tex;
     private double time;
-    public int placeid;
 
     private final World world;
 
@@ -155,6 +156,8 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
     private final IBlockTextureManager textureManager;
 
     private final IChunkFactory<Chunk> chunkFactory;
+
+    private IRenderer debugRenderer;
 
     public CubitMain(World world, IChunkFactory<Chunk> chunkFactory, IChunkLoader<Chunk> chunkLoader) {
         this.chunkFactory = chunkFactory;
@@ -191,6 +194,9 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
         Vec3I spawn = world.getSpawnPoint();
         player.setPosition(new EntityLocation(world, spawn));
         initDisplayLists();
+
+        this.debugRenderer = new DebugRenderer(font, timer, this.chunkFactory.getChunkSize(), width, height);
+
         while(isRunning) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -207,7 +213,8 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
             this.generateDisplayListsNearLocation(new BlockLocation(player.getLocation()));
             renderChunks();
             renderSelection();
-            renderText();
+            this.debugRenderer.update(player);
+            this.debugRenderer.render();;
             Display.update();
             errorCheck("Main");
             if(Display.isCloseRequested()) {
@@ -218,6 +225,11 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
     }
 
     private void renderChunks() {
+        glMatrixMode(GL_PROJECTION);
+        glLoadMatrix(perspectiveProjMatrix);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
         glRotated(player.getRy(), 1, 0, 0);
         glRotated(player.getRx(), 0, 1, 0);
         glTranslatef((float)-player.getX(), (float)-player.getY(), (float)-player.getZ());
@@ -230,9 +242,6 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
         int yStep = chunkSize.getY();
         int zStep = chunkSize.getZ();
 
-        //int playerX = playerChunkLoc.getX() * xStep;
-        //int playerY = playerChunkLoc.getY() * yStep;
-        //int playerZ = playerChunkLoc.getZ() * zStep;
         int radiusX = MathUtil.floor(renderDistance / (double)xStep) * xStep + xStep;
         int radiusY = MathUtil.floor(renderDistance / (double)yStep) * yStep + yStep;
         int radiusZ = MathUtil.floor(renderDistance / (double)zStep) * zStep + zStep;
@@ -259,87 +268,20 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
     }
 
     private void renderSelection() {
-        if(player.getSelectedBlock() == null) {
+        if(player.getSelectionLocation() == null) {
             return;
         }
         glBindTexture(GL_TEXTURE_2D, 0);
         glColor4f(1F, 1F, 1F, (float)Math.sin(time * .005F) / 4F + .75F);
         glPushMatrix();
-        BlockLocation pos = player.getSelectedBlock();
+        BlockLocation pos = player.getSelectionLocation();
         glTranslatef(pos.getX(), pos.getY(), pos.getZ());
         glCallList(selectionDisplayList);
         glPopMatrix();
     }
 
     private void renderText() {
-        glPushMatrix();
-        glMatrixMode(GL_PROJECTION);
-        glLoadMatrix(orthographicProjMatrix);
-        glMatrixMode(GL_MODELVIEW);
-
-        glLoadIdentity();
-
-        BitmapFont font = this.font.bind();
-
-        Color fpsColor;
-        int fps = timer.getFPS();
-        if(fps <= 1) {
-            fpsColor = Color.RED.darker();
-        } else if(fps <= 10) {
-            fpsColor = Color.RED;
-        } else if(fps <= 20) {
-            fpsColor = Color.ORANGE.darker();
-        } else if(fps < 28) {
-            fpsColor = Color.ORANGE;
-        } else if(fps <= 35) {
-            fpsColor = Color.YELLOW;
-        } else if(fps <= 58) {
-            fpsColor = Color.GREEN;
-        } else if(fps <= 98) {
-            fpsColor = Color.GREEN.brighter();
-        } else {
-            fpsColor = Color.WHITE;
-        }
-        int y = 0;
-        font.drawString(0, y, 1, fpsColor, String.format("FPS: %d", fps));
-        y += 16;
-
-        double playerX = player.getX();
-        double playerY = player.getY();
-        double playerZ = player.getZ();
-
-        ChunkLocation<? extends IChunk> chunkLoc = this.getPlayerChunkLocation();
-        int chunkX = chunkLoc.getX();
-        int chunkY = chunkLoc.getY();
-        int chunkZ = chunkLoc.getZ();
-        font.drawString(0, y, 1, Color.WHITE, String.format("Location(%.3f, %.3f, %.3f)", playerX, playerY, playerZ));
-        y += 16;
-        font.drawString(0, y, 1, Color.WHITE, String.format("PlayerChunk(%d, %d, %d)", chunkX, chunkY, chunkZ));
-        y += 16;
-
-        BlockLocation selectedPos = player.getSelectedBlock();
-        String selx = selectedPos != null ? String.format("%d", selectedPos.getX()) : "no selection";
-        String sely = selectedPos != null ? String.format("%d", selectedPos.getY()) : "no selection";
-        String selz = selectedPos != null ? String.format("%d", selectedPos.getZ()) : "no selection";
-        font.drawString(0, y, 1, Color.WHITE, String.format("Selection(%s, %s, %s)", selx, sely, selz));
-        y += 16;
-
-        BlockLocation blockOnSelected = player.getBlockOnSelectedBlock();
-        selx = blockOnSelected != null ? String.format("%d", blockOnSelected.getX()) : "no selection";
-        sely = blockOnSelected != null ? String.format("%d", blockOnSelected.getY()) : "no selection";
-        selz = blockOnSelected != null ? String.format("%d", blockOnSelected.getZ()) : "no selection";
-        font.drawString(0, y, 1, Color.WHITE, String.format("BlockOnSelection(%s, %s, %s)", selx, sely, selz));
-        y += 16;
-
-        Block placeBlock = this.world.getBlockRegistry().fromID(placeid);
-        String place = placeBlock == null ? "No block to place" : placeBlock.toString();
-        font.drawString(0, y, 1, Color.WHITE, String.format("PlaceBlock(%s)", place));
-
-        font.drawString((Display.getWidth() / 2F) / 3F - 8, (Display.getHeight() / 2F) / 3F - 8, 3, Color.ORANGE, "X");
-        glMatrixMode(GL_PROJECTION);
-        glLoadMatrix(perspectiveProjMatrix);
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
+        
     }
 
     private void initDisplay() {
@@ -365,6 +307,7 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
         glLoadIdentity();
         glOrtho(0, width, height, 0, -1, 1);
         glGetFloat(GL_PROJECTION_MATRIX, orthographicProjMatrix);
+
         glLoadMatrix(perspectiveProjMatrix);
         glMatrixMode(GL_MODELVIEW);
 

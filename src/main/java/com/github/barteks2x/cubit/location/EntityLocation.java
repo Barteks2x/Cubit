@@ -27,6 +27,7 @@ import com.github.barteks2x.cubit.util.MathUtil;
 import com.github.barteks2x.cubit.world.CubitWorld;
 import com.github.barteks2x.cubit.world.chunk.IChunk;
 import com.github.barteks2x.cubit.world.IWorld;
+import java.text.DecimalFormat;
 
 /**
  *
@@ -34,6 +35,7 @@ import com.github.barteks2x.cubit.world.IWorld;
  */
 public class EntityLocation extends Vec3D {
 
+    private static final DecimalFormat format = new DecimalFormat("#.##");
     private IWorld world;
 
     public EntityLocation(IWorld world, double x, double y, double z) {
@@ -60,20 +62,32 @@ public class EntityLocation extends Vec3D {
     }
 
     public BlockLocation toBlockLocation() {
-        return new BlockLocation(world, 
+        return new BlockLocation(world,
                 MathUtil.floor(this.getX()),
                 MathUtil.floor(this.getY()),
                 MathUtil.floor(this.getZ()));
     }
-    
+
     @Override
-    public EntityLocation add(double x, double y, double z){
+    public EntityLocation add(double x, double y, double z) {
         return new EntityLocation(world, super.add(x, y, z));
     }
-    
+
     @Override
-    public EntityLocation add(Vec3D vec){
+    public EntityLocation add(Vec3D vec) {
         return new EntityLocation(world, super.add(vec));
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(75);
+        //ChunkLocation(%d, %d, %d)
+        return sb.append("EntityLocation(").
+                append(format.format(this.getX())).
+                append(", ").
+                append(format.format(this.getY())).
+                append(", ").
+                append(format.format(this.getZ())).
+                append(")").toString();
+    }
 }

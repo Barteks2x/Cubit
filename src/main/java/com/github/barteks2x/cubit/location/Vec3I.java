@@ -126,4 +126,17 @@ public class Vec3I {
     public int hashCode() {
         return y ^ x << 10 ^ z << 21;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(50);
+        //ChunkLocation(%d, %d, %d)
+        return sb.append("Vec3I(").
+                append(this.getX()).
+                append(", ").
+                append(this.getY()).
+                append(", ").
+                append(this.getZ()).
+                append(")").toString();
+    }
 }

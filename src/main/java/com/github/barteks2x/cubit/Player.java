@@ -46,6 +46,8 @@ public class Player {
     private double side = 0;
     private double up = 0;
 
+    public int placeid;
+
     public <T extends IWorld> Player(T world) {
         this.location = new EntityLocation(world, 0, 0, 0);
         rx = 0;
@@ -84,11 +86,11 @@ public class Player {
         this.ry = ry;
     }
 
-    public BlockLocation getSelectedBlock() {
+    public BlockLocation getSelectionLocation() {
         return selectedBlock;
     }
 
-    public BlockLocation getBlockOnSelectedBlock() {
+    public BlockLocation getPlaceBlockLocation() {
         return blockOnSelected;
     }
 
@@ -98,7 +100,6 @@ public class Player {
 
     public void update() {
 
-        int placeid = CubitMain.getGame().placeid;
         while(Keyboard.next()) {
             boolean state = Keyboard.getEventKeyState();
             if(Keyboard.getEventKey() == Keyboard.KEY_W) {
@@ -129,7 +130,6 @@ public class Player {
             } catch(NumberFormatException ignore) {
             }
         }
-        CubitMain.getGame().placeid = placeid;
 
         double sinRX = Math.sin(Math.toRadians(rx));
         double cosRX = Math.cos(Math.toRadians(rx));
@@ -201,12 +201,12 @@ public class Player {
             if(!Mouse.getEventButtonState()) {
                 continue;
             }
-            BlockLocation blockPos = this.getSelectedBlock();
+            BlockLocation blockPos = this.getSelectionLocation();
             if(Mouse.getEventButton() == 0 && blockPos != null) {
                 this.getLocation().getWorld().setBlockAt(blockPos, Block.AIR);
                 CubitMain.getGame().blockRenderUpdate(blockPos);
             }
-            blockPos = this.getBlockOnSelectedBlock();
+            blockPos = this.getPlaceBlockLocation();
             if(Mouse.getEventButton() == 1 && blockPos != null) {
                 Mouse.setGrabbed(false);
                 IWorld world = this.getLocation().getWorld();
@@ -219,5 +219,9 @@ public class Player {
 
         }
 
+    }
+
+    public Block getBlockToPlace() {
+        return this.getLocation().getWorld().getBlockRegistry().fromID(this.placeid);
     }
 }
