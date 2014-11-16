@@ -108,35 +108,6 @@ public class WorldRenderer implements IRenderer {
         for(ChunkRenderer renderer : chunkRenderers.values()) {
             renderer.render();
         }
-        /*
-         * int xStep = this.renderChunkSize.getX();
-         * int yStep = this.renderChunkSize.getY();
-         * int zStep = this.renderChunkSize.getZ();
-         *
-         * int radiusX = floor(this.viewDistanceBlocks / (double)xStep) * xStep + xStep;
-         * int radiusY = floor(this.viewDistanceBlocks / (double)yStep) * yStep + yStep;
-         * int radiusZ = floor(this.viewDistanceBlocks / (double)zStep) * zStep + zStep;
-         *
-         * for(int x = -radiusX; x <= radiusX; x += xStep) {
-         * for(int y = -radiusY; y <= radiusY; y += yStep) {
-         * for(int z = -radiusZ; z <= radiusZ; z += yStep) {
-         * int chunkX = floor(x / (double)xStep);
-         * int chunkY = floor(y / (double)yStep);
-         * int chunkZ = floor(z / (double)zStep);
-         *
-         * ChunkLocation<?> loc = playerChunkLocation.add(chunkX, chunkY, chunkZ);
-         * int d = getChunkDisplayList(loc);
-         * if(d < 1) {
-         * continue;
-         * }
-         * glPushMatrix();
-         * glTranslatef(loc.getX() * xStep, loc.getY() * yStep, loc.getZ() * zStep);
-         * glCallList(d);
-         * glPopMatrix();
-         * }
-         * }
-         * }
-         */
     }
 
     @Override
@@ -182,7 +153,6 @@ public class WorldRenderer implements IRenderer {
     }
 
     private void createChunkRenderers(BlockLocation center) {
-        //Set<ChunkLocation<?>> chunkDisplayListsToCompile = new HashSet<ChunkLocation<?>>(20000);
         ChunkLocation<?> chunkLoc = new ChunkLocation<IChunk>(null, this.renderChunkSize, center);
 
         int xSize = this.renderChunkSize.getX();
