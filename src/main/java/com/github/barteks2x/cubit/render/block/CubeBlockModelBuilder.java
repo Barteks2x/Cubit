@@ -59,6 +59,15 @@ public class CubeBlockModelBuilder implements IBlockModelBuilder {
         {vec(1, 1, 0), vec(1, 0, 0), vec(0, 0, 0), vec(0, 1, 0)}//WEST
     };
 
+    private final Color colors[] = new Color[]{
+        new Color(0.7F, 0.7F, 0.7F),//NORTH
+        new Color(0.7F, 0.7F, 0.7F),//SOUTH
+        new Color(1.0F, 1.0F, 1.0F),//UP
+        new Color(0.6F, 0.6F, 0.6F),//DOWN
+        new Color(0.8F, 0.8F, 0.8F),//EAST
+        new Color(0.8F, 0.8F, 0.8F)//WEST
+    };
+
     @Override
     public List<Quad> build(IBlockTextureManager textureMgr, IWorld world,
             int worldX, int worldY, int worldZ) {
@@ -79,14 +88,12 @@ public class CubeBlockModelBuilder implements IBlockModelBuilder {
             if (!renderSides[i]) {
                 continue;
             }
-            String tex = block.getTextures()[block.getTextureForSide(sides[i].
-                    getVector())];
+            String tex = block.getTextures()[block.getTextureForSide(sides[i].getVector())];
             TextureCoords texCoords = textureMgr.getTextureCoordsForName(tex);
-            Color color = new Color(0.7F, 0.7F, 0.7F);
             
             List<Vertex> verticies = new ArrayList<Vertex>(4);
             for (int j = 0; j < 4; j++) {
-                verticies.add(new Vertex(vecs[i][j], color, tex));
+                verticies.add(new Vertex(this.vecs[i][j], this.colors[i], tex));
             }
             quads.add(new Quad(texCoords, verticies));
         }
