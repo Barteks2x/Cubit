@@ -23,6 +23,8 @@
  */
 package com.github.barteks2x.cubit;
 
+import com.github.barteks2x.cubit.profiling.GPUProfiler;
+import com.github.barteks2x.cubit.profiling.GPUTaskProfile;
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.EntityLocation;
@@ -175,6 +177,9 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
                 setzNear(zNear).build();
 
         while(isRunning) {
+            GPUProfiler.startFrame();
+            GPUProfiler.start("MainRender");
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             timer.nextFrame();
@@ -185,14 +190,41 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
             }
 
             glLoadIdentity();
+            GPUProfiler.start("WorldRender");
+
+            GPUProfiler.start("Update");
             this.worldRenderer.update(player);
+            GPUProfiler.endStart("Render");
             this.worldRenderer.render();
-            GL11.glFinish();
+
+            GPUProfiler.endStart("SelectionRender");
             renderSelection();
+            GPUProfiler.end();
+
+            GPUProfiler.endStart("DebugGui");
+            GPUProfiler.start("Update");
             this.debugRenderer.update(player);
+            GPUProfiler.endStart("Render");
             this.debugRenderer.render();
-            GL11.glFinish();
+            GPUProfiler.end();
+
+            GPUProfiler.endStart("Display.update");
             Display.update();
+            GPUProfiler.end();
+
+            GPUProfiler.end();
+            GPUProfiler.endFrame();
+
+            GPUTaskProfile tp;
+            while((tp = GPUProfiler.getFrameResults()) != null) {
+
+                tp.dump(); //Dumps the frame to System.out.
+                //or use the functions of GPUTaskProfile to extract information about the frame:
+                //getName(), getStartTime(), getEndTime(), getTimeTaken(), getChildren()
+                //Then you can draw the result as fancy graphs or something.
+
+                GPUProfiler.recycle(tp); //Recycles GPUTaskProfile instances and their OpenGL query objects.
+            }
             errorCheck("Main");
             if(Display.isCloseRequested()) {
                 isRunning = false;
