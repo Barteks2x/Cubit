@@ -30,13 +30,13 @@ import com.github.barteks2x.cubit.Player;
  *
  * @author Bartosz Skrzypczak
  */
-public interface IRenderer<T extends Object> {
+public interface IRenderer {
 
     public void render();
 
-    public void update(T obj);
+    public void update(Player player);
 
     public void updateWindowDimensions(int width, int height);
 
-    public void onExit();
+    public void delete();
 }

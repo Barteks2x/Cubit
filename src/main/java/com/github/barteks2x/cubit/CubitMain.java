@@ -23,12 +23,12 @@
  */
 package com.github.barteks2x.cubit;
 
-import com.github.barteks2x.cubit.profiling.GPUProfiler;
-import com.github.barteks2x.cubit.profiling.GPUTaskProfile;
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.EntityLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
+import com.github.barteks2x.cubit.profiling.GPUProfiler;
+import com.github.barteks2x.cubit.profiling.GPUTaskProfile;
 import com.github.barteks2x.cubit.render.BitmapFont;
 import com.github.barteks2x.cubit.render.Texture;
 import com.github.barteks2x.cubit.render.TextureLoader;
@@ -42,7 +42,6 @@ import com.github.barteks2x.cubit.util.Version;
 import com.github.barteks2x.cubit.util.logging.LoggerFactory;
 import com.github.barteks2x.cubit.world.CubitWorld;
 import com.github.barteks2x.cubit.world.chunk.ChunkCube16;
-import com.github.barteks2x.cubit.world.chunk.ChunkCube8;
 import com.github.barteks2x.cubit.world.chunk.ChunkCube16Factory;
 import com.github.barteks2x.cubit.world.chunk.IChunk;
 import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
@@ -51,9 +50,6 @@ import com.github.barteks2x.cubit.world.chunkloader.RAMChunkLoader;
 import com.github.barteks2x.cubit.world.generator.HeightmapChunkGenerator;
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.lwjgl.BufferUtils;
@@ -61,7 +57,6 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -88,7 +83,6 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glColor4f;
 import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDeleteLists;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glEndList;
@@ -131,7 +125,7 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
 
     private final IChunkFactory<Chunk> chunkFactory;
 
-    private IRenderer<Player> debugRenderer;
+    private IRenderer debugRenderer;
     private WorldRenderer worldRenderer;
 
     public CubitMain(World world, IChunkFactory<Chunk> chunkFactory, IChunkLoader<Chunk> chunkLoader) {
@@ -315,8 +309,8 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
     }
 
     private void onClose(int i) {
-        this.worldRenderer.onExit();
-        this.debugRenderer.onExit();
+        this.worldRenderer.delete();
+        this.debugRenderer.delete();
         System.exit(i);
     }
 

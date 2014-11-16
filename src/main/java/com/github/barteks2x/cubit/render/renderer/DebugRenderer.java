@@ -23,15 +23,14 @@
  */
 package com.github.barteks2x.cubit.render.renderer;
 
-import com.github.barteks2x.cubit.render.BitmapFont;
 import com.github.barteks2x.cubit.Player;
-import com.github.barteks2x.cubit.util.Timer;
 import com.github.barteks2x.cubit.block.Block;
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.EntityLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
-import com.github.barteks2x.cubit.world.IWorld;
+import com.github.barteks2x.cubit.render.BitmapFont;
+import com.github.barteks2x.cubit.util.Timer;
 import com.github.barteks2x.cubit.world.chunk.IChunk;
 import java.awt.Color;
 import java.nio.FloatBuffer;
@@ -52,7 +51,7 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
  *
  * @author Bartosz Skrzypczak
  */
-public class DebugRenderer implements IRenderer<Player> {
+public class DebugRenderer implements IRenderer {
 
     private final FloatBuffer orthographicProjMatrix = BufferUtils.createFloatBuffer(16);
     private final BitmapFont font;
@@ -152,7 +151,7 @@ public class DebugRenderer implements IRenderer<Player> {
     }
 
     @Override
-    public void onExit() {
+    public void delete() {
         font.delete();
     }
 
