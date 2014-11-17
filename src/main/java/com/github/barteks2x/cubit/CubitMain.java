@@ -159,7 +159,7 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
         float zNear = 0.1F;
         BlockTextureManager textureManager = new SpritesheetTextureManager();
 
-        this.debugRenderer = new DebugRenderer(font, timer, this.chunkFactory.getChunkSize(), width, height);
+        this.debugRenderer = new DebugRenderer(player, font, this.chunkFactory.getChunkSize(), width, height);
         this.worldRenderer = WorldRenderer.newRenderer().
                 setFov(fov).
                 setWidth(width).
@@ -186,7 +186,7 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
             GPUProfiler.start("WorldRender");
 
             GPUProfiler.start("Update");
-            this.worldRenderer.update(player);
+            this.worldRenderer.update();
             GPUProfiler.endStart("Render");
             this.worldRenderer.render();
 
@@ -196,7 +196,7 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
 
             GPUProfiler.endStart("DebugGui");
             GPUProfiler.start("Update");
-            this.debugRenderer.update(player);
+            this.debugRenderer.update();
             GPUProfiler.endStart("Render");
             this.debugRenderer.render();
             GPUProfiler.end();
