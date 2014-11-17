@@ -27,7 +27,7 @@ import com.github.barteks2x.cubit.block.Block;
 
 public class BlockAlredyRegisteredException extends RuntimeException {
 
-    public BlockAlredyRegisteredException(Block block, IWorld world) {
+    public BlockAlredyRegisteredException(Block block, World world) {
         super(String.format("Block %s is already registered for world %s", new Object[]{block, world}));
     }
 

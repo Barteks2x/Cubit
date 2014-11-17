@@ -28,7 +28,7 @@ import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.EntityLocation;
 import com.github.barteks2x.cubit.location.Vec3D;
 import com.github.barteks2x.cubit.world.CubitWorld;
-import com.github.barteks2x.cubit.world.IWorld;
+import com.github.barteks2x.cubit.world.World;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -48,7 +48,7 @@ public class Player {
 
     public int placeid;
 
-    public <T extends IWorld> Player(T world) {
+    public <T extends World> Player(T world) {
         this.location = new EntityLocation(world, 0, 0, 0);
         rx = 0;
         ry = 0;
@@ -209,7 +209,7 @@ public class Player {
             blockPos = this.getPlaceBlockLocation();
             if(Mouse.getEventButton() == 1 && blockPos != null) {
                 Mouse.setGrabbed(false);
-                IWorld world = this.getLocation().getWorld();
+                World world = this.getLocation().getWorld();
                 Block block = world.getBlockRegistry().fromID(placeid);
                 if(block != null) {
                     world.setBlockAt(blockPos, block);

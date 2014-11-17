@@ -23,122 +23,36 @@
  */
 package com.github.barteks2x.cubit.world.chunk;
 
-import com.github.barteks2x.cubit.world.chunk.IChunk;
 import com.github.barteks2x.cubit.block.Block;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
-import com.github.barteks2x.cubit.util.ArrayUtil;
-import com.github.barteks2x.cubit.util.logging.LoggerFactory;
-import com.github.barteks2x.cubit.world.CubitWorld;
+import com.github.barteks2x.cubit.util.logging.LoggerUtil;
 import java.util.logging.Logger;
 
 /**
  *
  * @author Bartosz Skrzypczak
  */
-//and here is how it's used
-//I extend IChunk<ChunKCube16>
-//T is ChunkCube16 and extends IChunk<T>
-public class ChunkCube16 implements IChunk {
+public class ChunkCube16 extends AbstractChunkCubeN<ChunkCube16> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ChunkCube16.class);
+    private static final Logger logger = LoggerUtil.getLogger(ChunkCube16.class);
     private static final Vec3I SIZE = new Vec3I(16, 16, 16);
-    private static final Block EMPTY_BLOCK = Block.AIR;
-
-    private final ChunkLocation<ChunkCube16> location;
-    private final int[][][] blocks;
-    private boolean isLoaded;
-    private boolean canLoad;
-
+    
     public ChunkCube16(ChunkLocation<ChunkCube16> location) {
-        this(location, EMPTY_BLOCK);
+        super(location, EMPTY_BLOCK);
     }
 
     public ChunkCube16(ChunkLocation<ChunkCube16> location, Block fill) {
-        this.blocks = new int[SIZE.getX()][SIZE.getY()][SIZE.getZ()];
-        CubitWorld<ChunkCube16> world = location.getWorld();
-        this.location = location;
-        ArrayUtil.fill(this.blocks, world.getBlockRegistry().getID(EMPTY_BLOCK));
+        super(location, fill);
     }
 
     public ChunkCube16(ChunkLocation<ChunkCube16> location, Block[][][] data) {
-        this.blocks = new int[SIZE.getX()][SIZE.getY()][SIZE.getZ()];
-        CubitWorld<ChunkCube16> world = location.getWorld();
-        this.location = location;
-        ArrayUtil.clone(blocks, this.blocks);
+        super(location, data);
     }
     
     @Override
     public String toString() {
-        return new StringBuilder(100).append("Position: (").append(
-                this.location.
-                toString()).toString();
-    }
-
-    @Override
-    public int getX() {
-        return this.location.getX();
-    }
-
-    @Override
-    public int getY() {
-        return this.location.getY();
-    }
-
-    @Override
-    public int getZ() {
-        return this.location.getZ();
-    }
-
-    protected void setBlocks(int[][][] data) {
-        ArrayUtil.clone(data, this.blocks);
-    }
-
-    @Override
-    public boolean setBlockAt(int x, int y, int z, Block b) {
-        this.blocks[x][y][z] = this.getWorld().getBlockRegistry().getID(b);
-        return true;
-    }
-
-    @Override
-    public Block getBlockAt(int x, int y, int z) {
-        return this.getWorld().getBlockRegistry().fromID(this.blocks[x][y][z]);
-    }
-
-    @Override
-    public ChunkLocation<ChunkCube16> getLocation() {
-        return this.location;
-    }
-
-    @Override
-    public CubitWorld<ChunkCube16> getWorld() {
-        return this.getLocation().getWorld();
-    }
-
-    @Override
-    public Block getDefaultBlock() {
-        return EMPTY_BLOCK;
-    }
-
-    @Override
-    public boolean isLoaded() {
-        return this.isLoaded;
-    }
-
-    @Override
-    public void unload() {
-        this.isLoaded = false;
-        this.canLoad = false;
-    }
-
-    @Override
-    public void load() {
-        if (this.isLoaded) {
-            throw new RuntimeException("Chunk already loaded!");
-        }
-        if (this.canLoad) {
-            this.isLoaded = true;
-        }
+        return new StringBuilder(100).append("Chunk16(").append(this.getLocation().toString()).append(")").toString();
     }
 
     @Override

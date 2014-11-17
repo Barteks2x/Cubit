@@ -26,7 +26,7 @@ package com.github.barteks2x.cubit.render.block;
 import com.github.barteks2x.cubit.render.Quad;
 import com.github.barteks2x.cubit.render.Vertex;
 import com.github.barteks2x.cubit.world.CubitWorld;
-import com.github.barteks2x.cubit.world.IWorld;
+import com.github.barteks2x.cubit.world.World;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,13 +35,13 @@ import java.util.List;
  * Special block renderer that does nothing. Always returns ampty list of
  * Verticies.
  */
-public class NullModelBuilder implements IBlockModelBuilder {
+public class NullModelBuilder implements BlockModelBuilder {
 
     private static final List<Quad> EMPTY_LIST =
             Collections.unmodifiableList(new ArrayList<Quad>(0));
 
     @Override
-    public List<Quad> build(IBlockTextureManager textureMgr, IWorld world,
+    public List<Quad> build(BlockTextureManager textureMgr, World world,
             int x, int y, int z) {
         return EMPTY_LIST;
     }

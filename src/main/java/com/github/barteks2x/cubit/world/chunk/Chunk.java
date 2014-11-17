@@ -31,7 +31,7 @@ import com.github.barteks2x.cubit.world.CubitWorld;
 /**
  * Basic chunk interface for block storage.
  */
-public interface IChunk {
+public interface Chunk {
 
     /**
      * @return x (positive towards north) location of the chunk. Chunk at x
@@ -55,7 +55,7 @@ public interface IChunk {
      * @return Location of the chunk. Location contains information about chunk
      *         size.
      */
-    public ChunkLocation<? extends IChunk> getLocation();
+    public ChunkLocation<? extends Chunk> getLocation();
 
     /**
      * @return Chunk size. X, Y and Z must be positive.

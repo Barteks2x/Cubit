@@ -23,7 +23,7 @@
  */
 package com.github.barteks2x.cubit.world.generator.noise;
 
-public class PerlinNoiseGenerator extends ANoiseGenerator2d {
+public class PerlinNoiseGenerator extends AbstractNoiseGenerator2d {
 
     public PerlinNoiseGenerator(double grid, double persistance, int octaves, double fq, long seed) {
         super(grid, persistance, octaves, fq, seed);
@@ -32,6 +32,11 @@ public class PerlinNoiseGenerator extends ANoiseGenerator2d {
     @Override
     public double getRawValueAt(double x, double z) {
         //TODO Perlin Noise Generator
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public long getSeed() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

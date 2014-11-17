@@ -23,14 +23,14 @@
  */
 package com.github.barteks2x.cubit.util;
 
-import com.github.barteks2x.cubit.util.logging.LoggerFactory;
+import com.github.barteks2x.cubit.util.logging.LoggerUtil;
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Version {
 
-    private static final Logger logger = LoggerFactory.getLogger(Version.class);
+    private static final Logger logger = LoggerUtil.getLogger(Version.class);
 
     public static String getVersion() {
         String version = null;

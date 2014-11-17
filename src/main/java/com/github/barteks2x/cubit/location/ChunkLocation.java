@@ -25,9 +25,9 @@ package com.github.barteks2x.cubit.location;
 
 import com.github.barteks2x.cubit.util.MathUtil;
 import com.github.barteks2x.cubit.world.CubitWorld;
-import com.github.barteks2x.cubit.world.chunk.IChunk;
+import com.github.barteks2x.cubit.world.chunk.Chunk;
 
-public class ChunkLocation<C extends IChunk> extends Vec3I {
+public class ChunkLocation<C extends Chunk> extends Vec3I {
 
     private final CubitWorld<C> world;
     private final Vec3I chunkSize;

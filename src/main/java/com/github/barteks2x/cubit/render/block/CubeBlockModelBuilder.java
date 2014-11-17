@@ -29,7 +29,7 @@ import com.github.barteks2x.cubit.location.Vec3D;
 import com.github.barteks2x.cubit.render.Quad;
 import com.github.barteks2x.cubit.render.TextureCoords;
 import com.github.barteks2x.cubit.render.Vertex;
-import com.github.barteks2x.cubit.world.IWorld;
+import com.github.barteks2x.cubit.world.World;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * General Cube block renderer.
  */
-public class CubeBlockModelBuilder implements IBlockModelBuilder {
+public class CubeBlockModelBuilder implements BlockModelBuilder {
 
     private final CubeBlockSide sides[] = new CubeBlockSide[]{
         CubeBlockSide.NORTH,
@@ -69,7 +69,7 @@ public class CubeBlockModelBuilder implements IBlockModelBuilder {
     };
 
     @Override
-    public List<Quad> build(IBlockTextureManager textureMgr, IWorld world,
+    public List<Quad> build(BlockTextureManager textureMgr, World world,
             int worldX, int worldY, int worldZ) {
 
         boolean renderSides[] = new boolean[]{

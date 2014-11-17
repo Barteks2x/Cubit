@@ -23,20 +23,20 @@
  */
 package com.github.barteks2x.cubit.world.generator;
 
-import com.github.barteks2x.cubit.world.IWorld;
+import com.github.barteks2x.cubit.world.World;
 import com.github.barteks2x.cubit.world.IncompleteBuildException;
-import com.github.barteks2x.cubit.world.generator.IChunkGeneratorBuilder;
-import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
-import com.github.barteks2x.cubit.world.chunk.IChunk;
-import com.github.barteks2x.cubit.world.generator.AChunkGenerator;
+import com.github.barteks2x.cubit.world.generator.ChunkGeneratorBuilder;
+import com.github.barteks2x.cubit.world.chunk.ChunkFactory;
+import com.github.barteks2x.cubit.world.chunk.Chunk;
+import com.github.barteks2x.cubit.world.generator.AbstractChunkGenerator;
 import com.github.barteks2x.cubit.world.generator.HeightmapChunkGenerator;
 
-public class HeightmapChunkGeneratorBuilder<T extends IChunk> implements
-        IChunkGeneratorBuilder<T> {
+public class HeightmapChunkGeneratorBuilder<T extends Chunk> implements
+        ChunkGeneratorBuilder<T> {
 
     private long seed;
-    private IWorld world;
-    private IChunkFactory<T> chunkFactory;
+    private World world;
+    private ChunkFactory<T> chunkFactory;
 
     @Override
     public HeightmapChunkGeneratorBuilder<T> setSeed(long seed) {
@@ -45,7 +45,7 @@ public class HeightmapChunkGeneratorBuilder<T extends IChunk> implements
     }
 
     @Override
-    public AChunkGenerator<T> build() {
+    public AbstractChunkGenerator<T> build() {
         if (this.world == null) {
             throw new IncompleteBuildException("No world specified.");
         }
@@ -53,7 +53,7 @@ public class HeightmapChunkGeneratorBuilder<T extends IChunk> implements
     }
 
     @Override
-    public HeightmapChunkGeneratorBuilder<T> setChunkFactory(IChunkFactory<T> factory) {
+    public HeightmapChunkGeneratorBuilder<T> setChunkFactory(ChunkFactory<T> factory) {
         this.chunkFactory = factory;
         return this;
     }

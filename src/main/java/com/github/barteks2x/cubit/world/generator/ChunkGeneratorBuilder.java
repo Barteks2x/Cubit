@@ -21,18 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit.render.block;
+package com.github.barteks2x.cubit.world.generator;
 
-import com.github.barteks2x.cubit.render.Quad;
-import com.github.barteks2x.cubit.world.IWorld;
-import java.util.List;
+import com.github.barteks2x.cubit.world.chunk.ChunkFactory;
+import com.github.barteks2x.cubit.world.chunk.Chunk;
+import com.github.barteks2x.cubit.world.generator.AbstractChunkGenerator;
 
-/**
- *
- * @author bartosz
- */
-public interface IBlockModelBuilder {
+public interface ChunkGeneratorBuilder<T extends Chunk> {
 
-    public List<Quad> build(IBlockTextureManager textureMgr, IWorld world,
-            int x, int y, int z);
+    public ChunkGeneratorBuilder<T> setSeed(long seed);
+    
+    public ChunkGeneratorBuilder<T> setChunkFactory(ChunkFactory<T> factory);
+    
+    public AbstractChunkGenerator<T> build();
+
 }

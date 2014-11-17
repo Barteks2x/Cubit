@@ -23,20 +23,20 @@
  */
 package com.github.barteks2x.cubit.world.generator;
 
-import com.github.barteks2x.cubit.world.generator.noise.INoiseGenerator2d;
+import com.github.barteks2x.cubit.world.generator.noise.NoiseGenerator2d;
 import com.github.barteks2x.cubit.world.generator.noise.ValueNoiseGenerator;
-import com.github.barteks2x.cubit.world.chunk.IChunk;
+import com.github.barteks2x.cubit.world.chunk.Chunk;
 import com.github.barteks2x.cubit.block.Block;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
 import com.github.barteks2x.cubit.world.CubitWorld;
-import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
+import com.github.barteks2x.cubit.world.chunk.ChunkFactory;
 
-public class HeightmapChunkGenerator<T extends IChunk> extends AChunkGenerator<T> {
+public class HeightmapChunkGenerator<T extends Chunk> extends AbstractChunkGenerator<T> {
 
-    private final INoiseGenerator2d noiseGen;
+    private final NoiseGenerator2d noiseGen;
 
-    public HeightmapChunkGenerator(IChunkFactory<T> chunkBuilder, long seed) {
+    public HeightmapChunkGenerator(ChunkFactory<T> chunkBuilder, long seed) {
         super(chunkBuilder, seed);
         this.noiseGen = new ValueNoiseGenerator(128, 0.8D, 4, 2.24564D, seed);
     }

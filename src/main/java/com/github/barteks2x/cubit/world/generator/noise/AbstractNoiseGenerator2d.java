@@ -21,19 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit.world.chunk;
+package com.github.barteks2x.cubit.world.generator.noise;
 
-import com.github.barteks2x.cubit.world.chunk.IChunk;
-import com.github.barteks2x.cubit.location.ChunkLocation;
-import com.github.barteks2x.cubit.location.Vec3I;
+import com.github.barteks2x.cubit.world.generator.noise.NoiseGenerator2d;
 
-/**
- * Used to construct new chunks for given world with specific location and block data.
- * @param <T>
- */
-public interface IChunkFactory<T extends IChunk> {
-    public IChunkFactory<T> clear();
-    public IChunkFactory<T> setLocation(ChunkLocation<T> loc);
-    public T build();
-    public Vec3I getChunkSize();
+public abstract class AbstractNoiseGenerator2d implements NoiseGenerator2d {
+
+    private double grid;
+    private double persistance;
+    private int octaves;
+    private double lacunarity;
+    private long seed;
+
+    public AbstractNoiseGenerator2d(double grid, double persistance, int octaves, double fq, long seed) {
+        this.grid = grid;
+        this.persistance = persistance;
+        this.octaves = octaves;
+        this.lacunarity = fq;
+        this.seed = seed;
+    }
+
+    @Override
+    public double getValueOctaves(int x, int z) {
+        double total = 0.0D;
+        double frequency = 1.0D / grid;
+        double amplitude = persistance;
+
+        for(int i = 0; i < octaves; ++i) {
+            total += getRawValueAt(x * frequency, z * frequency) * amplitude;
+            frequency *= lacunarity;
+            amplitude *= persistance;
+        }
+        return total;
+    }
+
+    @Override
+    public long getSeed() {
+        return this.seed;
+    }
 }

@@ -24,13 +24,13 @@
 package com.github.barteks2x.cubit.location;
 
 import com.github.barteks2x.cubit.util.MathUtil;
-import com.github.barteks2x.cubit.world.IWorld;
+import com.github.barteks2x.cubit.world.World;
 
 public class BlockLocation extends Vec3I {
 
-    private final IWorld world;
+    private final World world;
 
-    public BlockLocation(IWorld world, int x, int y, int z) {
+    public BlockLocation(World world, int x, int y, int z) {
         super(x, y, z);
         this.world = world;
     }
@@ -39,7 +39,7 @@ public class BlockLocation extends Vec3I {
         this(el.getWorld(), MathUtil.floor(el.getX()), MathUtil.floor(el.getY()), MathUtil.floor(el.getZ()));
     }
 
-    public IWorld getWorld() {
+    public World getWorld() {
         return this.world;
     }
 

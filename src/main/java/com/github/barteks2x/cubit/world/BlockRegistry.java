@@ -24,67 +24,26 @@
 package com.github.barteks2x.cubit.world;
 
 import com.github.barteks2x.cubit.block.Block;
-import com.github.barteks2x.cubit.util.logging.LoggerFactory;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-/**
- * Basic block registry using integer IDs.
- */
-public class BlockRegistry implements IBlockRegistry {
-
-    private static final Logger logger = LoggerFactory.getLogger(
-            BlockRegistry.class);
-
-    private final Map<Integer, Block> fromId = new HashMap<Integer, Block>(256);
-    private final Map<Block, Integer> toId = new HashMap<Block, Integer>(256);
-
-    private int nextId = 0;
-
-    private final IWorld world;
+public interface BlockRegistry {
 
     /**
-     * Constructs new BlockRegistry for given world.
+     * Returns ID assigned to the block. The same instance of IBlockReistry will
+     * return the same ID for the same block.
      * <p>
-     * @param world World in which this block registry will be used.
+     * @param block block to get ID for
+     * <p>
+     * @return ID for given block
      */
-    public BlockRegistry(IWorld world) {
-        this.world = world;
-    }
+    public int getID(Block block);
 
-    @Override
-    public int getID(Block block) {
-        if (!toId.containsKey(block)) {
-            logger.log(Level.WARNING,
-                    "Attempt to get ID of unregistered block: {0} in world: {1}. Registering block...",
-                    new Object[]{block, world});
-            registerBlock(block);
-        }
-        return toId.get(block);
-    }
-
-    @Override
-    public Block fromID(int id) {
-        return fromId.get(id);
-    }
-
-    protected void registerBlock(Block block) {
-        if (toId.containsKey(block)) {
-            assert fromId.containsValue(block) : "Block not fully registered.";
-            throw new BlockAlredyRegisteredException(block, world);
-        }
-
-        assert !fromId.containsValue(block) : "Block not fully registered.";
-        assert !fromId.containsKey(nextId) : "Id " + nextId + "already used!";
-
-        this.toId.put(block, nextId);
-        this.fromId.put(nextId, block);
-
-        logger.log(Level.FINE, "Block {0} successfully registered with ID {1}",
-                new Object[]{block, nextId});
-        nextId++;
-    }
-
+    /**
+     * Returns Block for which the ID is assigned. THIS SHOULD BE USED ONLY TO
+     * STORE BLOCK DATA IN ONE WORLD!.
+     * <p>
+     * @param id block ID
+     * <p>
+     * @return Block for which the ID is assigned
+     */
+    public Block fromID(int id);
 }

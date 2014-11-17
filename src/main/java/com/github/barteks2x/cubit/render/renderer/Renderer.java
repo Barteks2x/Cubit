@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2014 Bartosz Skrzypczak.
@@ -21,33 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit;
 
-public interface IConfig {
+package com.github.barteks2x.cubit.render.renderer;
 
-    /**
-     * This method returns config value for given config option name and type.
-     * Several config options with the same name and different type are allowed.
-     * <p>
-     * @param <T>          Value type
-     * @param name         Name of config value, dot separated path
-     * @param defaultValue Default value returned if config option not found
-     * <p>
-     * @return Value for given config option, default value if not found
-     */
-    public <T> T get(String name, T defaultValue);
+import com.github.barteks2x.cubit.Player;
 
-    /**
-     * This method sets config value for given config option name and type.
-     * Several config options with the same name and different type are allowed.
-     * <p>
-     * @param <T>   Value type
-     * @param name  Name of config value, dot separated path
-     * @param value Value to set
-     */
-    public <T> void set(String name, T value);
+/**
+ *
+ * @author Bartosz Skrzypczak
+ */
+public interface Renderer {
 
-    public void reload();
+    public void render();
 
-    public void save();
+    public void update(Player player);
+
+    public void updateWindowDimensions(int width, int height);
+
+    public void delete();
 }

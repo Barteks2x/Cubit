@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2014 Bartosz Skrzypczak.
@@ -21,11 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit.world.generator.noise;
 
-public interface INoiseGenerator2d {
+package com.github.barteks2x.cubit;
 
-    double getRawValueAt(double x, double z);
+/**
+ *
+ * @author Bartosz Skrzypczak
+ */
+public class PlayerController {
 
-    double getValueOctaves(int x, int z);
 }

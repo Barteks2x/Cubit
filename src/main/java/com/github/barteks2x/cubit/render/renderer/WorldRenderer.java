@@ -29,12 +29,12 @@ import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.EntityLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
 import com.github.barteks2x.cubit.render.Texture;
-import com.github.barteks2x.cubit.render.block.IBlockTextureManager;
+import com.github.barteks2x.cubit.render.block.BlockTextureManager;
 import com.github.barteks2x.cubit.util.MathUtil;
 import static com.github.barteks2x.cubit.util.MathUtil.mod;
-import com.github.barteks2x.cubit.world.IWorld;
+import com.github.barteks2x.cubit.world.World;
 import com.github.barteks2x.cubit.world.IncompleteBuildException;
-import com.github.barteks2x.cubit.world.chunk.IChunk;
+import com.github.barteks2x.cubit.world.chunk.Chunk;
 import java.nio.FloatBuffer;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,7 +59,7 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
  *
  * @author Bartosz Skrzypczak
  */
-public class WorldRenderer implements IRenderer {
+public class WorldRenderer implements Renderer {
 
     private final FloatBuffer perspectiveProjMatrix = BufferUtils.createFloatBuffer(16);
     private final int fov;
@@ -67,12 +67,12 @@ public class WorldRenderer implements IRenderer {
     private final int viewDistanceBlocks;
     private final Vec3I renderChunkSize;
     private final Texture texture;
-    private final IBlockTextureManager blockTextureManager;
+    private final BlockTextureManager blockTextureManager;
 
     private float rX, rY;
     private float playerX, playerY, playerZ;
     private ChunkLocation<?> playerChunkLocation;
-    private IWorld world;
+    private World world;
 
     private final Map<ChunkLocation<?>, ChunkRenderer> chunkRenderers;
 
@@ -121,7 +121,7 @@ public class WorldRenderer implements IRenderer {
 
         EntityLocation playerLocation = player.getLocation();
         BlockLocation playerBlockLocation = new BlockLocation(playerLocation);
-        this.playerChunkLocation = new ChunkLocation<IChunk>(null, this.renderChunkSize, playerBlockLocation);
+        this.playerChunkLocation = new ChunkLocation<Chunk>(null, this.renderChunkSize, playerBlockLocation);
 
         this.world = playerLocation.getWorld();
 
@@ -129,7 +129,7 @@ public class WorldRenderer implements IRenderer {
     }
 
     public void onBlockUpdate(BlockLocation location) {
-        ChunkLocation<?> chunkPos = new ChunkLocation<IChunk>(null, this.renderChunkSize, location);
+        ChunkLocation<?> chunkPos = new ChunkLocation<Chunk>(null, this.renderChunkSize, location);
         Vec3I chunkSize = chunkPos.getChunkSize();
         this.chunkRenderers.get(chunkPos).update(null);
         if(mod(location.getX(), chunkSize.getX()) == 0) {
@@ -153,7 +153,7 @@ public class WorldRenderer implements IRenderer {
     }
 
     private void createChunkRenderers(BlockLocation center) {
-        ChunkLocation<?> chunkLoc = new ChunkLocation<IChunk>(null, this.renderChunkSize, center);
+        ChunkLocation<?> chunkLoc = new ChunkLocation<Chunk>(null, this.renderChunkSize, center);
 
         int xSize = this.renderChunkSize.getX();
         int ySize = this.renderChunkSize.getY();
@@ -219,7 +219,7 @@ public class WorldRenderer implements IRenderer {
         private Integer viewDistBlocks;
         private Vec3I renderChunkSize;
         private Texture texture;
-        private IBlockTextureManager blockTextureManager;
+        private BlockTextureManager blockTextureManager;
 
         public WorldRendererBuilder setFov(int fov) {
             this.fov = fov;
@@ -256,7 +256,7 @@ public class WorldRenderer implements IRenderer {
             return this;
         }
 
-        public WorldRendererBuilder setTexture(IBlockTextureManager texMgr) {
+        public WorldRendererBuilder setTexture(BlockTextureManager texMgr) {
             this.blockTextureManager = texMgr;
             return this;
         }

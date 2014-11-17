@@ -21,29 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit.world;
+package com.github.barteks2x.cubit.render.block;
 
-import com.github.barteks2x.cubit.block.Block;
+import com.github.barteks2x.cubit.render.TextureCoords;
 
-public interface IBlockRegistry {
-
-    /**
-     * Returns ID assigned to the block. The same instance of IBlockReistry will
-     * return the same ID for the same block.
-     * <p>
-     * @param block block to get ID for
-     * <p>
-     * @return ID for given block
-     */
-    public int getID(Block block);
-
-    /**
-     * Returns Block for which the ID is assigned. THIS SHOULD BE USED ONLY TO
-     * STORE BLOCK DATA IN ONE WORLD!.
-     * <p>
-     * @param id block ID
-     * <p>
-     * @return Block for which the ID is assigned
-     */
-    public Block fromID(int id);
+public interface BlockTextureManager {
+    public TextureCoords getTextureCoordsForName(String name);
 }

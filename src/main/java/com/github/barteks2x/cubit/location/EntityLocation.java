@@ -25,8 +25,8 @@ package com.github.barteks2x.cubit.location;
 
 import com.github.barteks2x.cubit.util.MathUtil;
 import com.github.barteks2x.cubit.world.CubitWorld;
-import com.github.barteks2x.cubit.world.chunk.IChunk;
-import com.github.barteks2x.cubit.world.IWorld;
+import com.github.barteks2x.cubit.world.chunk.Chunk;
+import com.github.barteks2x.cubit.world.World;
 import java.text.DecimalFormat;
 
 /**
@@ -36,9 +36,9 @@ import java.text.DecimalFormat;
 public class EntityLocation extends Vec3D {
 
     private static final DecimalFormat format = new DecimalFormat("#.##");
-    private IWorld world;
+    private World world;
 
-    public EntityLocation(IWorld world, double x, double y, double z) {
+    public EntityLocation(World world, double x, double y, double z) {
         super(x, y, z);
         this.world = world;
     }
@@ -48,16 +48,16 @@ public class EntityLocation extends Vec3D {
         this.world = loc.getWorld();
     }
 
-    public EntityLocation(IWorld world, Vec3D loc) {
+    public EntityLocation(World world, Vec3D loc) {
         super(loc);
         this.world = world;
     }
 
-    public EntityLocation(IWorld world, Vec3I loc) {
+    public EntityLocation(World world, Vec3I loc) {
         this(world, loc.getX(), loc.getY(), loc.getZ());
     }
 
-    public IWorld getWorld() {
+    public World getWorld() {
         return world;
     }
 

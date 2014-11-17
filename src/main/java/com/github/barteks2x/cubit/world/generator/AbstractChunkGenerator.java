@@ -25,24 +25,24 @@ package com.github.barteks2x.cubit.world.generator;
 
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
-import com.github.barteks2x.cubit.world.chunk.IChunk;
+import com.github.barteks2x.cubit.world.chunk.Chunk;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.world.CubitWorld;
-import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
-import com.github.barteks2x.cubit.world.chunkloader.IChunkLoader;
+import com.github.barteks2x.cubit.world.chunk.ChunkFactory;
+import com.github.barteks2x.cubit.world.chunkloader.ChunkLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class AChunkGenerator<T extends IChunk> implements IChunkLoader<T> {
+public abstract class AbstractChunkGenerator<T extends Chunk> implements ChunkLoader<T> {
 
     protected final Random rand;
     protected final long seed;
-    protected final IChunkFactory<T> chunkBuilder;
+    protected final ChunkFactory<T> chunkBuilder;
 
     private CubitWorld<T> world = null;
 
-    protected AChunkGenerator(IChunkFactory<T> chunkBuilder, long seed) {
+    protected AbstractChunkGenerator(ChunkFactory<T> chunkBuilder, long seed) {
         this.rand = new Random(seed);
         this.seed = seed;
         this.chunkBuilder = chunkBuilder;
@@ -102,20 +102,20 @@ public abstract class AChunkGenerator<T extends IChunk> implements IChunkLoader<
     }
 
     @Override
-    public void addChainedChunkLoader(IChunkLoader<T> loader) {
+    public void addChainedChunkLoader(ChunkLoader<T> loader) {
         throw new UnsupportedOperationException(
                 "Chunk generator doesn't support chained chunk loaders.");
     }
 
     @Override
-    public boolean removeChainedChunkLoader(IChunkLoader<T> loader) {
+    public boolean removeChainedChunkLoader(ChunkLoader<T> loader) {
         throw new UnsupportedOperationException(
                 "Chunk generator doesn't support chained chunk loaders.");
     }
 
     @Override
-    public List<IChunkLoader<T>> getChainedChunkLoaders() {
-        return new ArrayList<IChunkLoader<T>>(0);
+    public List<ChunkLoader<T>> getChainedChunkLoaders() {
+        return new ArrayList<ChunkLoader<T>>(0);
     }
 
     @Override

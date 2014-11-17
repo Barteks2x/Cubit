@@ -32,20 +32,20 @@ import com.github.barteks2x.cubit.profiling.GPUTaskProfile;
 import com.github.barteks2x.cubit.render.BitmapFont;
 import com.github.barteks2x.cubit.render.Texture;
 import com.github.barteks2x.cubit.render.TextureLoader;
-import com.github.barteks2x.cubit.render.block.IBlockTextureManager;
+import com.github.barteks2x.cubit.render.block.BlockTextureManager;
 import com.github.barteks2x.cubit.render.block.SpritesheetTextureManager;
 import com.github.barteks2x.cubit.render.renderer.DebugRenderer;
-import com.github.barteks2x.cubit.render.renderer.IRenderer;
+import com.github.barteks2x.cubit.render.renderer.Renderer;
 import com.github.barteks2x.cubit.render.renderer.WorldRenderer;
 import com.github.barteks2x.cubit.util.Timer;
 import com.github.barteks2x.cubit.util.Version;
-import com.github.barteks2x.cubit.util.logging.LoggerFactory;
+import com.github.barteks2x.cubit.util.logging.LoggerUtil;
 import com.github.barteks2x.cubit.world.CubitWorld;
 import com.github.barteks2x.cubit.world.chunk.ChunkCube16;
 import com.github.barteks2x.cubit.world.chunk.ChunkCube16Factory;
-import com.github.barteks2x.cubit.world.chunk.IChunk;
-import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
-import com.github.barteks2x.cubit.world.chunkloader.IChunkLoader;
+import com.github.barteks2x.cubit.world.chunk.Chunk;
+import com.github.barteks2x.cubit.world.chunk.ChunkFactory;
+import com.github.barteks2x.cubit.world.chunkloader.ChunkLoader;
 import com.github.barteks2x.cubit.world.chunkloader.RAMChunkLoader;
 import com.github.barteks2x.cubit.world.generator.HeightmapChunkGenerator;
 import java.io.IOException;
@@ -98,9 +98,9 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 import static org.lwjgl.util.glu.GLU.gluErrorString;
 
-public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
+public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(CubitMain.class);
+    private static final Logger logger = LoggerUtil.getLogger(CubitMain.class);
 
     private static CubitMain<ChunkCube16, CubitWorld<ChunkCube16>> instance;
     private static final int TICKRATE = 20;
@@ -123,12 +123,12 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
 
     private long lastUpdateTime = System.nanoTime();
 
-    private final IChunkFactory<Chunk> chunkFactory;
+    private final ChunkFactory<C> chunkFactory;
 
-    private IRenderer debugRenderer;
+    private Renderer debugRenderer;
     private WorldRenderer worldRenderer;
 
-    public CubitMain(World world, IChunkFactory<Chunk> chunkFactory, IChunkLoader<Chunk> chunkLoader) {
+    public CubitMain(World world, ChunkFactory<C> chunkFactory, ChunkLoader<C> chunkLoader) {
         this.chunkFactory = chunkFactory;
         this.title = "Cubit " + Version.getVersion();
 
@@ -157,7 +157,7 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
 
         int fov = 70;
         float zNear = 0.1F;
-        IBlockTextureManager textureManager = new SpritesheetTextureManager();
+        BlockTextureManager textureManager = new SpritesheetTextureManager();
 
         this.debugRenderer = new DebugRenderer(font, timer, this.chunkFactory.getChunkSize(), width, height);
         this.worldRenderer = WorldRenderer.newRenderer().
@@ -356,9 +356,9 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
         this.grabMouse = !grabMouse;
     }
 
-    private ChunkLocation<Chunk> getPlayerChunkLocation() {
+    private ChunkLocation<C> getPlayerChunkLocation() {
         BlockLocation blockLoc = new BlockLocation(player.getLocation());
-        return new ChunkLocation<Chunk>(world, this.chunkFactory.getChunkSize(), blockLoc);
+        return new ChunkLocation<C>(world, this.chunkFactory.getChunkSize(), blockLoc);
     }
 
     public static CubitMain<ChunkCube16, CubitWorld<ChunkCube16>> getGame() {
@@ -366,12 +366,12 @@ public class CubitMain<Chunk extends IChunk, World extends CubitWorld<Chunk>> {
     }
 
     public static void main(String args[]) throws IOException {
-        LoggerFactory.initLoggers();
+        LoggerUtil.initLoggers();
         long seed = System.nanoTime();
-        IChunkFactory<ChunkCube16> factory = new ChunkCube16Factory();
+        ChunkFactory<ChunkCube16> factory = new ChunkCube16Factory();
 
-        IChunkLoader<ChunkCube16> chunkLoader = new RAMChunkLoader<ChunkCube16>();
-        IChunkLoader<ChunkCube16> chunkGenerator = new HeightmapChunkGenerator<ChunkCube16>(factory, seed);
+        ChunkLoader<ChunkCube16> chunkLoader = new RAMChunkLoader<ChunkCube16>();
+        ChunkLoader<ChunkCube16> chunkGenerator = new HeightmapChunkGenerator<ChunkCube16>(factory, seed);
         chunkLoader.addChainedChunkLoader(chunkGenerator);
 
         CubitWorld.CubitWorldBuilder<ChunkCube16> builder = CubitWorld.newWorld(ChunkCube16.class);

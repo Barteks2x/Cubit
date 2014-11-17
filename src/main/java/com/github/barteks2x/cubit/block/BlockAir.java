@@ -24,11 +24,11 @@
 package com.github.barteks2x.cubit.block;
 
 import com.github.barteks2x.cubit.location.Vec3I;
-import com.github.barteks2x.cubit.render.block.IBlockModelBuilder;
+import com.github.barteks2x.cubit.render.block.BlockModelBuilder;
 import com.github.barteks2x.cubit.render.block.NullModelBuilder;
 
 public class BlockAir extends Block {
-    private final IBlockModelBuilder modelBuilder;
+    private final BlockModelBuilder modelBuilder;
     public BlockAir(String name) {
         super(name);
         this.modelBuilder = new NullModelBuilder();
@@ -50,7 +50,7 @@ public class BlockAir extends Block {
     }
 
     @Override
-    public IBlockModelBuilder getModelBuilder() {
+    public BlockModelBuilder getModelBuilder() {
         return modelBuilder;
     }
 }

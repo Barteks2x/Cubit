@@ -26,23 +26,23 @@ package com.github.barteks2x.cubit.world.chunk;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
 import com.github.barteks2x.cubit.world.chunk.ChunkCube8;
-import com.github.barteks2x.cubit.world.chunk.IChunkFactory;
+import com.github.barteks2x.cubit.world.chunk.ChunkFactory;
 
 /**
  *
  * @author Bartosz Skrzypczak
  */
-public class ChunkCube8Factory implements IChunkFactory<ChunkCube8> {
+public class ChunkCube8Factory implements ChunkFactory<ChunkCube8> {
 
     private ChunkLocation<ChunkCube8> location;
     @Override
-    public IChunkFactory<ChunkCube8> clear() {
+    public ChunkFactory<ChunkCube8> clear() {
         this.location = null;
         return this;
     }
 
     @Override
-    public IChunkFactory<ChunkCube8> setLocation(ChunkLocation<ChunkCube8> loc) {
+    public ChunkFactory<ChunkCube8> setLocation(ChunkLocation<ChunkCube8> loc) {
         this.location = loc;
         return this;
     }

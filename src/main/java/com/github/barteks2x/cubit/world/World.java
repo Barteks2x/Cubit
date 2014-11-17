@@ -31,7 +31,7 @@ import com.github.barteks2x.cubit.location.Vec3I;
  * General world interface that allows to perform basic operations on blocks and
  * entities.
  */
-public interface IWorld {
+public interface World {
 
     //these are Javadic comments
     /**
@@ -116,7 +116,7 @@ public interface IWorld {
     /**
      * @return block registtry used by this world.
      */
-    public IBlockRegistry getBlockRegistry();
+    public BlockRegistry getBlockRegistry();
     
     /**
      * @return location of the spawnpoint

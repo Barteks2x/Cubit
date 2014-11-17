@@ -26,7 +26,7 @@ package com.github.barteks2x.cubit.world.generator.noise;
 import com.github.barteks2x.cubit.util.MathUtil;
 import java.util.Random;
 
-public class ValueNoiseGenerator extends ANoiseGenerator2d {
+public class ValueNoiseGenerator extends AbstractNoiseGenerator2d {
 
     private final Random rand = new Random();
 
@@ -38,10 +38,9 @@ public class ValueNoiseGenerator extends ANoiseGenerator2d {
     public double getRawValueAt(double x, double z) {
         int intX = MathUtil.floor(x);
         int intZ = MathUtil.floor(z);
+
         double fx = x - intX;
         double fz = z - intZ;
-        // int x1 = 1, z1 = 1;
-        
 
         double v1, v2, v3, v4, t1, t2;
 
@@ -49,6 +48,7 @@ public class ValueNoiseGenerator extends ANoiseGenerator2d {
         v2 = random(intX + 1, intZ);
         v3 = random(intX, intZ + 1);
         v4 = random(intX + 1, intZ + 1);
+
         t1 = lerp(v1, v2, fx);
         t2 = lerp(v3, v4, fx);
         return lerp(t1, t2, fz);
@@ -59,7 +59,7 @@ public class ValueNoiseGenerator extends ANoiseGenerator2d {
     }
 
     private double random(int x, int z) {
-        rand.setSeed(seed + new Random(x).nextInt() + new Random(z).nextInt());
+        rand.setSeed(this.getSeed() + new Random(x).nextInt() + new Random(z).nextInt());
         return rand.nextDouble();
     }
 }

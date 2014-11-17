@@ -25,7 +25,7 @@ package com.github.barteks2x.cubit.world.chunkloader;
 
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.ChunkLocation;
-import com.github.barteks2x.cubit.world.chunk.IChunk;
+import com.github.barteks2x.cubit.world.chunk.Chunk;
 import java.util.List;
 
 /**
@@ -34,7 +34,7 @@ import java.util.List;
  * <p>
  * @param <T> Chunk class supported by the chunk loader.
  */
-public interface IChunkLoader<T extends IChunk> {
+public interface ChunkLoader<T extends Chunk> {
 
     /**
      * This method returns chunk at given location or loads/generates it if not
@@ -98,7 +98,7 @@ public interface IChunkLoader<T extends IChunk> {
      * <p>
      * @param loader chunk loader to add
      */
-    public void addChainedChunkLoader(IChunkLoader<T> loader);
+    public void addChainedChunkLoader(ChunkLoader<T> loader);
 
     /**
      * Removes chained chunk loader. If the chunk loader have never been added -
@@ -108,7 +108,7 @@ public interface IChunkLoader<T extends IChunk> {
      * <p>
      * @return true if chunk loader has been removed, false otherwise.
      */
-    public boolean removeChainedChunkLoader(IChunkLoader<T> loader);
+    public boolean removeChainedChunkLoader(ChunkLoader<T> loader);
 
     /**
      * Returns copy of list of all chained chunk loaders. Removing or adding
@@ -117,7 +117,7 @@ public interface IChunkLoader<T extends IChunk> {
      * <p>
      * @return Copy of chained chunk loader list.
      */
-    public List<IChunkLoader<T>> getChainedChunkLoaders();
+    public List<ChunkLoader<T>> getChainedChunkLoaders();
 
     /**
      * @param location locatioon of chunk

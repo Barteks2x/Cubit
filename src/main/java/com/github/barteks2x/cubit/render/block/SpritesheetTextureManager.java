@@ -27,7 +27,7 @@ import com.github.barteks2x.cubit.render.TextureCoords;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SpritesheetTextureManager implements IBlockTextureManager {
+public class SpritesheetTextureManager implements BlockTextureManager {
 
     private final Map<String, TextureCoords> mapping;
     

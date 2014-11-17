@@ -31,7 +31,7 @@ import com.github.barteks2x.cubit.location.EntityLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
 import com.github.barteks2x.cubit.render.BitmapFont;
 import com.github.barteks2x.cubit.util.Timer;
-import com.github.barteks2x.cubit.world.chunk.IChunk;
+import com.github.barteks2x.cubit.world.chunk.Chunk;
 import java.awt.Color;
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
@@ -51,7 +51,7 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
  *
  * @author Bartosz Skrzypczak
  */
-public class DebugRenderer implements IRenderer {
+public class DebugRenderer implements Renderer {
 
     private final FloatBuffer orthographicProjMatrix = BufferUtils.createFloatBuffer(16);
     private final BitmapFont font;
@@ -61,7 +61,7 @@ public class DebugRenderer implements IRenderer {
     private int fps = 0;
     private Block toPlace;
     private EntityLocation playerLoc;
-    private ChunkLocation<? extends IChunk> playerChunkLocation;
+    private ChunkLocation<? extends Chunk> playerChunkLocation;
     private BlockLocation selectionLocation;
     private BlockLocation placeLocation;
 
@@ -145,9 +145,9 @@ public class DebugRenderer implements IRenderer {
 
     }
 
-    private ChunkLocation<? extends IChunk> getPlayerChunkLocation(Player player) {
+    private ChunkLocation<? extends Chunk> getPlayerChunkLocation(Player player) {
         BlockLocation blockLoc = new BlockLocation(player.getLocation());
-        return new ChunkLocation<IChunk>(null, this.chunkSize, blockLoc);
+        return new ChunkLocation<Chunk>(null, this.chunkSize, blockLoc);
     }
 
     @Override

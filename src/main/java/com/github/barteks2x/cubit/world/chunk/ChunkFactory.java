@@ -21,37 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit.world.generator.noise;
+package com.github.barteks2x.cubit.world.chunk;
 
-import com.github.barteks2x.cubit.world.generator.noise.INoiseGenerator2d;
+import com.github.barteks2x.cubit.world.chunk.Chunk;
+import com.github.barteks2x.cubit.location.ChunkLocation;
+import com.github.barteks2x.cubit.location.Vec3I;
 
-public abstract class ANoiseGenerator2d implements INoiseGenerator2d {
-
-    protected double grid;
-    protected double persistance;
-    protected int octaves;
-    protected double lacunarity;
-    protected long seed;
-
-    public ANoiseGenerator2d(double grid, double persistance, int octaves, double fq, long seed) {
-        this.grid = grid;
-        this.persistance = persistance;
-        this.octaves = octaves;
-        this.lacunarity = fq;
-        this.seed = seed;
-    }
-
-    @Override
-    public double getValueOctaves(int x, int z) {
-        double total = 0.0D;
-        double frequency = 1.0D / grid;
-        double amplitude = persistance;
-
-        for(int i = 0; i < octaves; ++i) {
-            total += getRawValueAt(x * frequency, z * frequency) * amplitude;
-            frequency *= lacunarity;
-            amplitude *= persistance;
-        }
-        return total;
-    }
+/**
+ * Used to construct new chunks for given world with specific location and block data.
+ * @param <T>
+ */
+public interface ChunkFactory<T extends Chunk> {
+    public ChunkFactory<T> clear();
+    public ChunkFactory<T> setLocation(ChunkLocation<T> loc);
+    public T build();
+    public Vec3I getChunkSize();
 }

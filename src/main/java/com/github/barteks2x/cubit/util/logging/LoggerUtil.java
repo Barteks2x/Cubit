@@ -31,7 +31,10 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 
-public class LoggerFactory {
+public class LoggerUtil {
+
+    private LoggerUtil() {
+    }
 
     public static void initLoggers() throws IOException {
         Logger global = Logger.getLogger("");
@@ -59,8 +62,4 @@ public class LoggerFactory {
     public static Logger getLogger(Class<? extends Object> clazz) {
         return Logger.getLogger(clazz.getName());
     }
-
-    private LoggerFactory() {
-    }
-
 }

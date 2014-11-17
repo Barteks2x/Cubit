@@ -25,7 +25,7 @@ package com.github.barteks2x.cubit.block;
 
 import com.github.barteks2x.cubit.location.Vec3I;
 import com.github.barteks2x.cubit.render.block.CubeBlockModelBuilder;
-import com.github.barteks2x.cubit.render.block.IBlockModelBuilder;
+import com.github.barteks2x.cubit.render.block.BlockModelBuilder;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,7 +33,7 @@ import java.util.Set;
 
 public abstract class Block {
 
-    protected static final IBlockModelBuilder CUBE_MODEL_BUILDER =
+    protected static final BlockModelBuilder CUBE_MODEL_BUILDER =
             new CubeBlockModelBuilder();
     public static final Set<Block> blocks = new HashSet<Block>(256);
     //Blocks
@@ -62,7 +62,7 @@ public abstract class Block {
         return name;
     }
 
-    public IBlockModelBuilder getModelBuilder() {
+    public BlockModelBuilder getModelBuilder() {
         return CUBE_MODEL_BUILDER;
     }
 

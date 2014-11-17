@@ -1,4 +1,4 @@
-/*
+/* 
  * The MIT License
  *
  * Copyright 2014 Bartosz Skrzypczak.
@@ -21,22 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package com.github.barteks2x.cubit.world.generator.noise;
 
-package com.github.barteks2x.cubit.render.renderer;
+public interface NoiseGenerator2d {
 
-import com.github.barteks2x.cubit.Player;
+    public double getRawValueAt(double x, double z);
 
-/**
- *
- * @author Bartosz Skrzypczak
- */
-public interface IRenderer {
+    public double getValueOctaves(int x, int z);
 
-    public void render();
-
-    public void update(Player player);
-
-    public void updateWindowDimensions(int width, int height);
-
-    public void delete();
+    public long getSeed();
 }

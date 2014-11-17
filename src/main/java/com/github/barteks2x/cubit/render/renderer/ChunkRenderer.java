@@ -31,9 +31,9 @@ import com.github.barteks2x.cubit.location.Vec3I;
 import com.github.barteks2x.cubit.render.Quad;
 import com.github.barteks2x.cubit.render.TextureCoords;
 import com.github.barteks2x.cubit.render.Vertex;
-import com.github.barteks2x.cubit.render.block.IBlockModelBuilder;
-import com.github.barteks2x.cubit.render.block.IBlockTextureManager;
-import com.github.barteks2x.cubit.world.IWorld;
+import com.github.barteks2x.cubit.render.block.BlockModelBuilder;
+import com.github.barteks2x.cubit.render.block.BlockTextureManager;
+import com.github.barteks2x.cubit.world.World;
 import java.awt.Color;
 import java.util.List;
 import static org.lwjgl.opengl.GL11.GL_COMPILE;
@@ -56,16 +56,16 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
  *
  * @author Bartosz Skrzypczak
  */
-public class ChunkRenderer implements IRenderer {
+public class ChunkRenderer implements Renderer {
 
     private final Vec3I renderChunkSize;
     private final BlockLocation startLocation;
-    private final IWorld world;
-    private final IBlockTextureManager blockTextureManager;
+    private final World world;
+    private final BlockTextureManager blockTextureManager;
 
     private int displayList = -1;
 
-    public ChunkRenderer(Vec3I renderChunkSize, BlockLocation startLocation, IBlockTextureManager texMgr, IWorld world) {
+    public ChunkRenderer(Vec3I renderChunkSize, BlockLocation startLocation, BlockTextureManager texMgr, World world) {
         this.renderChunkSize = renderChunkSize;
         this.startLocation = startLocation;
         this.world = world;
@@ -123,9 +123,9 @@ public class ChunkRenderer implements IRenderer {
         }
     }
 
-    private int drawBlock(IWorld world, int wX, int wY, int wZ, int x, int y, int z) {
+    private int drawBlock(World world, int wX, int wY, int wZ, int x, int y, int z) {
         Block block = this.world.getBlockAt(wX, wY, wZ);
-        IBlockModelBuilder modelBuilder = block.getModelBuilder();
+        BlockModelBuilder modelBuilder = block.getModelBuilder();
         List<Quad> quads = modelBuilder.build(this.blockTextureManager, world, wX, wY, wZ);
         int q = 0;
         for(Quad quad : quads) {
