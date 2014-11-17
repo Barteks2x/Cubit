@@ -370,12 +370,15 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
         ChunkFactory<ChunkCube16> factory = new ChunkCube16Factory();
 
         ChunkLoader<ChunkCube16> chunkLoader = new RAMChunkLoader<ChunkCube16>();
-        ChunkLoader<ChunkCube16> chunkGenerator = new HeightmapChunkGenerator<ChunkCube16>(factory, seed);
-        chunkLoader.addChainedChunkLoader(chunkGenerator);
-
+        
         CubitWorld.CubitWorldBuilder<ChunkCube16> builder = CubitWorld.newWorld(ChunkCube16.class);
-        CubitWorld<ChunkCube16> world =
-                builder.setChunkFactory(factory).setChunkLoader(chunkLoader).setSeed(seed).build();
+        CubitWorld<ChunkCube16> world = builder.
+                setChunkFactory(factory).
+                setChunkLoader(chunkLoader).
+                setSeed(seed).build();
+
+        ChunkLoader<ChunkCube16> chunkGenerator = new HeightmapChunkGenerator<ChunkCube16>(factory, world);
+        chunkLoader.addChainedChunkLoader(chunkGenerator);
 
         instance = new CubitMain<ChunkCube16, CubitWorld<ChunkCube16>>(world, factory, chunkLoader);
         instance.start(800, 600);

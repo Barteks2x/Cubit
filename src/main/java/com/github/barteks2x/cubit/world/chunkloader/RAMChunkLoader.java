@@ -32,8 +32,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
- * @author Bartosz Skrzypczak
+ * Loads chunks from caache. If chunk is nt stored in cache - uses chained chunk loader.
+ * <p>
+ * @param <C> Chunk class used by this chunk loader
  */
 public class RAMChunkLoader<C extends Chunk> implements ChunkLoader<C> {
 
@@ -41,8 +42,23 @@ public class RAMChunkLoader<C extends Chunk> implements ChunkLoader<C> {
 
     private final List<ChunkLoader<C>> chained;
 
+    /**
+     * Constructs new RAMChunkLoader with initial capacity large enough to store chunks within 10 chunks from player.
+     */
     public RAMChunkLoader() {
-        this.chunks = new HashMap<ChunkLocation<C>, C>(21 * 21 * 21);
+        this(10);
+    }
+
+    /**
+     * Constructs new RAMChunkLoader with initial capacity large enough to store chunks within {@code radius} chunks
+     * from player.
+     * <p>
+     * @param radius Specifies initial capacity
+     */
+    public RAMChunkLoader(int radius) {
+        int d = 2 * radius;
+        d += 1;
+        this.chunks = new HashMap<ChunkLocation<C>, C>(d * d * d);
         this.chained = new ArrayList<ChunkLoader<C>>(2);
     }
 

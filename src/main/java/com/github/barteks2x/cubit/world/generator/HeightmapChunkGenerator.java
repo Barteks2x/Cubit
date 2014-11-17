@@ -36,9 +36,9 @@ public class HeightmapChunkGenerator<T extends Chunk> extends AbstractChunkGener
 
     private final NoiseGenerator2d noiseGen;
 
-    public HeightmapChunkGenerator(ChunkFactory<T> chunkBuilder, long seed) {
-        super(chunkBuilder, seed);
-        this.noiseGen = new ValueNoiseGenerator(128, 0.8D, 4, 2.24564D, seed);
+    public HeightmapChunkGenerator(ChunkFactory<T> chunkBuilder, CubitWorld<T> world) {
+        super(chunkBuilder, world);
+        this.noiseGen = new ValueNoiseGenerator(128, 0.8D, 4, 2.24564D, world.getSeedLong());
     }
 
     @Override
@@ -47,8 +47,9 @@ public class HeightmapChunkGenerator<T extends Chunk> extends AbstractChunkGener
     }
 
     @Override
-    protected void generateTerrain(ChunkLocation<T> location, T chunk) {
+    protected void generateTerrain(T chunk) {
         Vec3I chunkSize = chunk.getSize();
+        ChunkLocation<?> location = chunk.getLocation();
         final int maxX = chunkSize.getX(),
                 maxY = chunkSize.getY(),
                 maxZ = chunkSize.getZ();
