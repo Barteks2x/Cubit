@@ -23,11 +23,33 @@
  */
 package com.github.barteks2x.cubit.world.generator.noise;
 
+/**
+ * 2D noise generator interface, contains besic methods.
+ */
 public interface NoiseGenerator2d {
 
-    public double getRawValueAt(double x, double z);
+    /**
+     * Generates noise values at (x, z) coordinates.
+     * <p>
+     * @param x x coordinate
+     * @param z z coordinate
+     * <p>
+     * @return value at (x, z)
+     */
+    public double getRaw(double x, double z);
 
-    public double getValueOctaves(int x, int z);
+    /**
+     * Generates final noise value.
+     * <p>
+     * @param x x coorlue, scaled coodinate
+     * @param z z coordinate
+     * <p>
+     * @return final noise value.
+     */
+    public double get(int x, int z);
 
+    /**
+     * @return noise generator seed.
+     */
     public long getSeed();
 }

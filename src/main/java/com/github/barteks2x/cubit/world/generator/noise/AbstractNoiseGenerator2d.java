@@ -25,13 +25,17 @@ package com.github.barteks2x.cubit.world.generator.noise;
 
 import com.github.barteks2x.cubit.world.generator.noise.NoiseGenerator2d;
 
+/**
+ * Abstract NoiseGenerator2D implementation. Implements {@link NoiseGenerator2d#get} using
+ * {@link NoiseGenerator2d#getRaw} with specified octaves, lacunarity, frequency and other parameters.
+ */
 public abstract class AbstractNoiseGenerator2d implements NoiseGenerator2d {
 
-    private double grid;
-    private double persistance;
-    private int octaves;
-    private double lacunarity;
-    private long seed;
+    private final double grid;
+    private final double persistance;
+    private final int octaves;
+    private final double lacunarity;
+    private final long seed;
 
     public AbstractNoiseGenerator2d(double grid, double persistance, int octaves, double fq, long seed) {
         this.grid = grid;
@@ -42,13 +46,13 @@ public abstract class AbstractNoiseGenerator2d implements NoiseGenerator2d {
     }
 
     @Override
-    public double getValueOctaves(int x, int z) {
+    public double get(int x, int z) {
         double total = 0.0D;
         double frequency = 1.0D / grid;
         double amplitude = persistance;
 
         for(int i = 0; i < octaves; ++i) {
-            total += getRawValueAt(x * frequency, z * frequency) * amplitude;
+            total += getRaw(x * frequency, z * frequency) * amplitude;
             frequency *= lacunarity;
             amplitude *= persistance;
         }

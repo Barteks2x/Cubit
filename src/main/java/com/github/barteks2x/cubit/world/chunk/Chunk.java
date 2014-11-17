@@ -95,7 +95,7 @@ public interface Chunk {
      * @return World containing the chunk. Null if chunk it not loaded yet or
      *         has been unloaded.
      */
-    public CubitWorld getWorld();
+    public CubitWorld<? extends Chunk> getWorld();
 
     /**
      * @return true if load method has been calles and unload method has not

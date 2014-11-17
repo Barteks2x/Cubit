@@ -26,6 +26,9 @@ package com.github.barteks2x.cubit.world.generator.noise;
 import com.github.barteks2x.cubit.util.MathUtil;
 import java.util.Random;
 
+/**
+ * Simple value noise generator implementation.
+ */
 public class ValueNoiseGenerator extends AbstractNoiseGenerator2d {
 
     private final Random rand = new Random();
@@ -35,7 +38,7 @@ public class ValueNoiseGenerator extends AbstractNoiseGenerator2d {
     }
 
     @Override
-    public double getRawValueAt(double x, double z) {
+    public double getRaw(double x, double z) {
         int intX = MathUtil.floor(x);
         int intZ = MathUtil.floor(z);
 

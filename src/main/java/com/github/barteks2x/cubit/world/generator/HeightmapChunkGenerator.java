@@ -32,6 +32,11 @@ import com.github.barteks2x.cubit.location.Vec3I;
 import com.github.barteks2x.cubit.world.CubitWorld;
 import com.github.barteks2x.cubit.world.chunk.ChunkFactory;
 
+/**
+ * Chunk generator implemented using noise generator as heightmap.
+ * <p>
+ * @param <T> Chunk class used by the chunk generator
+ */
 public class HeightmapChunkGenerator<T extends Chunk> extends AbstractChunkGenerator<T> {
 
     private final NoiseGenerator2d noiseGen;
@@ -43,7 +48,7 @@ public class HeightmapChunkGenerator<T extends Chunk> extends AbstractChunkGener
 
     @Override
     protected int getApproximateHeightAt(int x, int z) {
-        return (int) (noiseGen.getValueOctaves(x, z) * 32);
+        return (int)(noiseGen.get(x, z) * 32) + 1;
     }
 
     @Override
@@ -53,34 +58,33 @@ public class HeightmapChunkGenerator<T extends Chunk> extends AbstractChunkGener
         final int maxX = chunkSize.getX(),
                 maxY = chunkSize.getY(),
                 maxZ = chunkSize.getZ();
-        for (int x = 0; x < maxX; ++x) {
-            for (int z = 0; z < maxZ; ++z) {
-                double v = noiseGen.
-                        getValueOctaves(
+        for(int x = 0; x < maxX; ++x) {
+            for(int z = 0; z < maxZ; ++z) {
+                double v = noiseGen.get(
                                 (location.getX() * maxX) + x,
                                 (location.getZ() * maxZ) + z);
                 v *= 32;
                 v -= location.getY() * maxY;
-                if (v <= 0) {
+                if(v <= 0) {
                     continue;
                 }
-                if (v >= maxY) {
-                    for (int y = 0; y < maxY; y++) {
+                if(v >= maxY) {
+                    for(int y = 0; y < maxY; y++) {
                         Block block = Block.STONE;
-                        if (((int) v) - y == 0) {
+                        if(((int)v) - y == 0) {
                             block = Block.GRASS;
-                        } else if (((int) v) - y < 4) {
+                        } else if(((int)v) - y < 4) {
                             block = Block.DIRT;
                         }
                         chunk.setBlockAt(x, y, z, block);
                     }
                     continue;
                 }
-                for (int y = (int) v; y >= 0; --y) {
+                for(int y = (int)v; y >= 0; --y) {
                     Block block = Block.STONE;
-                    if (((int) v) - y == 0) {
+                    if(((int)v) - y == 0) {
                         block = Block.GRASS;
-                    } else if (((int) v) - y < 4) {
+                    } else if(((int)v) - y < 4) {
                         block = Block.DIRT;
                     }
                     chunk.setBlockAt(x, y, z, block);

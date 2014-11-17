@@ -30,7 +30,7 @@ public class PerlinNoiseGenerator extends AbstractNoiseGenerator2d {
     }
 
     @Override
-    public double getRawValueAt(double x, double z) {
+    public double getRaw(double x, double z) {
         //TODO Perlin Noise Generator
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
