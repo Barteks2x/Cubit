@@ -75,6 +75,7 @@ public class WorldRenderer implements Renderer {
     private World world;
 
     private final Map<ChunkLocation<?>, ChunkRenderer> chunkRenderers;
+    private final Player player;
 
     private WorldRenderer(WorldRendererBuilder builder) {
         this.zNear = builder.zNear;
@@ -85,6 +86,7 @@ public class WorldRenderer implements Renderer {
         this.fov = builder.fov;
         this.texture = builder.texture;
         this.blockTextureManager = builder.blockTextureManager;
+        this.player = builder.player;
 
         this.updateWindowDimensions(builder.width, builder.height);
 
@@ -111,7 +113,7 @@ public class WorldRenderer implements Renderer {
     }
 
     @Override
-    public void update(Player player) {
+    public void update() {
         this.rX = (float)player.getRx();
         this.rY = (float)player.getRy();
 
@@ -131,24 +133,24 @@ public class WorldRenderer implements Renderer {
     public void onBlockUpdate(BlockLocation location) {
         ChunkLocation<?> chunkPos = new ChunkLocation<Chunk>(null, this.renderChunkSize, location);
         Vec3I chunkSize = chunkPos.getChunkSize();
-        this.chunkRenderers.get(chunkPos).update(null);
+        this.chunkRenderers.get(chunkPos).update();
         if(mod(location.getX(), chunkSize.getX()) == 0) {
-            this.chunkRenderers.get(chunkPos.add(-1, 0, 0)).update(null);
+            this.chunkRenderers.get(chunkPos.add(-1, 0, 0)).update();
         }
         if(mod(location.getX(), chunkSize.getX()) == chunkSize.getX() - 1) {
-            this.chunkRenderers.get(chunkPos.add(1, 0, 0)).update(null);
+            this.chunkRenderers.get(chunkPos.add(1, 0, 0)).update();
         }
         if(mod(location.getY(), chunkSize.getY()) == 0) {
-            this.chunkRenderers.get(chunkPos.add(0, -1, 0)).update(null);
+            this.chunkRenderers.get(chunkPos.add(0, -1, 0)).update();
         }
         if(mod(location.getY(), chunkSize.getY()) == chunkSize.getY() - 1) {
-            this.chunkRenderers.get(chunkPos.add(0, 1, 0)).update(null);
+            this.chunkRenderers.get(chunkPos.add(0, 1, 0)).update();
         }
         if(mod(location.getZ(), chunkSize.getZ()) == 0) {
-            this.chunkRenderers.get(chunkPos.add(0, 0, -1)).update(null);
+            this.chunkRenderers.get(chunkPos.add(0, 0, -1)).update();
         }
         if(mod(location.getZ(), chunkSize.getZ()) == chunkSize.getZ() - 1) {
-            this.chunkRenderers.get(chunkPos.add(0, 0, 1)).update(null);
+            this.chunkRenderers.get(chunkPos.add(0, 0, 1)).update();
         }
     }
 
@@ -220,6 +222,7 @@ public class WorldRenderer implements Renderer {
         private Vec3I renderChunkSize;
         private Texture texture;
         private BlockTextureManager blockTextureManager;
+        private Player player;
 
         public WorldRendererBuilder setFov(int fov) {
             this.fov = fov;
@@ -256,8 +259,13 @@ public class WorldRenderer implements Renderer {
             return this;
         }
 
-        public WorldRendererBuilder setTexture(BlockTextureManager texMgr) {
+        public WorldRendererBuilder setBlockTextureManager(BlockTextureManager texMgr) {
             this.blockTextureManager = texMgr;
+            return this;
+        }
+
+        public WorldRendererBuilder setPlayer(Player player) {
+            this.player = player;
             return this;
         }
 
@@ -269,9 +277,10 @@ public class WorldRenderer implements Renderer {
                     height == null ||
                     renderChunkSize == null ||
                     texture == null ||
-                    blockTextureManager == null) {
+                    blockTextureManager == null ||
+                    player == null) {
                 throw new IncompleteBuildException(
-                        "WorldRenderer requires fov, zNear, viewDist, width, height, renderChunkSize, texture and BlockTextureManager");
+                        "WorldRenderer requires fov, zNear, viewDist, width, height, renderChunkSize, player, texture and BlockTextureManager");
             }
             return new WorldRenderer(this);
         }

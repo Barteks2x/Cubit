@@ -54,6 +54,7 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 public class DebugRenderer implements Renderer {
 
     private final FloatBuffer orthographicProjMatrix = BufferUtils.createFloatBuffer(16);
+    private final Player player;
     private final BitmapFont font;
     private final Timer timer;
     private final Vec3I chunkSize;
@@ -65,9 +66,10 @@ public class DebugRenderer implements Renderer {
     private BlockLocation selectionLocation;
     private BlockLocation placeLocation;
 
-    public DebugRenderer(BitmapFont font, Timer timer, Vec3I chunkSize, int width, int height) {
+    public DebugRenderer(Player player, BitmapFont font, Vec3I chunkSize, int width, int height) {
+        this.player = player;
         this.font = font;
-        this.timer = timer;
+        this.timer = new Timer();
         this.chunkSize = chunkSize;
         this.updateWindowDimensions(width, height);
     }
@@ -123,7 +125,7 @@ public class DebugRenderer implements Renderer {
     }
 
     @Override
-    public void update(Player player) {
+    public void update() {
         this.playerLoc = player.getLocation();
         this.playerChunkLocation = getPlayerChunkLocation(player);
         this.selectionLocation = player.getSelectionLocation();

@@ -34,7 +34,7 @@ public interface Renderer {
 
     public void render();
 
-    public void update(Player player);
+    public void update();
 
     public void updateWindowDimensions(int width, int height);
 

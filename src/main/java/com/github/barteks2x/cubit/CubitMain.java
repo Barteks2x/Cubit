@@ -164,8 +164,7 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
                 setFov(fov).
                 setWidth(width).
                 setHeight(height).
-                setRenderChunkSize(this.chunkFactory.getChunkSize()).
-                setTexture(textureManager).
+                setRenderChunkSize(this.chunkFactory.getChunkSize()).setBlockTextureManager(textureManager).
                 setTexture(tex).
                 setViewDistanceBlocks(this.renderDistance).
                 setzNear(zNear).build();

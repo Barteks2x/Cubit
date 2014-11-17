@@ -70,7 +70,7 @@ public class ChunkRenderer implements Renderer {
         this.startLocation = startLocation;
         this.world = world;
         this.blockTextureManager = texMgr;
-        this.update(null);
+        this.update();
     }
 
     @Override
@@ -88,7 +88,7 @@ public class ChunkRenderer implements Renderer {
     }
 
     @Override
-    public final void update(Player player) {
+    public final void update() {
         if(this.displayList == -1) {
             this.displayList = glGenLists(1);
         }
