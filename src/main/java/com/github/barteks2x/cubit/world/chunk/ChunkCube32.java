@@ -23,33 +23,26 @@
  */
 package com.github.barteks2x.cubit.world.chunk;
 
-import com.github.barteks2x.cubit.world.chunk.Chunk;
 import com.github.barteks2x.cubit.block.Block;
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
-import com.github.barteks2x.cubit.util.ArrayUtil;
 import com.github.barteks2x.cubit.util.logging.LoggerUtil;
-import com.github.barteks2x.cubit.world.CubitWorld;
 import java.util.logging.Logger;
 
-/**
- *
- * @author Bartosz Skrzypczak
- */
-public class ChunkCube8 extends AbstractChunkCubeN<ChunkCube8> {
+public class ChunkCube32 extends AbstractChunkCubeN<ChunkCube32> {
 
     private static final Logger logger = LoggerUtil.getLogger(ChunkCube16.class);
-    private static final Vec3I SIZE = new Vec3I(16, 16, 16);
+    private static final Vec3I SIZE = new Vec3I(32, 32, 32);
 
-    public ChunkCube8(ChunkLocation<ChunkCube8> location) {
+    public ChunkCube32(ChunkLocation<ChunkCube32> location) {
         super(location, EMPTY_BLOCK);
     }
 
-    public ChunkCube8(ChunkLocation<ChunkCube8> location, Block fill) {
+    public ChunkCube32(ChunkLocation<ChunkCube32> location, Block fill) {
         super(location, fill);
     }
 
-    public ChunkCube8(ChunkLocation<ChunkCube8> location, Block[][][] data) {
+    public ChunkCube32(ChunkLocation<ChunkCube32> location, Block[][][] data) {
         super(location, data);
     }
 

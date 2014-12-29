@@ -33,8 +33,9 @@ import com.github.barteks2x.cubit.world.CubitWorld;
 import java.util.logging.Logger;
 
 /**
- *
- * @author Bartosz Skrzypczak
+ * Basic abstract Chunk implementation using array as block storage.
+ * <p>
+ * @param <C> The implementation.
  */
 public abstract class AbstractChunkCubeN<C extends AbstractChunkCubeN<C>> implements Chunk {
 
@@ -46,16 +47,32 @@ public abstract class AbstractChunkCubeN<C extends AbstractChunkCubeN<C>> implem
     private boolean isLoaded;
     private boolean canLoad;
 
+    /**
+     * Constructs new chunk at {@code location} filled with {@link Block#AIR}
+     * <p>
+     * @param location chunk location
+     */
     public AbstractChunkCubeN(ChunkLocation<C> location) {
         this(location, EMPTY_BLOCK);
     }
 
-    public AbstractChunkCubeN(ChunkLocation<C> location, Block fill) {
+    /**
+     * Constructs new chunk at {@code location} filled with {@code blockFill}
+     * <p>
+     * @param location chunk location
+     * @param blockFill chunk will be filled with this block
+     */
+    public AbstractChunkCubeN(ChunkLocation<C> location, Block blockFill) {
         CubitWorld<C> world = location.getWorld();
         this.location = location;
         ArrayUtil.fill(this.blocks, world.getBlockRegistry().getID(EMPTY_BLOCK));
     }
-
+    /**
+     * Constructs new chunk at {@code location} filled with blocks in {@code data} array.
+     * <p>
+     * @param location  chunk location
+     * @param data     chunk will contain these blocks
+     */
     public AbstractChunkCubeN(ChunkLocation<C> location, Block[][][] data) {
         this.location = location;
         ArrayUtil.clone(blocks, this.blocks);
@@ -76,13 +93,9 @@ public abstract class AbstractChunkCubeN<C extends AbstractChunkCubeN<C>> implem
         return this.location.getZ();
     }
 
-    protected void setBlocks(int[][][] data) {
-        ArrayUtil.clone(data, this.blocks);
-    }
-
     @Override
-    public boolean setBlockAt(int x, int y, int z, Block b) {
-        this.blocks[x][y][z] = this.getWorld().getBlockRegistry().getID(b);
+    public boolean setBlockAt(int x, int y, int z, Block block) {
+        this.blocks[x][y][z] = this.getWorld().getBlockRegistry().getID(block);
         return true;
     }
 

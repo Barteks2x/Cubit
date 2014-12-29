@@ -126,6 +126,7 @@ public class DebugRenderer implements Renderer {
 
     @Override
     public void update() {
+        timer.nextFrame();
         this.playerLoc = player.getLocation();
         this.playerChunkLocation = getPlayerChunkLocation(player);
         this.selectionLocation = player.getSelectionLocation();

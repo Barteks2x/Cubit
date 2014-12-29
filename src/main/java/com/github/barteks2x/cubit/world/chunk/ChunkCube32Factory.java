@@ -25,36 +25,29 @@ package com.github.barteks2x.cubit.world.chunk;
 
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
-import com.github.barteks2x.cubit.world.chunk.ChunkCube8;
+import com.github.barteks2x.cubit.world.chunk.ChunkCube32;
 import com.github.barteks2x.cubit.world.chunk.ChunkFactory;
 
 /**
- *
- * @author Bartosz Skrzypczak
+ * Creates instances of ChunkCube32 and provides size information.
  */
-public class ChunkCube8Factory implements ChunkFactory<ChunkCube8> {
+public class ChunkCube32Factory implements ChunkFactory<ChunkCube32> {
 
-    private ChunkLocation<ChunkCube8> location;
-    @Override
-    public ChunkFactory<ChunkCube8> clear() {
-        this.location = null;
-        return this;
-    }
+    private ChunkLocation<ChunkCube32> location;
 
     @Override
-    public ChunkFactory<ChunkCube8> setLocation(ChunkLocation<ChunkCube8> loc) {
+    public ChunkFactory<ChunkCube32> setLocation(ChunkLocation<ChunkCube32> loc) {
         this.location = loc;
         return this;
     }
 
     @Override
-    public ChunkCube8 build() {
-        return new ChunkCube8(location);
+    public ChunkCube32 build() {
+        return new ChunkCube32(location);
     }
 
     @Override
     public Vec3I getChunkSize() {
-        return ChunkCube8.chunkSize();
+        return ChunkCube32.chunkSize();
     }
-
 }

@@ -25,21 +25,16 @@ package com.github.barteks2x.cubit.world.chunk;
 
 import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
+import com.github.barteks2x.cubit.world.IncompleteBuildException;
 import com.github.barteks2x.cubit.world.chunk.ChunkCube16;
 import com.github.barteks2x.cubit.world.chunk.ChunkFactory;
 
 /**
- *
- * @author Bartosz Skrzypczak
+ * Creates instances of ChunkCube16 and provides size information.
  */
 public class ChunkCube16Factory implements ChunkFactory<ChunkCube16> {
 
     private ChunkLocation<ChunkCube16> location;
-    @Override
-    public ChunkFactory<ChunkCube16> clear() {
-        this.location = null;
-        return this;
-    }
 
     @Override
     public ChunkFactory<ChunkCube16> setLocation(ChunkLocation<ChunkCube16> loc) {
@@ -49,6 +44,9 @@ public class ChunkCube16Factory implements ChunkFactory<ChunkCube16> {
 
     @Override
     public ChunkCube16 build() {
+        if(location == null) {
+            throw new IncompleteBuildException("To create new chunk you need to set location!");
+        }
         return new ChunkCube16(location);
     }
 

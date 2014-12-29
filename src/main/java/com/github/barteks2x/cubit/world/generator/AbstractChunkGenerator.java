@@ -68,7 +68,7 @@ public abstract class AbstractChunkGenerator<T extends Chunk> implements ChunkLo
      * @return New chunk at {@code location}
      */
     public T generateChunk(ChunkLocation<T> location) {
-        T chunk = this.chunkFactory.clear().setLocation(location).build();
+        T chunk = this.chunkFactory.setLocation(location).build();
         generateTerrain(chunk);
         return chunk;
     }

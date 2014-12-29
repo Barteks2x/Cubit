@@ -29,10 +29,6 @@ import com.github.barteks2x.cubit.location.Vec3I;
 import com.github.barteks2x.cubit.util.logging.LoggerUtil;
 import java.util.logging.Logger;
 
-/**
- *
- * @author Bartosz Skrzypczak
- */
 public class ChunkCube16 extends AbstractChunkCubeN<ChunkCube16> {
 
     private static final Logger logger = LoggerUtil.getLogger(ChunkCube16.class);

@@ -44,6 +44,8 @@ import com.github.barteks2x.cubit.world.CubitWorld;
 import com.github.barteks2x.cubit.world.chunk.ChunkCube16;
 import com.github.barteks2x.cubit.world.chunk.ChunkCube16Factory;
 import com.github.barteks2x.cubit.world.chunk.Chunk;
+import com.github.barteks2x.cubit.world.chunk.ChunkCube32;
+import com.github.barteks2x.cubit.world.chunk.ChunkCube32Factory;
 import com.github.barteks2x.cubit.world.chunk.ChunkFactory;
 import com.github.barteks2x.cubit.world.chunkloader.ChunkLoader;
 import com.github.barteks2x.cubit.world.chunkloader.RAMChunkLoader;
@@ -102,7 +104,7 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
 
     private static final Logger logger = LoggerUtil.getLogger(CubitMain.class);
 
-    private static CubitMain<ChunkCube16, CubitWorld<ChunkCube16>> instance;
+    private static CubitMain<ChunkCube32, CubitWorld<ChunkCube32>> instance;
     private static final int TICKRATE = 20;
     private static final long UPDATE_TIME = 1000000000L / TICKRATE;
     private final int renderDistance = 64;
@@ -164,10 +166,12 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
                 setFov(fov).
                 setWidth(width).
                 setHeight(height).
-                setRenderChunkSize(this.chunkFactory.getChunkSize()).setBlockTextureManager(textureManager).
+                setRenderChunkSize(this.chunkFactory.getChunkSize()).
+                setBlockTextureManager(textureManager).
                 setTexture(tex).
                 setViewDistanceBlocks(this.renderDistance).
-                setzNear(zNear).build();
+                setzNear(zNear).
+                setPlayer(player).build();
 
         while(isRunning) {
             GPUProfiler.startFrame();
@@ -360,27 +364,28 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
         return new ChunkLocation<C>(world, this.chunkFactory.getChunkSize(), blockLoc);
     }
 
-    public static CubitMain<ChunkCube16, CubitWorld<ChunkCube16>> getGame() {
+    public static CubitMain<ChunkCube32, CubitWorld<ChunkCube32>> getGame() {
         return instance;
     }
 
     public static void main(String args[]) throws IOException {
         LoggerUtil.initLoggers();
         long seed = System.nanoTime();
-        ChunkFactory<ChunkCube16> factory = new ChunkCube16Factory();
+        ChunkFactory<ChunkCube32> factory = new ChunkCube32Factory();
 
-        ChunkLoader<ChunkCube16> chunkLoader = new RAMChunkLoader<ChunkCube16>();
+        ChunkLoader<ChunkCube32> chunkLoader = new RAMChunkLoader<ChunkCube32>();
         
-        CubitWorld.CubitWorldBuilder<ChunkCube16> builder = CubitWorld.newWorld(ChunkCube16.class);
-        CubitWorld<ChunkCube16> world = builder.
+        CubitWorld.CubitWorldBuilder<ChunkCube32> builder = CubitWorld.newWorld(ChunkCube32.class);
+        CubitWorld<ChunkCube32> world = builder.
                 setChunkFactory(factory).
                 setChunkLoader(chunkLoader).
                 setSeed(seed).build();
+        assert world != null;
 
-        ChunkLoader<ChunkCube16> chunkGenerator = new HeightmapChunkGenerator<ChunkCube16>(factory, world);
+        ChunkLoader<ChunkCube32> chunkGenerator = new HeightmapChunkGenerator<ChunkCube32>(factory, world);
         chunkLoader.addChainedChunkLoader(chunkGenerator);
 
-        instance = new CubitMain<ChunkCube16, CubitWorld<ChunkCube16>>(world, factory, chunkLoader);
+        instance = new CubitMain<ChunkCube32, CubitWorld<ChunkCube32>>(world, factory, chunkLoader);
         instance.start(800, 600);
     }
 

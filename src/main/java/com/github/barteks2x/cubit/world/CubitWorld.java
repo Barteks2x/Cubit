@@ -58,16 +58,14 @@ public class CubitWorld<C extends Chunk> implements World {
      */
     @SuppressWarnings("LeakingThisInConstructor")
     public CubitWorld(ChunkLoader<C> chunkLoader, ChunkFactory<C> chunkFactory, long seed) {
-        this.spawnPoint = chunkLoader.getSpawnPoint();
-
         this.chunkLoader = chunkLoader;
-        
+
         this.chunkFactory = chunkFactory;
 
         this.seed = seed;
 
         this.blockRegistry = new SimpleBlockRegistry(this);
-        
+
         this.players = new HashSet<Player>(2);
         this.registerBlocks();
     }
@@ -153,7 +151,10 @@ public class CubitWorld<C extends Chunk> implements World {
 
     @Override
     public Vec3I getSpawnPoint() {
-        return this.spawnPoint;
+        if(spawnPoint == null) {
+            spawnPoint = this.chunkLoader.getSpawnPoint();
+        }
+        return this.spawnPoint == null ? new Vec3I(0, 0, 0) : this.spawnPoint;
     }
 
     @Override
@@ -170,14 +171,14 @@ public class CubitWorld<C extends Chunk> implements World {
         System.out.println("TODO: OnBlockUpdate()");
     }
 
-    protected Vec3I getChunkSize(){
+    protected Vec3I getChunkSize() {
         return this.chunkFactory.getChunkSize();
     }
-    
+
     protected void onChunkLoad(ChunkLocation<Chunk> location) {
         System.out.println("TODO: OnChunkLoad()");
     }
-    
+
     public void joinPlayer(Player player) {
         this.players.add(player);
     }
@@ -225,10 +226,10 @@ public class CubitWorld<C extends Chunk> implements World {
             this.loadChunksWithinRadius(playerBlockLoc, loadDistance);
         }
     }
-    
+
     private void loadChunksWithinRadius(BlockLocation location, int blockRadius) {
         Vec3I chunkSize = this.getChunkSize();
-        
+
         double xSize = chunkSize.getX();
         double ySize = chunkSize.getY();
         double zSize = chunkSize.getZ();
@@ -249,6 +250,7 @@ public class CubitWorld<C extends Chunk> implements World {
             }
         }
     }
+
     public static class CubitWorldBuilder<C extends Chunk> {
 
         private ChunkLoader<C> chunkLoader;
@@ -265,7 +267,7 @@ public class CubitWorld<C extends Chunk> implements World {
             this.chunkLoader = chunkLoader;
             return this;
         }
-        
+
         public CubitWorldBuilder<C> setChunkFactory(ChunkFactory<C> chunkFactory) {
             if(chunkFactory == null) {
                 throw new IllegalArgumentException("ChunkFactory cannot be null!");
@@ -280,7 +282,7 @@ public class CubitWorld<C extends Chunk> implements World {
         }
 
         public CubitWorld<C> build() {
-            if(seed == null || chunkFactory == null || chunkLoader == null){
+            if(seed == null || chunkFactory == null || chunkLoader == null) {
                 throw new IncompleteBuildException("Not fully built.");
             }
             return new CubitWorld<C>(chunkLoader, chunkFactory, seed);

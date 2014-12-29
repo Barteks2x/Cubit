@@ -28,12 +28,30 @@ import com.github.barteks2x.cubit.location.ChunkLocation;
 import com.github.barteks2x.cubit.location.Vec3I;
 
 /**
- * Used to construct new chunks for given world with specific location and block data.
+ * Used to construct new chunks for given world with specific location and get chunk size data.
+ * <p>
  * @param <T>
  */
 public interface ChunkFactory<T extends Chunk> {
-    public ChunkFactory<T> clear();
+
+    /**
+     * Set chunk location that will be used to construct new chunk.
+     * <p>
+     * @param loc chunk location
+     * <p>
+     * @return this
+     */
     public ChunkFactory<T> setLocation(ChunkLocation<T> loc);
+
+    /**
+     * Constructs and returns new chunk.
+     * <p>
+     * @return new Chunk
+     */
     public T build();
+
+    /**
+     * @return chunk size
+     */
     public Vec3I getChunkSize();
 }
