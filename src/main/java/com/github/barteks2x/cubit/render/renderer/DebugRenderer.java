@@ -121,7 +121,7 @@ public class DebugRenderer implements Renderer {
 
         font.drawString(0, y, 1, Color.WHITE, String.format("PlaceBlock(%s)", toPlace));
 
-        font.drawString((Display.getWidth() / 2F) / 3F - 8, (Display.getHeight() / 2F) / 3F - 8, 3, Color.ORANGE, "X");
+        font.drawString((Display.getWidth() / 2F) / 3F - 8, (Display.getHeight() / 2F) / 3F - 8, 3, Color.WHITE, ".");
     }
 
     @Override
