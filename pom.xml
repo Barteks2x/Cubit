@@ -15,7 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lwjgl.version>2.8.5</lwjgl.version>
         <junit.version>4.11</junit.version>
-        <netbeans.hint.license>mit</netbeans.hint.license>
+        <netbeans.hint.license>HEADER</netbeans.hint.license>
     </properties>
     <repositories>
         <repository>
