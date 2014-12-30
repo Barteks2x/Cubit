@@ -43,6 +43,7 @@ public abstract class Block {
     public static final Block COBBLESTONE = new BlockCobbleStone("COBBLESTONE");
     public static final Block SAND = new BlockSand("SAND");
     public static final Block WOOD = new BlockWood("WOOD");
+    public static final Block LEAVES = new BlockLeaves("LEAVES");
     private final String name;
 
     public Block(String name) {
