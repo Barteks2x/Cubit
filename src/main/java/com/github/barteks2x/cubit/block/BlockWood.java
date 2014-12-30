@@ -25,10 +25,6 @@ package com.github.barteks2x.cubit.block;
 
 import com.github.barteks2x.cubit.location.Vec3I;
 
-/**
- *
- * @author Greg
- */
 public class BlockWood extends Block {
     
     

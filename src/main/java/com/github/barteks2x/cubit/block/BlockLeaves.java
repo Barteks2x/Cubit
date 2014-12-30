@@ -1,7 +1,7 @@
-/*
+/* 
  * The MIT License
  *
- * Copyright 2014 Greg.
+ * Copyright (C) contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,15 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package com.github.barteks2x.cubit.block;
 
 import com.github.barteks2x.cubit.location.Vec3I;
 
-/**
- *
- * @author Greg
- */
 public class BlockLeaves extends Block {
     
     
