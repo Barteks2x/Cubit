@@ -58,7 +58,7 @@ public abstract class AbstractChunkCubeN<C extends AbstractChunkCubeN<C>> implem
     /**
      * Constructs new chunk at {@code location} filled with {@code blockFill}
      * <p>
-     * @param location chunk location
+     * @param location  chunk location
      * @param blockFill chunk will be filled with this block
      */
     public AbstractChunkCubeN(ChunkLocation<C> location, Block blockFill) {
@@ -66,10 +66,11 @@ public abstract class AbstractChunkCubeN<C extends AbstractChunkCubeN<C>> implem
         this.location = location;
         ArrayUtil.fill(this.blocks, world.getBlockRegistry().getID(EMPTY_BLOCK));
     }
+
     /**
      * Constructs new chunk at {@code location} filled with blocks in {@code data} array.
      * <p>
-     * @param location  chunk location
+     * @param location chunk location
      * @param data     chunk will contain these blocks
      */
     public AbstractChunkCubeN(ChunkLocation<C> location, Block[][][] data) {

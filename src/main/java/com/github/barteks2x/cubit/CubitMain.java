@@ -151,7 +151,7 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
         BitmapFont font = loadFonts();
         Texture tex = loadTextures();
         Vec3I spawn = world.getSpawnPoint();
-        player.setPosition(new EntityLocation(world, spawn));
+        player.setLocation(new EntityLocation(world, spawn));
         initDisplayLists();
 
         int fov = 90;
@@ -223,13 +223,13 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
     }
 
     private void renderSelection() {
-        if(player.getSelectionLocation() == null) {
+        if(player.getController().getSelectionLocation() == null) {
             return;
         }
         glBindTexture(GL_TEXTURE_2D, 0);
         glColor4f(1F, 1F, 1F, (float)Math.sin(time * .005F) / 4F + .75F);
         glPushMatrix();
-        BlockLocation pos = player.getSelectionLocation();
+        BlockLocation pos = player.getController().getSelectionLocation();
         glTranslatef(pos.getX(), pos.getY(), pos.getZ());
         glCallList(selectionDisplayList);
         glPopMatrix();

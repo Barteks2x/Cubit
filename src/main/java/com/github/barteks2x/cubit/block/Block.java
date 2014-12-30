@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import toxi.geom.AABB;
+import toxi.geom.Vec3D;
 
 public abstract class Block {
 
@@ -45,14 +47,27 @@ public abstract class Block {
     public static final Block WOOD = new BlockWood("WOOD");
     public static final Block LEAVES = new BlockLeaves("LEAVES");
     private final String name;
+    private final AABB boundingBox;
 
-    public Block(String name) {
+    /**
+     * Constructs new Block with specified name and axis algined bounding box.
+     * <p>
+     * @param name        name of the block
+     * @param boundingBox bounding box of the block. Cube bounding box is min=(0, 0, 0), max=(1, 1, 1).
+     */
+    public Block(String name, AABB boundingBox) {
         this.name = name;
         blocks.add(this);
+
+        this.boundingBox = boundingBox;
+    }
+
+    public Block(String name) {
+        this(name, AABB.fromMinMax(new Vec3D(0, 0, 0), new Vec3D(1, 1, 1)));
     }
 
     /**
-     * < p>
+     * <p>
      * @param side Vector pointing outwards from block face.
      * <p/>
      * @return texture index

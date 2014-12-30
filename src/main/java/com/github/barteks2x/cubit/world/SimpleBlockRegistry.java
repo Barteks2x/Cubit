@@ -72,7 +72,7 @@ public class SimpleBlockRegistry implements BlockRegistry {
     protected void registerBlock(Block block) {
         if (toId.containsKey(block)) {
             assert fromId.containsValue(block) : "Block not fully registered.";
-            throw new BlockAlredyRegisteredException(block, world);
+            throw new BlockAlreadyRegisteredException(block, world);
         }
 
         assert !fromId.containsValue(block) : "Block not fully registered.";

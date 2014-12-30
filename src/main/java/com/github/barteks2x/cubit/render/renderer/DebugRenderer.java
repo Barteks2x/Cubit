@@ -24,6 +24,7 @@
 package com.github.barteks2x.cubit.render.renderer;
 
 import com.github.barteks2x.cubit.Player;
+import com.github.barteks2x.cubit.PlayerController;
 import com.github.barteks2x.cubit.block.Block;
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.ChunkLocation;
@@ -127,11 +128,12 @@ public class DebugRenderer implements Renderer {
     @Override
     public void update() {
         timer.nextFrame();
+        PlayerController controller = player.getController();
         this.playerLoc = player.getLocation();
         this.playerChunkLocation = getPlayerChunkLocation(player);
-        this.selectionLocation = player.getSelectionLocation();
-        this.placeLocation = player.getPlaceBlockLocation();
-        this.toPlace = player.getBlockToPlace();
+        this.selectionLocation = controller.getSelectionLocation();
+        this.placeLocation = controller.getPlaceBlockLocation();
+        this.toPlace = controller.getBlockToPlace();
         this.fps = timer.getFPS();
     }
 

@@ -26,32 +26,29 @@ package com.github.barteks2x.cubit;
 import com.github.barteks2x.cubit.block.Block;
 import com.github.barteks2x.cubit.location.BlockLocation;
 import com.github.barteks2x.cubit.location.EntityLocation;
-import com.github.barteks2x.cubit.location.Vec3D;
 import com.github.barteks2x.cubit.world.CubitWorld;
 import com.github.barteks2x.cubit.world.World;
+import java.util.Collection;
+import java.util.Collections;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import toxi.geom.AABB;
+import toxi.geom.Vec3D;
 
 public class Player {
 
-    private static final double PLAYER_SPEED = 0.4;//blocks/tick
-    private static final boolean VERT_DIRECTION_MOVE = false;
-
     private EntityLocation location;
     private double rx, ry;
-    private BlockLocation selectedBlock = null;
-    private BlockLocation blockOnSelected = null;
 
-    private double forward = 0;
-    private double side = 0;
-    private double up = 0;
+    private final AABB aabb = AABB.fromMinMax(new Vec3D(-0.4F, 0.0F, -0.4F), new Vec3D(0.4F, 1.8F, 0.4F));
 
-    public int placeid;
+    private final PlayerController controller;
 
     public <T extends World> Player(T world) {
         this.location = new EntityLocation(world, 0, 0, 0);
         rx = 0;
         ry = 0;
+        this.controller = new PlayerController();
     }
 
     public double getX() {
@@ -66,7 +63,7 @@ public class Player {
         return location.getZ();
     }
 
-    public void setPosition(EntityLocation pos) {
+    public void setLocation(EntityLocation pos) {
         this.location = new EntityLocation(pos);
     }
 
@@ -86,149 +83,23 @@ public class Player {
         this.ry = ry;
     }
 
-    public BlockLocation getSelectionLocation() {
-        return selectedBlock;
-    }
-
-    public BlockLocation getPlaceBlockLocation() {
-        return blockOnSelected;
-    }
-
     public EntityLocation getLocation() {
         return this.location;
     }
 
     public void update() {
-
-        while(Keyboard.next()) {
-            boolean state = Keyboard.getEventKeyState();
-            if(Keyboard.getEventKey() == Keyboard.KEY_W) {
-                forward = state ? PLAYER_SPEED : 0;
-            }
-            if(Keyboard.getEventKey() == Keyboard.KEY_S) {
-                forward = state ? -PLAYER_SPEED : 0;
-            }
-            if(Keyboard.getEventKey() == Keyboard.KEY_A) {
-                side = state ? PLAYER_SPEED : 0;
-            }
-            if(Keyboard.getEventKey() == Keyboard.KEY_D) {
-                side = state ? -PLAYER_SPEED : 0;
-            }
-            if(Keyboard.getEventKey() == Keyboard.KEY_LSHIFT) {
-                up = state ? PLAYER_SPEED : 0;
-            }
-            if(Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
-                up = state ? -PLAYER_SPEED : 0;
-            }
-            if(Keyboard.getEventKey() == Keyboard.KEY_ESCAPE && Keyboard.
-                    getEventKeyState()) {
-                CubitMain.getGame().pauseInvert();
-            }
-            String c = String.valueOf(Keyboard.getEventCharacter());
-            try {
-                placeid = Integer.parseInt(c);
-            } catch(NumberFormatException ignore) {
-            }
+        Iterable<PlayerAction> actions = this.controller.update(this);
+        
+        for(PlayerAction action : actions) {
+            action.performAction(this);
         }
-
-        double sinRX = Math.sin(Math.toRadians(rx));
-        double cosRX = Math.cos(Math.toRadians(rx));
-        double cosRY = Math.cos(Math.toRadians(ry));
-        double sinRY = Math.sin(Math.toRadians(ry));
-
-        double forwardX = forward * sinRX;
-        double forwardZ = -forward * cosRX;
-        double forwardY = 0;//may be non-0
-
-        double sideX = -side * cosRX;
-        double sideZ = -side * sinRX;
-        double sideY = 0;//always 0
-
-        double upX = 0;//always 0
-        double upZ = 0;//always 0
-        double upY = -up;
-
-        if(VERT_DIRECTION_MOVE) {
-            forwardX *= cosRY;
-            forwardZ *= cosRY;
-
-            forwardY -= forward * sinRY;
-        }
-
-        this.location = this.location.add(
-                forwardX + sideX + upX,
-                forwardY + sideY + upY,
-                forwardZ + sideZ + upZ);
-
-        double px = 0, py = 0, pz = 0;
-        this.selectedBlock = null;
-        this.blockOnSelected = null;
-        //TODO: FIX REYTRACING!!!
-        //FIXME!!!
-        for(double i = 0; i <= 5; i += 0.001F) {
-            int px_int_prev = (int)px - (px < 0 ? 1 : 0);
-            int py_int_prev = (int)py - (py < 0 ? 1 : 0);
-            int pz_int_prev = (int)pz - (pz < 0 ? 1 : 0);
-
-            pz = this.getZ() + -i * cosRX * cosRY;
-            py = this.getY() + -i * sinRY;
-            px = this.getX() + i * sinRX * cosRY;
-
-            int px_int = (int)px - (px < 0 ? 1 : 0);
-            int py_int = (int)py - (py < 0 ? 1 : 0);
-            int pz_int = (int)pz - (pz < 0 ? 1 : 0);
-
-            Block b = this.getLocation().getWorld().getBlockAt(px_int, py_int,
-                    pz_int);
-            if(b != Block.AIR) {
-                this.selectedBlock = new BlockLocation(this.getLocation().
-                        getWorld(), px_int, py_int, pz_int);
-                this.blockOnSelected = new BlockLocation(this.getLocation().
-                        getWorld(), px_int_prev, py_int_prev, pz_int_prev);
-                break;
-            }
-        }
-
-        while(Mouse.next()) {
-            if(!Mouse.isGrabbed()) {
-                continue;
-            }
-            double mouseSensitivity = CubitMain.getGame().mouseSensitivity;
-            rx += Mouse.getDX() * mouseSensitivity;
-            rx %= 360;
-            ry = Math.max(-90, Math.min(90, ry - Mouse.getDY() *
-                    mouseSensitivity));
-            if(!Mouse.getEventButtonState()) {
-                continue;
-            }
-            BlockLocation blockPos = this.getSelectionLocation();
-            if(Mouse.getEventButton() == 0 && blockPos != null) {
-                this.getLocation().getWorld().setBlockAt(blockPos, Block.AIR);
-                CubitMain.getGame().onBlockUpdate(blockPos);
-            }
-            blockPos = this.getPlaceBlockLocation();
-            if(Mouse.getEventButton() == 1 && blockPos != null) {
-                World world = this.getLocation().getWorld();
-                Block block = world.getBlockRegistry().fromID(placeid);
-                if(block != null) {
-                    world.setBlockAt(blockPos, block);
-                    CubitMain.getGame().onBlockUpdate(blockPos);
-                }
-            }
-            int dWheel = Mouse.getDWheel();
-            if(dWheel != 0){
-                if(dWheel < 0){
-                    placeid--;
-                }else{
-                    placeid++;
-                }
-            }
-
-        }
-
     }
 
-    public Block getBlockToPlace() {
-        return this.getLocation().getWorld().getBlockRegistry().fromID(this.placeid);
+    public Collection<AABB> getCollisionBoundingBoxes() {
+        return Collections.singleton(aabb);
+    }
+
+    public PlayerController getController() {
+        return this.controller;
     }
 }

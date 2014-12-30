@@ -23,6 +23,7 @@
  */
 package com.github.barteks2x.cubit.world;
 
+import com.github.barteks2x.cubit.CubitMain;
 import com.github.barteks2x.cubit.Player;
 import com.github.barteks2x.cubit.block.Block;
 import com.github.barteks2x.cubit.location.BlockLocation;
@@ -168,7 +169,7 @@ public class CubitWorld<C extends Chunk> implements World {
     }
 
     protected void onBlockUpdate(BlockLocation location, Block old, Block updated) {
-        System.out.println("TODO: OnBlockUpdate()");
+        CubitMain.getGame().onBlockUpdate(location);
     }
 
     protected Vec3I getChunkSize() {
