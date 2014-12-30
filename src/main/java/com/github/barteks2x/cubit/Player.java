@@ -34,7 +34,7 @@ import org.lwjgl.input.Mouse;
 
 public class Player {
 
-    private static final double PLAYER_SPEED = 0.1;//blocks/tick
+    private static final double PLAYER_SPEED = 0.4;//blocks/tick
     private static final boolean VERT_DIRECTION_MOVE = false;
 
     private EntityLocation location;
@@ -208,12 +208,19 @@ public class Player {
             }
             blockPos = this.getPlaceBlockLocation();
             if(Mouse.getEventButton() == 1 && blockPos != null) {
-                Mouse.setGrabbed(false);
                 World world = this.getLocation().getWorld();
                 Block block = world.getBlockRegistry().fromID(placeid);
                 if(block != null) {
                     world.setBlockAt(blockPos, block);
                     CubitMain.getGame().onBlockUpdate(blockPos);
+                }
+            }
+            int dWheel = Mouse.getDWheel();
+            if(dWheel != 0){
+                if(dWheel < 0){
+                    placeid--;
+                }else{
+                    placeid++;
                 }
             }
 

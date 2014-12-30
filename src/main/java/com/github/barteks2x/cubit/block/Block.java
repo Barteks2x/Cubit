@@ -36,12 +36,13 @@ public abstract class Block {
     protected static final BlockModelBuilder CUBE_MODEL_BUILDER =
             new CubeBlockModelBuilder();
     public static final Set<Block> blocks = new HashSet<Block>(256);
-    //Blocks
     public static final Block AIR = new BlockAir("AIR");
     public static final Block STONE = new BlockStone("STONE");
     public static final Block DIRT = new BlockDirt("DIRT");
     public static final Block GRASS = new BlockGrass("GRASS");
     public static final Block COBBLESTONE = new BlockCobbleStone("COBBLESTONE");
+    public static final Block SAND = new BlockSand("SAND");
+    public static final Block WOOD = new BlockWood("WOOD");
     private final String name;
 
     public Block(String name) {
