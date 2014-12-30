@@ -105,15 +105,12 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
     private static final Logger logger = LoggerUtil.getLogger(CubitMain.class);
 
     private static CubitMain<ChunkCube32, CubitWorld<ChunkCube32>> instance;
-    private static final int TICKRATE = 20;
+    private static final int TICKRATE = 30;
     private static final long UPDATE_TIME = 1000000000L / TICKRATE;
     private final int renderDistance = 64;
-    //OpenGL
     private final String title;
     private boolean isRunning = true;
-    //Rendering
     private int selectionDisplayList;
-    //movement
     private final Timer timer;
     final double mouseSensitivity;
     private boolean grabMouse;
@@ -138,7 +135,7 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
 
         timer = new Timer();
         player = new Player(world);
-        mouseSensitivity = 0.6F;
+        mouseSensitivity = 0.3F;
 
         this.world.joinPlayer(player);
     }
@@ -157,7 +154,7 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
         player.setPosition(new EntityLocation(world, spawn));
         initDisplayLists();
 
-        int fov = 70;
+        int fov = 90;
         float zNear = 0.1F;
         BlockTextureManager textureManager = new SpritesheetTextureManager();
 
@@ -214,13 +211,8 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
 
             GPUTaskProfile tp;
             while((tp = GPUProfiler.getFrameResults()) != null) {
-
-                tp.dump(); //Dumps the frame to System.out.
-                //or use the functions of GPUTaskProfile to extract information about the frame:
-                //getName(), getStartTime(), getEndTime(), getTimeTaken(), getChildren()
-                //Then you can draw the result as fancy graphs or something.
-
-                GPUProfiler.recycle(tp); //Recycles GPUTaskProfile instances and their OpenGL query objects.
+                tp.dump();
+                GPUProfiler.recycle(tp);
             }
             errorCheck("Main");
             if(Display.isCloseRequested()) {
@@ -374,7 +366,7 @@ public class CubitMain<C extends Chunk, World extends CubitWorld<C>> {
         ChunkFactory<ChunkCube32> factory = new ChunkCube32Factory();
 
         ChunkLoader<ChunkCube32> chunkLoader = new RAMChunkLoader<ChunkCube32>();
-        
+
         CubitWorld.CubitWorldBuilder<ChunkCube32> builder = CubitWorld.newWorld(ChunkCube32.class);
         CubitWorld<ChunkCube32> world = builder.
                 setChunkFactory(factory).

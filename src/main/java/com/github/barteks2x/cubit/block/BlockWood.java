@@ -1,7 +1,7 @@
-/* 
+/*
  * The MIT License
  *
- * Copyright 2014 Bartosz Skrzypczak.
+ * Copyright 2014 Greg.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,32 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.barteks2x.cubit.render.block;
 
-import com.github.barteks2x.cubit.render.TextureCoords;
-import java.util.HashMap;
-import java.util.Map;
+package com.github.barteks2x.cubit.block;
 
-public class SpritesheetTextureManager implements BlockTextureManager {
+import com.github.barteks2x.cubit.location.Vec3I;
 
-    private final Map<String, TextureCoords> mapping;
+/**
+ *
+ * @author Greg
+ */
+public class BlockWood extends Block {
     
-    public SpritesheetTextureManager(){
-        mapping = new HashMap<String, TextureCoords>(5);
-        //TODO: TEXTURE MANAGER!!!
-        //FIXME!!!
-        mapping.put("stone", new TextureCoords(4, 0, 0));
-        mapping.put("grass", new TextureCoords(4, 1, 0));
-        mapping.put("dirtgrass", new TextureCoords(4, 2, 0));
-        mapping.put("dirt", new TextureCoords(4, 3, 0));
-        mapping.put("cobblestone", new TextureCoords(4, 4, 0));
-        mapping.put("sand", new TextureCoords(4, 6, 0));
-        mapping.put("wood", new TextureCoords(4, 7, 0));
-        mapping.put("cutwood", new TextureCoords(4, 8, 0));
-    }
-    @Override
-    public TextureCoords getTextureCoordsForName(String name) {
-        return mapping.get(name);
+    
+    public BlockWood(String name) {
+        super(name);
     }
 
+    @Override
+    public int getTextureForSide(Vec3I side) {
+        if(side.equals(CubeBlockSide.UP.getVector())) {
+            return 1;
+        }
+        if(side.equals(CubeBlockSide.DOWN.getVector())) {
+            return 1;
+        }
+        return 0;
+    }
+
+    @Override
+    public String[] getTextures() {
+        return new String[]{"wood", "cutwood"};
+    }
+    
 }
